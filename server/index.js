@@ -25,7 +25,9 @@ app.use(session(app));
 app.use(bodyParser());
 
 // router
-app.use(router);
+app
+	.use(router.routes())
+	.use(router.allowedMethods());
 
 if (!module.parent) {
 	app.listen(PORT, () => {
