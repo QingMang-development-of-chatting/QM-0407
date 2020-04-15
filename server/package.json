@@ -1,0 +1,17 @@
+{
+  "name": "qingmangserver",
+  "version": "1.0.0",
+  "description": "QingMang server",
+  "main": "index.js",
+  "scripts": {
+    "test": "cd test && curl 127.0.0.1:3000/register -b cookies.txt -c cookies.txt -H \"Content-Type: application/json\" -d @test.json && curl 127.0.0.1:3000/login -b cookies.txt -c cookies.txt -H \"Content-Type: application/json\" -d @test.json && curl 127.0.0.1:3000/logout -c cookies.txt"
+  },
+  "author": "QingMang team",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "^2.11.0",
+    "koa-body": "^4.1.1",
+    "koa-compose": "^4.1.0",
+    "koa-session": "^5.13.1"
+  }
+}
