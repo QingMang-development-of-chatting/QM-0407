@@ -31,7 +31,6 @@ Controller.register = async function(ctx) {
  * @param {Koa.ctx} ctx
  */
 Controller.login = async function(ctx) {
-	console.log(ctx.session.authenticated);
 	if (ctx.session.authenticated) return ctx.status = 403;
 	let { username, password, nickname } = ctx.request.body;
 	if (!service.login(username, password))
