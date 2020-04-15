@@ -2,7 +2,10 @@
  * Module dependencies
  */
 const compose = require('koa-compose');
+const Router = require('@koa/router');
 const controller = require('../controller/controller');
+
+const router = new Router();
 
 /**
  * register router middleware
@@ -10,13 +13,10 @@ const controller = require('../controller/controller');
  * static method
  * 
  * @param {Koa.ctx} ctx
- * @param {middleware function} next
  */
-async function register(ctx, next) {
-	if (ctx.path !== '/register') return await next();
-	if (ctx.method !== 'POST') return;
+router.post('/register', async ctx => {
 	await controller.register(ctx);
-}
+});
 
 /**
  * login router middleware
@@ -24,13 +24,10 @@ async function register(ctx, next) {
  * static method
  * 
  * @param {Koa.ctx} ctx
- * @param {middleware function} next
  */
-async function login(ctx, next) {
-	if (ctx.path !== '/login') return await next();
-	if (ctx.method !== 'POST') return;
+router.post('/login', async ctx => {
 	await controller.login(ctx);
-}
+})
 
 /**
  * logout router middleware
@@ -38,21 +35,9 @@ async function login(ctx, next) {
  * static method
  * 
  * @param {Koa.ctx} ctx
- * @param {middleware function} next
  */
-async function logout(ctx, next) {
-	if (ctx.path !== '/logout') return await next();
-	if (ctx.method !== 'GET') return;
+router.get('/logout', async ctx => {
 	await controller.logout(ctx);
-}
-
-/**
- * API
- */
-const router = compose([
-	register,
-	login,
-	logout
-	]);
+});
 
 module.exports = router;
