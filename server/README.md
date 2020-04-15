@@ -69,7 +69,7 @@ URL Example: */path/to/myfile.html?key1=value1&key2=value2*
 
 ---
 
-## /api/v1/user/register `POST`
+## /register `POST`
 
 用户注册
 
@@ -101,7 +101,7 @@ curl -v 127.0.0.1:3000/register -b cookies.txt -c cookies.txt -H "Content-Type: 
 
 ---
 
-## /api/v1/user/login `POST`
+## /login `POST`
 
 用户登录
 
@@ -132,7 +132,7 @@ curl -v 127.0.0.1:3000/login -b cookies.txt -c cookies.txt -H "Content-Type: app
 
 ---
 
-## /api/v1/user/logout `GET`
+## /logout `GET`
 
 用户注销
 
