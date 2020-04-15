@@ -27,7 +27,7 @@ router.post('/register', async ctx => {
  */
 router.post('/login', async ctx => {
 	await controller.login(ctx);
-})
+});
 
 /**
  * logout router middleware
