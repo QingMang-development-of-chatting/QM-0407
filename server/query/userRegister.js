@@ -6,24 +6,25 @@
  */
 const insertUser = function(info) {
 	axios.post(
-		'https://afusuj.toutiao15.com/ifUserUnique', 
-		{	
-      id: info.id,
-			key: info.key,
-			name: info.name,
-		}
-	).then(function(response){
-		let status = response.data;	 
-		console.log("response:" + status);
-		if (status == -1)
-		{
-			console.log("error:" + status);
-			return false;
-		}
-		else
-		{
-    	console.log("insert id:" + status.result.user_id);
-			return true;
-		}
+	'https://afusuj.toutiao15.com/ifUserUnique', 
+	{	
+      	    id: info.id,
+	    key: info.key,
+	    name: info.name,
+	}
+	).then(function(response)
+	{
+	    let status = response.data;	 
+	    console.log("response:" + status);
+	    if (status == -1)
+	    {
+		console.log("error:" + status);
+		return false;
+	    }
+	    else
+	    {
+    	        console.log("insert id:" + status.result.user_id);
+	        return true;
+	    }
 	})
 }
