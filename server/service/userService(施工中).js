@@ -2,7 +2,7 @@
 const user_query = require('../query/......');
 
 //API
-const userService = {};
+const UserService = {};
 
 /**
  * delay for MS ms
@@ -65,7 +65,7 @@ const checkNickname = function(nickname){
  * @param {String} nickname
  * @return {Boolean}
  */
-userService.register = function (username, password, nickname) {
+UserService.register = function (username, password, nickname) {
 	//检验重复
 	if (isDuplicateUser(username)) return false;
 	//合法性检测
@@ -86,8 +86,8 @@ userService.register = function (username, password, nickname) {
  * @param {String} nickname
  * @return {Boolean}
  */
-userService.login = function (username, password) {
+UserService.login = function (username, password) {
 	return authenticate(username, password)
 };
 
-module.exports = userService;
+module.exports = UserService;
