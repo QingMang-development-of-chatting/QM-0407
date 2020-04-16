@@ -31,7 +31,7 @@ const login = function(info) {
 	     * 返回错误码388
 	     */
             console.log(-1);
-            return -1;
+            return 388;
         }
         else
         {
