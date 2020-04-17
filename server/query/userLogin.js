@@ -6,14 +6,14 @@
  * return: users_(boolean)
  */
 const login = async function(info) {
-	await axios.post(
-		'https://afusuj.toutiao15.com/login',  //url,"插入某个用户于DB"的云函数的网址
-		{	
+    await axios.post(
+        'https://afusuj.toutiao15.com/login',  //url,"插入某个用户于DB"的云函数的网址
+        {    
             id: info.id,
             key: info.key,
-		}
-	).then(function(response){
-		let status = response.data;	    //sta为response的key值，根据云函数修改
+        }
+    ).then(function(response){
+        let status = response.data;        //sta为response的key值，根据云函数修改
         if (status == 0)
         {
             /**
@@ -41,7 +41,7 @@ const login = async function(info) {
             console.log(status + " 200");
             return status;
         }
-	})
+    })
 };
 
 //module.exports = login;
