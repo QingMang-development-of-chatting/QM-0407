@@ -1,5 +1,7 @@
 //Module Dependencies
-const user_query = require('../query/......');
+const login = require('../query/userLogin.js');
+const logout = require('../query/userLogout.js');
+const insertUser = require('../query/userInsert.js');
 
 //API
 const UserService = {};
@@ -16,28 +18,6 @@ const timeout = function(ms) {
 	})
 };
 
-/**
- * 
- * @param {String} username
- * @return {Boolean}
- */
-const isDuplicateUser = function(username) {
-
-};
-/**
- * user insert
- */
-const insertUser = function(username, password,nickname) {
-
-};
-
-/**
- *检测用户名和密码
- */
-const authenticate = function(username, password) {
-	
-}
-
 //username合法性检测
 const checkUsername = function(username){
 	//TODO位数限制
@@ -53,21 +33,15 @@ const checkNickname = function(nickname){
 	return true;
 }
 
-
-
 /**
  * register
- * 
- * static method
- * 
+ *
  * @param {String} username
  * @param {String} password
  * @param {String} nickname
  * @return {Boolean}
  */
 UserService.register = function (username, password, nickname) {
-	//检验重复
-	if (isDuplicateUser(username)) return false;
 	//合法性检测
 	if(!(checkUsername(username)&&checkPassword(password)&&checkNickname(nickname))){
 		return false;
@@ -79,15 +53,37 @@ UserService.register = function (username, password, nickname) {
 /**
  * login
  * 
- * static method
- * 
  * @param {String} username
  * @param {String} password
- * @param {String} nickname
  * @return {Boolean}
  */
 UserService.login = function (username, password) {
-	return authenticate(username, password)
+	var status = login(username,password);	//TODO为什么是undefined？
+	if(status!=400&&status!=388){
+		return true;
+	}
+	else{
+		return false;
+	}
+
+};
+
+/**
+ * logout
+ * 
+ * @param {String} username
+ * @param {String} password
+ * @return {Boolean}
+ */
+UserService.logout = function (username, password) {
+	var status = logout(username,password);
+	if(status!=0&&status!=-1){
+		return true;
+	}
+	else{
+		return false;
+	}
+
 };
 
 module.exports = UserService;
