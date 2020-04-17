@@ -18,7 +18,7 @@ const Controller = {};
 Controller.register = async function(ctx) {
 	if (ctx.session.authenticated) return ctx.status = 403;
 	let { username, password, nickname } = ctx.request.body;
-	if (!service.register(username, password, nickname))
+	if (! await service.register(username, password, nickname))
 		return ctx.status = 400;
 	ctx.status = 200;
 };
@@ -33,7 +33,7 @@ Controller.register = async function(ctx) {
 Controller.login = async function(ctx) {
 	if (ctx.session.authenticated) return ctx.status = 403;
 	let { username, password, nickname } = ctx.request.body;
-	if (!service.login(username, password))
+	if (! await service.login(username, password))
 		return ctx.status = 400;
 	ctx.status = 200;
 	ctx.session.authenticated = true;
