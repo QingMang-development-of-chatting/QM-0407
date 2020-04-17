@@ -1,7 +1,7 @@
 //Module Dependencies
 const login = require('../query/userLogin.js');
 const logout = require('../query/userLogout.js');
-const insertUser = require('../query/userInsert.js');
+const insertUser = require('../query/userRegister.js');
 
 //API
 const UserService = {};
@@ -41,13 +41,13 @@ const checkNickname = function(nickname){
  * @param {String} nickname
  * @return {Boolean}
  */
-UserService.register = function (username, password, nickname) {
-	//合法性检测
+UserService.register = async function (username, password, nickname) {
+	//TODO合法性检测
 	if(!(checkUsername(username)&&checkPassword(password)&&checkNickname(nickname))){
 		return false;
 	}
 	//在DB注册用户
-	return insertUser(username,password,nickname);
+	return await insertUser(username,password,nickname);
 };
 
 /**
@@ -57,15 +57,12 @@ UserService.register = function (username, password, nickname) {
  * @param {String} password
  * @return {Boolean}
  */
-UserService.login = function (username, password) {
-	var status = login(username,password);	//TODO为什么是undefined？
-	if(status!=400&&status!=388){
+UserService.login = async function (username, password) {
+	var status = await login(username,password);	
+	if(status!=400&&status!=403){
 		return true;
 	}
-	else{
-		return false;
-	}
-
+	return false;
 };
 
 /**
@@ -75,15 +72,12 @@ UserService.login = function (username, password) {
  * @param {String} password
  * @return {Boolean}
  */
-UserService.logout = function (username, password) {
-	var status = logout(username,password);
-	if(status!=0&&status!=-1){
+UserService.logout = async function (username, password) {
+	var status = await logout(username,password);
+	if(status!=400&&status!=403){
 		return true;
 	}
-	else{
-		return false;
-	}
-
+	return false;
 };
 
 module.exports = UserService;
