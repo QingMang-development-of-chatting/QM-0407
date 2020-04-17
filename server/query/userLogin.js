@@ -5,6 +5,7 @@
  * get: id & key
  * return: error code / name
  */
+const axios = require("axios");
 
 const login = function(info) {
 	axios.post(
@@ -44,4 +45,5 @@ const login = function(info) {
         }
 	})
 };
+module.exports = login;
 
