@@ -4,27 +4,36 @@
  * get: info{id, key, name}
  * return: 
  */
-const insertUser = function(info) {
-	axios.post(
-	'https://afusuj.toutiao15.com/ifUserUnique', 
-	{	
-      	    id: info.id,
-	    key: info.key,
-	    name: info.name,
-	}
-	).then(function(response)
-	{
-	    let status = response.data;	 
-	    console.log("response:" + status);
-	    if (status == -1)
-	    {
-		console.log("error:" + status);
-		return false;
-	    }
-	    else
-	    {
-    	        console.log("insert id:" + status.result.user_id);
-	        return true;
-	    }
-	})
+const insertUser = async function(info) {
+    await axios.post(
+        'https://afusuj.toutiao15.com/ifUserUnique',
+        {    
+            id: info.id,
+            key: info.key,
+            name: info.name,
+        }
+    ).then(function(response){
+        status = response.data;
+        console.log("response:" + status);
+        if (status == -1)
+        {
+            /**
+             * 账号重名，注册不成功
+             * code:400
+             */
+            console.log("error:" + status + " 400");
+            return false;
+        }
+        else
+        {
+            /**
+             * 注册成功
+             * code:200
+             */
+            console.log("insert id:" + status.result.user_id + " 200");
+            return true;
+        }
+    })
 }
+
+//module.exports =  insertUser;
