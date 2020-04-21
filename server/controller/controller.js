@@ -1,7 +1,7 @@
 /**
  * Module Dependencies
  */
-const service = require('../service/service')
+const service = require('../service/userService');
 
 /**
  * API
