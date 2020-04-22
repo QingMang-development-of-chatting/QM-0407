@@ -4,7 +4,7 @@
   "description": "QingMang server",
   "main": "index.js",
   "scripts": {
-    "test": "cd test && curl 127.0.0.1:3000/register -b cookies.txt -c cookies.txt -H \"Content-Type: application/json\" -d @test.json && curl 127.0.0.1:3000/login -b cookies.txt -c cookies.txt -H \"Content-Type: application/json\" -d @test.json && curl 127.0.0.1:3000/logout -c cookies.txt"
+    "test": "node ./test/chat.test.js"
   },
   "author": "QingMang team",
   "license": "ISC",
@@ -16,5 +16,9 @@
     "koa-compose": "^4.1.0",
     "koa-session": "^5.13.1",
     "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "readline": "^1.3.0",
+    "socket.io-client": "^2.3.0"
   }
 }
