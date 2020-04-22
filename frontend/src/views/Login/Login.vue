@@ -4,7 +4,7 @@
         <el-input placeholder="请输入账号" v-model="id" maxlength="15" prefix-icon="el-icon-user-solid" clearable></el-input>
             <span  v-if="idRemind" id="idRemind">{{idTips}}</span>
         <br/>
-        <el-input  placeholder="请输入密码"  v-model="password" maxlength="16" prefix-icon="el-icon-lock"show-password></el-input>
+        <el-input  placeholder="请输入密码"  v-model="password" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>
              <span  v-if="passwordRemind" id="passwordRemind">{{passwordTips}}</span>
         <br/>
         <el-button id="login-submit" :loading="isLoading" @click="login" >{{loginText}}</el-button>
@@ -16,6 +16,15 @@
 <script>
     export default {
         name:"login",
+        mounted() {
+            this.$store.state.username = sessionStorage.getItem("username");
+            console.log(this.$store.state.username);
+            if(this.$store.state.username != null)
+            {
+                this.$message({message:"您已登录, 即将跳转至主页",type:"warning"});
+                setTimeout(function(){window.location.href = "home"},2000);
+            }
+        },
         data(){
             return {
                 id: "",
@@ -52,10 +61,10 @@
                         this.loginText = "登录";
                         if(error.response.status == 400)
                             this.$message({message:"登录失败：账号或者密码错误",type:"error"});
-                        else if(error.response.status == 403) {
-                            this.$message({message:"您已登录,不可重复登录",type:"warning"});
-                            window.location.href = "home";
-                        }
+                        // else if(error.response.status == 403) {
+                        //     this.$message({message:"不可重复登录, 即将跳转至主页",type:"warning"});
+                        //     setTimeout(function(){window.location.href = "home"},2000);
+                        // }
                         else
                             this.$message({message:"服务器未响应",type:"warning"});
                     })
