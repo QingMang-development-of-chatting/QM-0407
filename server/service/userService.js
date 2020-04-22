@@ -47,7 +47,7 @@ UserService.register = async function (username, password, nickname) {
 		return false;
 	}
 	//在DB注册用户
-	return await insertUser(username,password,nickname);
+	return await insertUser({"id":username,"key":password,"name":nickname});
 };
 
 /**
@@ -58,7 +58,8 @@ UserService.register = async function (username, password, nickname) {
  * @return {Boolean}
  */
 UserService.login = async function (username, password) {
-	var status = await login(username,password);	
+	
+	var status = await login({"id":username,"key":password});	
 	if(status!=400&&status!=403){
 		return true;
 	}
@@ -73,7 +74,7 @@ UserService.login = async function (username, password) {
  * @return {Boolean}
  */
 UserService.logout = async function (username, password) {
-	var status = await logout(username,password);
+	var status = await logout({"id":username,"key":password});
 	if(status!=400&&status!=403){
 		return true;
 	}
@@ -81,3 +82,4 @@ UserService.logout = async function (username, password) {
 };
 
 module.exports = UserService;
+
