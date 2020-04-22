@@ -37,6 +37,7 @@ Controller.login = async function(ctx) {
 		return ctx.status = 400;
 	ctx.status = 200;
 	ctx.session.authenticated = true;
+	ctx.session.username = username;
 };
 
 /**
@@ -47,6 +48,8 @@ Controller.login = async function(ctx) {
  * @param {Koa.ctx} ctx
  */
 Controller.logout = async function(ctx) {
+	const username = ctx.session.username;
+	service.logout(username);
 	ctx.session.authenticated = false;
 	return ctx.status = 200;
 };
