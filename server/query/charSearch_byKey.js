@@ -1,8 +1,16 @@
 /**
  * 查询聊天记录
  * 每查一次显示六分钟(随便改啦)
- * info.id (string) 用户名
- * info.key (string) 关键字
+ * 
+ * 输入：
+ * --info.id (string) 用户账号
+ *   info.key (string) 关键字
+ * 输出：
+ * --0：没有查到记录
+ * --[{host_id:"id", chat:"chat", data:"Date.getTime"}...]
+ *   result[i].host_id 用户ID
+ *   result[i].chat 信息
+ *   result[i].date 需要转换回去的自1970年1月1日以来的毫秒数
  */
 const axios = require('axios');
 const searchChat_key = async function(info) {
