@@ -2,6 +2,15 @@
  * 用户登出
  * 和登录一模一样的冗余代码
  * 待改
+ * 
+ * 输入: 
+ * --info.id (string) 用户账号
+ * 输出：
+ * --388: 出现bug
+ * --400: 用户名或者密码错误
+ * --403: 用户已登录
+ * --result.id: 用户账号
+ *   result.name: 用户名
  */
 const axios = require('axios');
 const logout = async function(info) {
@@ -11,7 +20,6 @@ const logout = async function(info) {
         'https://afusuj.toutiao15.com/logout',
         {    
             id: info.id,
-            key: info.key,
         }
     ).then(function(response){
         let status = response.data;
