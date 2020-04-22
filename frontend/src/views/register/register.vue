@@ -14,8 +14,8 @@
         <el-input  placeholder="请再次输入密码"  v-model="password1" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>
         <span  v-if="passwordConfirm" id="passwordConfirm">{{confirmTips}}</span>
         <br/>
-        <el-tooltip class="item" effect="dark" content="输入1到16位中英字符组合" placement="top-start">
-            <el-input  placeholder="请输入昵称"  v-model="nickname" maxlength="16" prefix-icon="el-icon-edit-outline" clearable></el-input>
+        <el-tooltip class="item" effect="dark" content="输入1到10位中英字符组合" placement="top-start">
+            <el-input  placeholder="请输入昵称"  v-model="nickname" maxlength="10" prefix-icon="el-icon-edit-outline" clearable></el-input>
         </el-tooltip>
         <span  v-if="nicknameRemind" id="nicknameRemind">{{nicknameTips}}</span>
         <br/>
@@ -45,25 +45,25 @@
         },
         methods:{
             register(){
-                if(this.id == "")
+                if(this.id === "")
                 {
                     this.$message({message:"账号不能为空",type:"warning"});
                 }
                 else if(!usernamePat.test(this.id)){
                     this.$message({message:"账号不合法",type:"warning"});
                 }
-                else if(this.password == "")
+                else if(this.password === "")
                 {
                     this.$message({message:"密码不能为空",type:"warning"});
                 }
                 else if(this.password.length < 8){
                     this.$message({message:"密码过短",type:"warning"});
                 }
-                else if(this.passwordConfirm == true)
+                else if(this.passwordConfirm === true)
                 {
                     this.$message({message:"两次密码输入不一致", type:"warning"});
                 }
-                else if(this.nickname == "")
+                else if(this.nickname === "")
                 {
                     this.$message({message:"昵称不能为空", type:"warning"});
                 }
@@ -80,10 +80,10 @@
                         window.location.href = "login";
                     }).catch((error)=>{
                         console.log(error.response.status);
-                        if(error.response.status == 400)
+                        if(error.response.status === 400)
                             this.$message({message:"注册失败，该账号已被使用",type:"error"});
-                        else if(error.response.status == 403)
-                            this.$message({message:"您已登录，不可注册",type:"warning"});
+                        // else if(error.response.status == 403)
+                        //     this.$message({message:"您已登录，不可注册",type:"warning"});
                         else
                             this.$message({message:"服务器未响应",type:"warning"});
                         this.isLoading = false;
@@ -98,7 +98,7 @@
         },
         watch:{
             id(val){
-              if(val == "")
+              if(val === "")
               {
                   this.idTips = "账号不能为空";
                   this.idRemind = true;
@@ -114,7 +114,7 @@
               }
             },
             password(val){
-                if(val == "") {
+                if(val === "") {
                     this.passwordTips = "密码不能为空";
                     this.passwordRemind = true;
                 }
@@ -125,8 +125,8 @@
                 else{
                     this.passwordRemind = false;
                 }
-                if(this.password1!="") {
-                    if(val != this.password1)
+                if(this.password1!=="") {
+                    if(val !== this.password1)
                     {
                         this.confirmTips = "两次密码输入不一致";
                         this.passwordConfirm = true;
@@ -137,7 +137,7 @@
                 }
             },
             password1(val){
-                if(val != this.password)
+                if(val !== this.password)
                 {
                     this.confirmTips = "两次密码输入不一致";
                     this.passwordConfirm = true;
@@ -147,7 +147,7 @@
                 }
             },
             nickname(val){
-                if(val == "")
+                if(val === "")
                 {
                     this.nicknameTips = "昵称不能为空";
                     this.nicknameRemind = true;
@@ -199,7 +199,6 @@
         color: rgba(255, 255, 255, 1);
         font-size: 20px;
         text-align: center;
-        font-family: Roboto;
         border: 1px solid rgba(58, 98, 215, 1);
     }
     #register-submit:hover{
@@ -217,7 +216,6 @@
         color: rgba(227, 225, 225, 1);
         font-size: 20px;
         text-align: center;
-        font-family: Roboto;
         border: 1px solid rgba(255, 255, 255, 0);
 
     }
