@@ -2,8 +2,16 @@
  * 用户登录
  * 输入账号和密码→数据库查询账号密码是否存在→跳转登录(3)
  * 数据库返回user(obj)
- * get: id & key
- * return: users_(boolean)
+ * 
+ * 输入: 
+ * --info.id (string) 用户账号
+ *   info.key (string) 用户密码
+ * 输出：
+ * --388: 出现bug
+ * --400: 用户名或者密码错误
+ * --403: 用户已登录
+ * --result.id: 用户账号
+ *   result.name: 用户名
  */
 const axios = require('axios');
 const login = async function(info) {
