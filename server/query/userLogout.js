@@ -3,7 +3,10 @@
  * 和登录一模一样的冗余代码
  * 待改
  */
+const axios = require('axios');
 const logout = async function(info) {
+    result = 388;
+
     await axios.post(
         'https://afusuj.toutiao15.com/logout',
         {    
@@ -19,7 +22,7 @@ const logout = async function(info) {
              * code:400
              */
             console.log(400);
-            return 400;
+            result = 400;
         }
         else if (status == -1)
         {
@@ -28,7 +31,7 @@ const logout = async function(info) {
              * code:403
              */
             console.log(403);
-            return 403;
+            result = 403;
         }
         else
         {
@@ -37,9 +40,11 @@ const logout = async function(info) {
              * code:200
              */
             console.log(status + " 200");
-            return status;
+            result = status;
         }
     })
+
+    return result;
 };
 
-//module.exports = logout;
+module.exports = logout;
