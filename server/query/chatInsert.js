@@ -5,7 +5,10 @@
  * info.id (string) 用户名
  * info.chat (Array["text1", "text2"..]) 聊天内容
  */
+const axios = require('axios');
 const insertChat = async function(info) {
+    result = false;
+
     await axios.post(
         'https://afusuj.toutiao15.com/insertChat',
         {    
@@ -14,10 +17,25 @@ const insertChat = async function(info) {
         }
     ).then(function(response){
         status = response.data;
-        console.log("insert " + status + "chatting");
+        //console.log("insert " + status + "chatting");
         if (status > 0)
-        { return true; }
+        {
+            /**
+             * 无法插入数据/插入数据不存在
+             */
+            rusult = false;
+        }
         else
-        { return false; }
+        {
+            /**
+             * 成功插入记录
+             * 返回插入记录条数
+             */
+            result = status;
+        }
     })
+
+    return result;
 }
+
+module.export = insertChat;
