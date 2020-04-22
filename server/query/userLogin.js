@@ -5,15 +5,18 @@
  * get: id & key
  * return: users_(boolean)
  */
+const axios = require('axios');
 const login = async function(info) {
+    result = 388;   
+
     await axios.post(
-        'https://afusuj.toutiao15.com/login',  //url,"插入某个用户于DB"的云函数的网址
+        'https://afusuj.toutiao15.com/login',
         {    
             id: info.id,
             key: info.key,
         }
     ).then(function(response){
-        let status = response.data;        //sta为response的key值，根据云函数修改
+        let status = response.data;
         if (status == 0)
         {
             /**
@@ -21,7 +24,7 @@ const login = async function(info) {
              * code:400
              */
             console.log(400);
-            return 400;
+            result = 400;
         }
         else if (status == -1)
         {
@@ -30,7 +33,7 @@ const login = async function(info) {
              * code:403
              */
             console.log(403);
-            return 403;
+            result = 403;
         }
         else
         {
@@ -39,9 +42,11 @@ const login = async function(info) {
              * code:200
              */
             console.log(status + " 200");
-            return status;
+            result = status;
         }
     })
+    
+    return result;
 };
 
-//module.exports = login;
+module.exports = login;
