@@ -4,7 +4,10 @@
  * get: info{id, key, name}
  * return: 
  */
+const axios = require('axios');
 const insertUser = async function(info) {
+    result = false;
+
     await axios.post(
         'https://afusuj.toutiao15.com/ifUserUnique',
         {    
@@ -14,15 +17,15 @@ const insertUser = async function(info) {
         }
     ).then(function(response){
         status = response.data;
-        console.log("response:" + status);
+        //console.log("response:" + status);
         if (status == -1)
         {
             /**
              * 账号重名，注册不成功
              * code:400
              */
-            console.log("error:" + status + " 400");
-            return false;
+            //console.log("error:" + status + " 400");
+            result = false;
         }
         else
         {
@@ -30,10 +33,12 @@ const insertUser = async function(info) {
              * 注册成功
              * code:200
              */
-            console.log("insert id:" + status.result.user_id + " 200");
-            return true;
+            //console.log("insert id:" + status.result.user_id + " 200");
+            result = status;
         }
     })
+
+    return result;
 }
 
-//module.exports =  insertUser;
+module.exports = insertUser;
