@@ -46,4 +46,4 @@ const searchChat_key = async function(info) {
     return status;
 }
 
-module.export = searchChat_key;
+module.exports = searchChat_key;

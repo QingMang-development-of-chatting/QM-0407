@@ -47,4 +47,4 @@ const searchChat_time = async function(info) {
     return result;
 }
 
-module.export = searchChat_time;
+module.exports = searchChat_time;

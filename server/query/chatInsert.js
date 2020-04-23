@@ -43,4 +43,4 @@ const insertChat = async function(info) {
     return result;
 }
 
-module.export = insertChat;
+module.exports = insertChat;
