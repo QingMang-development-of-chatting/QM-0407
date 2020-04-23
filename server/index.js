@@ -25,7 +25,8 @@ const PORT = process.env.PORT || 3000;
 app.keys = ['QingMang', 'Server'];
 
 // session
-app.use(session(app));
+const SESS_CONFIG = { maxAge: 86400000*30*12 }
+app.use(session(SESS_CONFIG, app));
 
 // request body parser
 app.use(bodyParser());

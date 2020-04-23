@@ -32,11 +32,14 @@ Controller.register = async function(ctx) {
  */
 Controller.login = async function(ctx) {
 	if (ctx.session.authenticated) return ctx.status = 403;
-	let { username, password, nickname } = ctx.request.body;
-	if (! await service.login(username, password))
+	let { username, password } = ctx.request.body;
+	console.log(`${username}, ${password}`);
+	const flag = await service.login(username, password);
+	console.log(flag);
+	if (! flag)
 		return ctx.status = 400;
 	ctx.status = 200;
-	ctx.session.authenticated = true;
+	// ctx.session.authenticated = true;
 	ctx.session.username = username;
 };
 
