@@ -47,14 +47,11 @@ UserService.register = async function (username, password, nickname) {
 		return false;
 	}
 	//在DB注册用户
-	var result = await insertUser({"id":username,"key":password,"name":nickname});
-	if(result){	//这里因为query的返回类型不仅仅是bool，所以得判断一下
-		return result;
+	var status = await insertUser({"id":username,"key":password,"name":nickname});
+	if(status!=400){
+		return true;
 	}
-	else{
-		return false;
-	}
-	 
+	return status;
 };
 
 /**
@@ -64,12 +61,11 @@ UserService.register = async function (username, password, nickname) {
  * @param {String} password
  */
 UserService.login = async function (username, password) {
-	
 	var status = await login({"id":username,"key":password});	
 	if(status!=400&&status!=403){
-		return status;
+		return true;
 	}
-	return false;
+	return status;
 };
 
 /**
@@ -82,9 +78,9 @@ UserService.login = async function (username, password) {
 UserService.logout = async function (username, password) {
 	var status = await logout({"id":username,"key":password});
 	if(status!=400&&status!=403){
-		return status;
+		return true;
 	}
-	return false;
+	return status;
 };
 
 module.exports = UserService;
