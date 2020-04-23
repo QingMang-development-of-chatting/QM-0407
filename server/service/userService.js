@@ -62,13 +62,12 @@ UserService.register = async function (username, password, nickname) {
  * 
  * @param {String} username
  * @param {String} password
- * @return {Boolean}
  */
 UserService.login = async function (username, password) {
 	
 	var status = await login({"id":username,"key":password});	
 	if(status!=400&&status!=403){
-		return true;
+		return status;
 	}
 	return false;
 };
