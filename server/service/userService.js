@@ -49,7 +49,7 @@ UserService.register = async function (username, password, nickname) {
 	//在DB注册用户
 	var result = await insertUser({"id":username,"key":password,"name":nickname});
 	if(result){	//这里因为query的返回类型不仅仅是bool，所以得判断一下
-		return true;
+		return result;
 	}
 	else{
 		return false;
@@ -82,7 +82,7 @@ UserService.login = async function (username, password) {
 UserService.logout = async function (username, password) {
 	var status = await logout({"id":username,"key":password});
 	if(status!=400&&status!=403){
-		return true;
+		return status;
 	}
 	return false;
 };
