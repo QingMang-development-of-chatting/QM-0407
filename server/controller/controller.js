@@ -18,8 +18,9 @@ const Controller = {};
 Controller.register = async function(ctx) {
 	if (ctx.session.authenticated) return ctx.status = 403;
 	let { username, password, nickname } = ctx.request.body;
-	if (! await service.register(username, password, nickname))
-		return ctx.status = 400;
+	const flag = await service.register(username, password, nickname);
+	if (flag !== true)
+		return ctx.status = flag;
 	ctx.status = 200;
 };
 
@@ -31,13 +32,13 @@ Controller.register = async function(ctx) {
  * @param {Koa.ctx} ctx
  */
 Controller.login = async function(ctx) {
-	if (ctx.session.authenticated) return ctx.status = 403;
+	// if (ctx.session.authenticated) return ctx.status = 403;
 	let { username, password } = ctx.request.body;
 	console.log(`${username}, ${password}`);
 	const flag = await service.login(username, password);
 	console.log(flag);
-	if (! flag)
-		return ctx.status = 400;
+	if (flag !== true)
+		return ctx.status = flag;
 	ctx.status = 200;
 	// ctx.session.authenticated = true;
 	ctx.session.username = username;
