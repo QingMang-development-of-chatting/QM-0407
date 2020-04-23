@@ -5,13 +5,16 @@ const insertChat = require('../query/chatInsert.js');
 const MsgService = {};
 
 /**
- * msg直接存入DB
+ * msg直接存入DB。暂时时来一条传一条。
+ * TODO：增加缓存
  * @param {String} id
- * @param {object} msg
+ * @param {object} msg      eg.{"sender":"0002","text":"test"}
  * @return {Boolean}
  */
-MsgService.insertChat = async function (id,msg){
-    var status = await insertChat({"id":id,"chat":msg});	
+MsgService.insertChat = async function (msg){
+    let sender = msg.sender;
+    let text = msg.text;
+    var status = await insertChat({"id":sender,"chat":[text]});	
     if(!status){
         return false;
     }
@@ -19,4 +22,5 @@ MsgService.insertChat = async function (id,msg){
 }
 
 module.exports =MsgService;
+
 
