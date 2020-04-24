@@ -42,7 +42,7 @@
             chatbar
         },
         mounted() {
-            this.$store.state.username = sessionStorage.getItem("username");
+            this.$store.state.username = window.localStorage.getItem("username");
             console.log(this.$store.state.username);
             if(this.$store.state.username == null)
             {
@@ -93,7 +93,7 @@
         },
         computed:{
             currentUser(){
-                this.$store.commit('setUser',sessionStorage.getItem("username"));
+                this.$store.commit('setUser',window.localStorage.getItem("username"));
                 return this.$store.state.username;
             },
          },
@@ -117,7 +117,7 @@
             logout(){
                 this.$axios.get("/logout").then(()=>{
                     console.log("已注销");
-                    sessionStorage.removeItem("username");
+                    window.localStorage.removeItem("username");
                     window.location.href="login";
                 }).catch((error)=>{
                     console.log(error.response);
