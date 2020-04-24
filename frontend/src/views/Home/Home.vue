@@ -12,7 +12,7 @@
             </el-aside>
             <el-main id="main">
                 <div id="init" v-if="isInit">
-                    <img :src="logo" alt="logo">
+                    <img class ="logo" :src="logo"  alt="logo">
                 </div>
                 <chat-area v-if="showChatArea" :friend-nickname="chattingFriendNickname" :friend-avatar="chattingFriendAvatar" :my-avatar="currentUserAvatar" :chatting-info="chattingInfo"></chat-area>
             </el-main>
@@ -157,7 +157,7 @@
         height: 100vh;
     }
     #aside{
-        width:10% !important;
+        width:5% !important;
     }
     #chat,#friend{
         width: 24% !important;
@@ -172,6 +172,14 @@
     .chatArea{
         height: inherit;
         background-color:#ffffffdb;
+    }
+    .logo{
+        height:250px;
+        width: 200px;
+        opacity: 10%;
+        position: relative;
+        top:50%;
+        margin-top: -125px;
     }
 
 </style>
