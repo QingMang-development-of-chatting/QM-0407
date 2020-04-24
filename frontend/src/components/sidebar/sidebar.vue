@@ -1,6 +1,6 @@
 <template>
     <div class="sidebar">
-        <el-avatar id="avatar" title="修改资料" shape="square" :size="100" fit="cover" :src="avatarUrl"  @click.native="showInfo" ></el-avatar>
+        <el-avatar id="avatar" title="修改资料" shape="square" :size="60" fit="cover" :src="avatarUrl"  @click.native="showInfo" ></el-avatar>
         <br/>
         <el-link id="chat" v-bind:class="{selected:chatSelect}" title="聊天" :underline="false"  icon="el-icon-chat-line-round" @click="showChat"></el-link>
         <br/>
@@ -58,7 +58,7 @@
         height: inherit;
     }
     #chat,#friend,#logout{
-        font-size: 55px;
+        font-size: 48px;
         font-weight: bold;
     }
     #chat:hover,#friend:hover{
@@ -79,6 +79,6 @@
         margin-top:30px;
     }
     #logout{
-        margin-top: 340px;
+        margin-top: 430px;
     }
 </style>
