@@ -1,10 +1,22 @@
 <template>
     <div class="Login">
         <h1>青芒</h1>
-        <el-input placeholder="请输入账号" v-model="id" maxlength="15" prefix-icon="el-icon-user-solid" clearable></el-input>
+<!--        <el-input placeholder="请输入账号" v-model="id" maxlength="15" prefix-icon="el-icon-user-solid" :clearable="true">-->
+<!--            -->
+<!--        </el-input>-->
+        <div class="input-div" @mouseover="showClIcon" @mouseleave="showClearIcon = false">
+            <el-input placeholder="请输入账号" v-model="id" maxlength="15" prefix-icon="el-icon-user-solid" @input="showClIcon">
+                <el-button  class="Icon" v-if="showClearIcon" slot="suffix" type="text" icon="el-icon-error" @click="clearInput"></el-button>
+            </el-input>
+        </div>
             <span  v-if="idRemind" id="idRemind">{{idTips}}</span>
-        <br/>
-        <el-input  placeholder="请输入密码"  v-model="password" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>
+            <br/>
+<!--        <el-input  placeholder="请输入密码"  v-model="password" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>-->
+        <div class="input-div" @mouseover="showPassIcon" @mouseleave="showPasswordIcon = false" >
+            <el-input  placeholder="请输入密码"  :type="passwordType" v-model="password" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon">
+                <el-button  class="Icon" v-if="showPasswordIcon" slot="suffix" type="text" icon="el-icon-view" @click="showPass"></el-button>
+            </el-input>
+        </div>
              <span  v-if="passwordRemind" id="passwordRemind">{{passwordTips}}</span>
         <br/>
         <el-button id="login-submit" :loading="isLoading" @click="login" >{{loginText}}</el-button>
@@ -17,7 +29,7 @@
     export default {
         name:"login",
         mounted() {
-            this.$store.state.username = sessionStorage.getItem("username");
+            this.$store.state.username = window.localStorage.getItem("username");
             console.log(this.$store.state.username);
             if(this.$store.state.username != null)
             {
@@ -34,14 +46,17 @@
                 idTips:"",
                 passwordTips:"",
                 isLoading:false,
-                loginText:"登录"
+                loginText:"登录",
+                passwordType:"password",
+                showPasswordIcon:false,
+                showClearIcon:false,
             }
         },
         methods:{
             login(){
-                if(this.id == "")
+                if(this.id === "")
                     this.$message({message:"账号不能为空",type:"warning"});
-                else if(this.password == "")
+                else if(this.password === "")
                     this.$message({message:"密码不能为空",type:"warning"});
                 else{
                     this.isLoading = true;
@@ -52,19 +67,19 @@
                     }).then((result)=>{
                         console.log(result);
                         this.$message({message:"登录成功",type:"success"});
-                        sessionStorage.setItem("username",this.id);
+                        window.localStorage.setItem("username",this.id);
                         this.$store.commit('setUser',this.id);
                         window.location.href = "home";
                     }).catch((error)=>{
                         console.log(error.response.status);
                         this.isLoading = false;
                         this.loginText = "登录";
-                        if(error.response.status == 400)
+                        if(error.response.status === 400)
                             this.$message({message:"登录失败：账号或者密码错误",type:"error"});
-                        // else if(error.response.status == 403) {
-                        //     this.$message({message:"不可重复登录, 即将跳转至主页",type:"warning"});
-                        //     setTimeout(function(){window.location.href = "home"},2000);
-                        // }
+                        else if(error.response.status === 403) {
+                            this.$message({message:"该用户已登录",type:"warning"});
+                            //setTimeout(function(){window.location.href = "home"},2000);
+                        }
                         else
                             this.$message({message:"服务器未响应",type:"warning"});
                     })
@@ -72,11 +87,28 @@
             },
             register(){
                 window.location.href = "register";
-            }
+            },
+            showPass(){
+                if(this.passwordType === "password")
+                    this.passwordType = "text";
+                else
+                    this.passwordType = "password";
+            },
+            showPassIcon(){
+                if(this.password !=="")
+                    this.showPasswordIcon = true;
+            },
+            showClIcon(){
+                if(this.id !=="")
+                    this.showClearIcon = true;
+            },
+            clearInput(){
+                this.id="";
+            },
         },
         watch:{
             id(val){
-                if(val == "")
+                if(val === "")
                 {
                     this.idRemind = true;
                     this.idTips = "账号不能为空";
@@ -84,7 +116,7 @@
                 else this.idRemind = false;
             },
             password(val){
-                if(val == "")
+                if(val === "")
                 {
                     this.passwordRemind = true;
                     this.passwordTips = "密码不能为空";
@@ -170,6 +202,13 @@
         width:50%;
         padding: 20px;
         margin: 60px auto;
+    }
+    .Icon{
+        font-size: 30px;
+        color: white;
+    }
+    .input-div{
+        display: inline;
     }
 
 
