@@ -2,20 +2,39 @@
     <div class="register">
         <h1>青芒</h1>
         <el-tooltip class="item" effect="dark" content="输入3到15位字母、数字、下划线组合" placement="top-start">
-            <el-input placeholder="请输入用户名" v-model="id" maxlength="15"    prefix-icon="el-icon-user-solid" clearable></el-input>
+<!--            <el-input placeholder="请输入用户名" v-model="id" maxlength="15"    prefix-icon="el-icon-user-solid" clearable></el-input>-->
+            <div class="input-div" @mouseover="showClIdIcon" @mouseleave="showClearIdIcon = false" >
+                <el-input placeholder="请输入用户名" v-model="id" maxlength="15"    prefix-icon="el-icon-user-solid" @input="showClIdIcon">
+                     <el-button class="Icon" v-if="showClearIdIcon" slot="suffix" type="text" icon="el-icon-error" @click="clearIdInput"></el-button>
+                 </el-input>-
+            </div>
         </el-tooltip>
         <span  v-if="idRemind" id="idRemind">{{idTips}}</span>
         <br/>
         <el-tooltip class="item" effect="dark" content="输入8到16位字符组合" placement="top-start">
-            <el-input  placeholder="请输入密码"  v-model="password" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>
+<!--            <el-input  placeholder="请输入密码"  v-model="password" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>-->
+            <div class="input-div"  @mouseover="showPassIcon" @mouseleave="showPasswordIcon = false">
+                <el-input  placeholder="请输入密码" :type="passwordType" v-model="password" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon">
+                    <el-button  class="Icon" v-if="showPasswordIcon" slot="suffix" type="text" icon="el-icon-view" @click="showPass"></el-button>
+                </el-input>
+            </div>
         </el-tooltip>
         <span  v-if="passwordRemind" id="passwordRemind">{{passwordTips}}</span>
         <br/>
-        <el-input  placeholder="请再次输入密码"  v-model="password1" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>
+        <div class="input-div" @mouseover="showPassIcon1" @mouseleave="showPasswordIcon1 = false">
+            <el-input  placeholder="请再次输入密码"  :type="passwordConfirmType" v-model="password1" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon1">
+                <el-button  class="Icon" v-if="showPasswordIcon1" slot="suffix" type="text" icon="el-icon-view" @click="showPass1"></el-button>
+            </el-input>
+        </div>
         <span  v-if="passwordConfirm" id="passwordConfirm">{{confirmTips}}</span>
         <br/>
         <el-tooltip class="item" effect="dark" content="输入1到10位中英字符组合" placement="top-start">
-            <el-input  placeholder="请输入昵称"  v-model="nickname" maxlength="10" prefix-icon="el-icon-edit-outline" clearable></el-input>
+<!--            <el-input  placeholder="请输入昵称"  v-model="nickname" maxlength="10" prefix-icon="el-icon-edit-outline" clearable></el-input>-->
+            <div class="input-div" @mouseover="showClNickIcon" @mouseleave="showClearNickIcon=false">
+                <el-input  placeholder="请输入昵称"  v-model="nickname" maxlength="10" prefix-icon="el-icon-edit-outline" @input="showClNickIcon">
+                    <el-button class="Icon" v-if="showClearNickIcon" slot="suffix" type="text" icon="el-icon-error" @click="clearNickInput"></el-button>
+                </el-input>
+            </div>
         </el-tooltip>
         <span  v-if="nicknameRemind" id="nicknameRemind">{{nicknameTips}}</span>
         <br/>
@@ -36,11 +55,18 @@
                 password1:"",
                 nickname:"",
                 registerText:"注册",
+                passwordType:"password",
+                passwordConfirmType:"password",
                 idRemind:false,
                 passwordRemind:false,
                 passwordConfirm:false,
                 nicknameRemind:false,
-                isLoading:false
+                isLoading:false,
+                showClearIdIcon:false,
+                showPasswordIcon:false,
+                showPasswordIcon1:false,
+                showClearNickIcon:false,
+
             }
         },
         methods:{
@@ -82,8 +108,8 @@
                         console.log(error.response.status);
                         if(error.response.status === 400)
                             this.$message({message:"注册失败，该账号已被使用",type:"error"});
-                        // else if(error.response.status == 403)
-                        //     this.$message({message:"您已登录，不可注册",type:"warning"});
+                        else if(error.response.status == 403)
+                            this.$message({message:"您已登录，不可注册",type:"warning"});
                         else
                             this.$message({message:"服务器未响应",type:"warning"});
                         this.isLoading = false;
@@ -93,7 +119,41 @@
             },
             login(){
                 window.location.href = "login";
-            }
+            },
+            showClIdIcon(){
+                if(this.id !=="")
+                    this.showClearIdIcon = true;
+            },
+            clearIdInput(){
+                this.id="";
+            },
+            showPassIcon(){
+                if(this.password !=="")
+                    this.showPasswordIcon = true;
+            },
+            showPass(){
+                if(this.passwordType === "password")
+                    this.passwordType = "text";
+                else
+                    this.passwordType = "password";
+            },
+            showPassIcon1(){
+                if(this.password1 !=="")
+                    this.showPasswordIcon1 = true;
+            },
+            showPass1(){
+                if(this.passwordConfirmType === "password")
+                    this.passwordConfirmType = "text";
+                else
+                    this.passwordConfirmType = "password";
+            },
+            showClNickIcon(){
+                if(this.nickname !=="")
+                    this.showClearNickIcon = true;
+            },
+            clearNickInput(){
+                this.nickname="";
+            },
 
         },
         watch:{
@@ -217,7 +277,6 @@
         font-size: 20px;
         text-align: center;
         border: 1px solid rgba(255, 255, 255, 0);
-
     }
     #login:hover{
         opacity: 1;
@@ -235,6 +294,14 @@
         padding: 20px;
         margin: 0 auto;
     }
+    .Icon{
+        font-size: 30px;
+        color: white;
+    }
+    .input-div{
+        display: inline;
+    }
+
 
 
 </style>
