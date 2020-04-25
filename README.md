@@ -1,5 +1,11 @@
 # QingMang
 
+## 2020/04/25
+
+注明`room_id`为`String`类型。
+
+
+
 ## 2020/04/23
 
 在下一版本中的「青芒」服务器中：
@@ -37,7 +43,7 @@
 
 |                   | **Client -> Server** |        | **Server -> Client** |
 | ----------------- | -------------------- | ------ | -------------------- |
-| room_id           | 房间号               | (None) |                      |
+| room_id `String`  | 房间号               | (None) |                      |
 | username `String` | 用户名               |        |                      |
 
 ---
@@ -50,16 +56,16 @@
 
 **Purpose**
 
-|          | **Client -> Server** | **Server -> Client** |
-| -------- | -------------------- | -------------------- |
-| **emit** | 客户端请求离开某房间 |                      |
-| **on**   | 授权客户端离开某房间 |                      |
+|           | **Client -> Server** | **Server -> Client** |
+| --------- | -------------------- | -------------------- |
+| **emit ** | 客户端请求离开某房间 |                      |
+| **on**    | 授权客户端离开某房间 |                      |
 
 **Callback Params**
 
 |                   | **Client -> Server** |        | **Server -> Client** |
 | ----------------- | -------------------- | ------ | -------------------- |
-| room_id           | 房间号               | (None) |                      |
+| room_id `String`  | 房间号               | (None) |                      |
 | username `String` | 用户名               |        |                      |
 
 ---
@@ -81,7 +87,7 @@
 
 |                     | **Client -> Server** |                     | **Server -> Client** |
 | ------------------- | -------------------- | ------------------- | -------------------- |
-| room_id             | 房间号               | room_id             | 房间号               |
+| room_id `String`    | 房间号               | room_id             | 房间号               |
 | msg `Object`        | 消息体               | msg `Object`        | 消息体               |
 | msg.sender `String` | 用户名               | msg.sender `String` | 用户名               |
 | msg.text `String`   | 消息文本             | msg.text `String`   | 消息文本             |
