@@ -21,6 +21,7 @@ const searchChat_time = async function(info) {
         {    
             host: info.id,
             date: info.date,
+            room: info.room_id,
         }
     ).then(function(response){
         status = response.data;
