@@ -19,6 +19,7 @@ const insertChat = async function(info) {
         {    
             host: info.id,
             chat: info.chat,
+            room: info.room_id,
         }
     ).then(function(response){
         status = response.data;
