@@ -20,6 +20,7 @@ const searchChat_key = async function(info) {
         {    
             host: info.id,
             key: info.key,
+            room: info.room_id,
         }
     ).then(function(response){
         status = response.data;
