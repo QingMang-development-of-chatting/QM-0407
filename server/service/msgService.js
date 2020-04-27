@@ -1,5 +1,6 @@
 //Module Dependencies
 const insertChat = require('../query/chatInsert.js');
+//const insertChat = require('../query/charSearch_byRoomid.js');
 
 //API
 const MsgService = {};
@@ -19,6 +20,16 @@ MsgService.insertChat = async function (room_id,msg){
         return false;
     }
     return true;
+}
+
+/**
+ * 按room_id查找msg
+ * @param {String} room_id
+ * @return msg
+ */
+MsgService.searchMsgByRoomid = async function (room_id){
+    //var result = await charSearch_byRoomid({"room_id":room_id});	
+    return result;
 }
 
 module.exports =MsgService;
