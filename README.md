@@ -9,6 +9,7 @@
 *Socket.IO*模块将会**支持**以下事件：
 
 - `v1/friend`
+- `v1/friend/remove`
 - `v1/friend/add`
 - `v1/friend/access`
 - `v1/friend/refuse`
@@ -57,6 +58,38 @@
 命名不一致性，user_id与其它API的username不一致。
 
 耦合度较高，后续业务添加可能存在空闲字段。
+
+---
+
+**Event** `v1/friend/remove`
+
+某用户移除信箱内的某条好友消息。
+
+**Kind** $CS$
+
+**Purpose**
+
+|          | **Client -> Server**     | **Server -> Client** |
+| -------- | ------------------------ | -------------------- |
+| **emit** | 客户端移除好友消息       |                      |
+| **on**   | 服务器删除数据库中的记录 |                      |
+
+**Callback Params**
+
+|                    | **Client -> Server**                                  |      | **Server -> Client** |
+| ------------------ | ----------------------------------------------------- | ---- | -------------------- |
+| user_id `String`   | 用户名 (指代信箱号)                                   |      |                      |
+| friend_id `String` | 好友用户名 (不显然的，好友用户名与消息是一对一的关系) |      |                      |
+
+**Note**
+
+安全性较低，因为存在伪造user_id的请求。
+
+安全性较低，因为存在伪造friend_id的请求。
+
+命名不一致性，user_id与其它API的username不一致。
+
+耦合度较高，目前的业务虽然好友用户名与消息是一对一的关系，但不保证以后。
 
 ---
 
@@ -143,8 +176,6 @@
 命名不一致性，user_id与其它API的username不一致。
 
 ---
-
-
 
 
 
