@@ -4,6 +4,13 @@
 
 ## 2020/04/27
 
+在0427版本的「青芒」服务器中：
+*Socket.IO*模块的`v1/friend`将不会收到"refused"类型的消息。
+
+
+
+## 2020/04/27
+
 在下一版本中的「青芒」服务器中：
 
 *Socket.IO*模块将会**支持**以下事件：
@@ -49,7 +56,7 @@
 | (None) |                      | friends `Array`               |                                 |
 |        |                      | friends[i] `Object`           |                                 |
 |        |                      | friends[i].friend_id `String` | 消息中的好友用户名              |
-|        |                      | friends[i].type `String`      | "add"-请求添加/ "refused"被删除 |
+|        |                      | friends[i].type `String`      | "add"-请求添加/ "deleted"被删除 |
 
 **Note**
 
