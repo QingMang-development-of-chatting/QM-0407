@@ -5,12 +5,10 @@
 </template>
 
 <script>
-import Login from "./views/Login/Login.vue";
-
 export default {
   name: 'app',
   components: {
-    Login
+
   }
 }
 </script>

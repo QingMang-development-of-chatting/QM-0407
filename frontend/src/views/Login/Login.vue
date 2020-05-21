@@ -1,3 +1,4 @@
+//登录组件
 <template>
     <div class="Login">
         <h1>青芒</h1>
@@ -39,20 +40,32 @@
         },
         data(){
             return {
+                //账号
                 id: "",
+                //密码
                 password: "",
+                //是否显示id输入提示
                 idRemind: false,
+                //是否显示密码输入提示
                 passwordRemind:false,
+                //id输入提示文本
                 idTips:"",
+                //密码输入提示文本
                 passwordTips:"",
+                //按钮是否显示加载图标
                 isLoading:false,
+                //按钮文本
                 loginText:"登录",
+                //密码输入栏文本类型
                 passwordType:"password",
+                //是否显示密码图标
                 showPasswordIcon:false,
+                //是否显示清除ID图标
                 showClearIcon:false,
             }
         },
         methods:{
+            //提交登录处理
             login(){
                 if(this.id === "")
                     this.$message({message:"账号不能为空",type:"warning"});
@@ -85,28 +98,34 @@
                     })
                 }
             },
+            //跳转至注册页面
             register(){
                 window.location.href = "register";
             },
+            //密码输入栏切换显示
             showPass(){
                 if(this.passwordType === "password")
                     this.passwordType = "text";
                 else
                     this.passwordType = "password";
             },
+            //显示密码图标
             showPassIcon(){
                 if(this.password !=="")
                     this.showPasswordIcon = true;
             },
+            //显示id清除图标
             showClIcon(){
                 if(this.id !=="")
                     this.showClearIcon = true;
             },
+            //清除id输入
             clearInput(){
                 this.id="";
             },
         },
         watch:{
+            //验证id输入合法性
             id(val){
                 if(val === "")
                 {
@@ -115,6 +134,7 @@
                 }
                 else this.idRemind = false;
             },
+            //验证密码输入合法性
             password(val){
                 if(val === "")
                 {

@@ -1,12 +1,13 @@
+//好友侧边栏组件
 <template>
     <div class="friendbar">
         <el-input  placeholder="请输入好友姓名" v-model="input" clearable suffix-icon="el-icon-search"></el-input>
-        <div class="addFriend">
+        <div class="addFriend" @click="showAdd">
             <i id="addIcon" class="el-icon-circle-plus el-icon--right"></i>
-            <span class="addText">添加好友</span>
+            <span class="addText">新的朋友</span>
         </div>
         <el-menu class="friendbar-main">
-            <el-menu-item class="friendList" v-for="friend in friendList" :key="friend.index">
+            <el-menu-item class="friendList" v-for="(friend,key) in friendList" :key="key" @click="showFriend()">
                 <el-avatar class="avatar" shape="square" :size="58" fit="cover" :src="friend.avatar"></el-avatar>
                 <span class="nickname">{{friend.nickname}}</span>
             </el-menu-item>
@@ -17,13 +18,22 @@
 <script>
     export default {
         props: {
-            friendList:Array
+            friendList:Object
         },
         data(){
             return{
                 input: "",
             }
+        },
+        methods:{
+            showAdd(){
+                this.$emit('showAdd');
+            },
+            showFriend(){
+                this.$emit('showFriend');
+            }
         }
+
     };
 </script>
 <style  lang="css" scoped>

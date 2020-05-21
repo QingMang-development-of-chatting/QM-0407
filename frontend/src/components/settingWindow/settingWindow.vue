@@ -1,20 +1,27 @@
+//用户信息设置组件
 <template>
     <div class="settingWindow" >
         <div id="info-head">
             <span id="info-head-text">我的资料</span>
-            <el-button id="info-close"  size="mini" icon="el-icon-close" @click="closeInfo"></el-button></div>
+            <el-button id="info-close"  size="mini" icon="el-icon-close" @click="closeInfo"></el-button>
+        </div>
         <div id="info-avatar">
             头像：
             <el-avatar id="avatar"  shape="square" :size="120" fit="cover" :src="avatarUrl" ></el-avatar>
-            <el-button class="settingButton"  id="settingButtonAvatar" type="text" icon="el-icon-edit">修改</el-button>
+<!--            <el-button class="settingButton"  id="settingButtonAvatar" type="text" icon="el-icon-edit">修改</el-button>-->
+
+            <el-upload class="settingButton" id="settingButtonAvatar" action="#" accept="image/png,image/gif,image/jpg,image/jpeg"  :on-change="changeAvatar" >
+                <i class="el-icon-edit"></i>修改
+            </el-upload>
         </div>
         <div id="info-id">
             账号：
             {{id}}
         </div>
         <div id="info-nickname">昵称：
-            <input class="viewNickname" maxlength="10" v-bind:class="{editNickname:isEdit}" v-model="nickname" :readonly="!isEdit">
-            <el-button class="settingButton" id="settingButtonNickname" type="text" icon="el-icon-edit" @click="editNickname">{{editButtonText}}</el-button>
+            <input v-if="!isEdit" class="viewNickname" maxlength="10"  :value="nickname" :readonly="true">
+            <input v-if="isEdit" class="viewNickname editNickname" maxlength="10"  v-model="nicknameEdit" >
+            <el-button class="settingButton" id="settingButtonNickname" type="text" icon="el-icon-edit" @click="editNickname(nicknameEdit)">{{editButtonText}}</el-button>
         </div>
     </div>
 </template>
@@ -30,12 +37,14 @@
             return{
                 isEdit:false,
                 editButtonText:"修改",
+                nicknameEdit:"",
             }
         },
         methods:{
-            editNickname(){
+            //修改昵称
+            editNickname(nicknameEdit){
                 if(this.isEdit) {
-                    this.$emit('changeNickname',this.nickname);
+                    this.$emit('changeNickname',nicknameEdit);
                     this.editButtonText = "修改";
                     this.isEdit = false;
                 }
@@ -44,8 +53,13 @@
                     this.isEdit = true;
                 }
             },
+            //关闭资料栏显示
             closeInfo(){
                 this.$emit('closeInfo');
+            },
+            //修改头像
+            changeAvatar(res,file){
+                this.$emit('changeAvatar',file);
             }
         }
     };
@@ -113,7 +127,9 @@
     }
     #settingButtonAvatar{
         position: relative;
-        left:80px;
+        color: teal;
+        left:270px;
+        bottom:30px;
     }
 
 </style>
