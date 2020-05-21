@@ -1,3 +1,4 @@
+//注册组件
 <template>
     <div class="register">
         <h1>青芒</h1>
@@ -50,26 +51,42 @@
         name: "register",
         data(){
             return{
+                //账号
                 id: "",
+                //密码
                 password: "",
+                //确认密码
                 password1:"",
+                //昵称
                 nickname:"",
+                //注册按钮文本
                 registerText:"注册",
+                //密码输入栏类型
                 passwordType:"password",
+                //密码确认栏类型
                 passwordConfirmType:"password",
+                //是否显示id输入提示
                 idRemind:false,
+                //是否显示密码输入提示
                 passwordRemind:false,
+                //是否显示密码确认提示
                 passwordConfirm:false,
+                //是否显示昵称输入提示
                 nicknameRemind:false,
+                //注册按钮是否显示加载
                 isLoading:false,
+                //是否显示id输入栏清除图标
                 showClearIdIcon:false,
+                //是否显示密码输入栏密码图标
                 showPasswordIcon:false,
+                //是否显示密码确认栏密码图标
                 showPasswordIcon1:false,
+                //是否显示昵称输入栏清除图标
                 showClearNickIcon:false,
-
             }
         },
         methods:{
+            //提交注册处理
             register(){
                 if(this.id === "")
                 {
@@ -117,46 +134,56 @@
                     })
                 }
             },
+            //跳转至登录页面
             login(){
                 window.location.href = "login";
             },
+            //显示id清除图标
             showClIdIcon(){
                 if(this.id !=="")
                     this.showClearIdIcon = true;
             },
+            //清除id输入栏文本
             clearIdInput(){
                 this.id="";
             },
+            //显示密码输入栏密码图标
             showPassIcon(){
                 if(this.password !=="")
                     this.showPasswordIcon = true;
             },
+            //切换密码输入栏文本显示
             showPass(){
                 if(this.passwordType === "password")
                     this.passwordType = "text";
                 else
                     this.passwordType = "password";
             },
+            //显示密码确认栏密码图标
             showPassIcon1(){
                 if(this.password1 !=="")
                     this.showPasswordIcon1 = true;
             },
+            //切换密码确认栏文本显示
             showPass1(){
                 if(this.passwordConfirmType === "password")
                     this.passwordConfirmType = "text";
                 else
                     this.passwordConfirmType = "password";
             },
+            //显示昵称清除图标
             showClNickIcon(){
                 if(this.nickname !=="")
                     this.showClearNickIcon = true;
             },
+            //清除昵称输入栏文本
             clearNickInput(){
                 this.nickname="";
             },
 
         },
         watch:{
+            //验证id输入合法性
             id(val){
               if(val === "")
               {
@@ -173,6 +200,7 @@
                   this.idRemind = false;
               }
             },
+            //验证密码输入合法性
             password(val){
                 if(val === "") {
                     this.passwordTips = "密码不能为空";
@@ -196,6 +224,7 @@
                     }
                 }
             },
+            //验证两次密码输入是否一致
             password1(val){
                 if(val !== this.password)
                 {
@@ -206,6 +235,7 @@
                     this.passwordConfirm = false;
                 }
             },
+            //验证昵称输入合法性
             nickname(val){
                 if(val === "")
                 {

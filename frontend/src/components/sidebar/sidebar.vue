@@ -1,3 +1,4 @@
+//侧边栏组件
 <template>
     <div class="sidebar">
         <el-avatar id="avatar" title="修改资料" shape="square" :size="60" fit="cover" :src="avatarUrl"  @click.native="showInfo" ></el-avatar>
@@ -14,40 +15,36 @@
     export default {
         name:"sidebar",
         props: {
-            avatarUrl:String,
+            avatarUrl:String,   //当前用户头像url
         },
         data(){
             return {
-                chatSelect: true,
-                friendSelect: false,
-                // url: "url",
+                chatSelect: true,   //是否选中聊天图标
+                friendSelect: false,    //是否选中好友图标
             }
         },
         methods:{
+            //展示聊天侧边栏
             showChat(){
                 this.chatSelect = true;
                 this.friendSelect = false;
-                this.$emit('showChat');
+                this.$emit('showChat'); //触发父组件showChat事件
             },
+            //展示好友资料侧边栏
             showFriend(){
                 this.chatSelect = false;
                 this.friendSelect = true;
-                this.$emit('showFriend');
+                this.$emit('showFriend');   //触发父组件showFriend事件
             },
+            //展示个人资料设置
             showInfo(){
                 this.chatSelect = false;
                 this.friendSelect = false;
-                this.$emit('showInfo');
+                this.$emit('showInfo'); //触发父组件showInfo事件
             },
+            //注销
             logout(){
-                this.$emit('logout');
-                // this.$axios.get("/logout").then(()=>{
-                //     console.log("已注销");
-                //     sessionStorage.removeItem("username");
-                //     window.location.href="login";
-                // }).catch((error)=>{
-                //     console.log(error.response);
-                // })
+                this.$emit('logout');                //触发父组件logout事件
             }
         },
     };
