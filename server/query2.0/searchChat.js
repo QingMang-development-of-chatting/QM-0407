@@ -56,8 +56,3 @@ const searchChat = async function(info) {
 }
 
 module.exports = searchChat;
-searchChat({
-    'user_id':'0080', 
-    'room':'A123',
-    'date':"1590163571271",
-});

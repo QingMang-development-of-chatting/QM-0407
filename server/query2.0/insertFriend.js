@@ -47,7 +47,3 @@ const insertFriend = async function(info) {
 }
 
 module.exports = insertFriend;
-insertFriend({
-    "host_id": "0080",
-    "friend_id": "0003"
-});

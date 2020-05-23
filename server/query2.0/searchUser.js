@@ -46,6 +46,3 @@ const searchUser = async function(info) {
 }
 
 module.exports = searchUser;
-searchUser({
-    "user_id": "0080",
-});

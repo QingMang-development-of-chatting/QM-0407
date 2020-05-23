@@ -50,8 +50,3 @@ const insertUser = async function(info) {
 }
 
 module.exports = insertUser;
-insertUser({
-    "user_id": "0090",
-    "user_key": "123456",
-    "user_name": "测试",
-  });
