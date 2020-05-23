@@ -46,13 +46,3 @@ const insertChat = async function(info) {
 }
 
 module.exports = insertChat;
-insertChat({
-    "host_id": "0070",
-    "room": "A123",
-    "chat": [
-      "hello",
-      "world",
-      "happy",
-      "life"
-    ]
-});
