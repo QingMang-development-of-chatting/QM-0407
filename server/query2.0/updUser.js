@@ -54,8 +54,3 @@ const updUser = async function(info) {
 }
 
 module.exports = updUser;
-updUser({
-    "user_id": "0080",
-    "user_key": "123456",
-    "user_name": "2111",
-  });
