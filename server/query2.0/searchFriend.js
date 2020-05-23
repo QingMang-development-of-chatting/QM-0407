@@ -45,6 +45,3 @@ const searchFriend = async function(info) {
 }
 
 module.exports = searchFriend;
-searchFriend({
-    "host_id": "0080",
-});
