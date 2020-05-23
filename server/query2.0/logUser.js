@@ -79,6 +79,3 @@ const logUser = async function(info) {
 };
 
 module.exports = logUser;
-logUser({
-    "user_id":"0080",
-})
