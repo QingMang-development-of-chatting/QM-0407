@@ -6,7 +6,7 @@ const updUser = require('../query2.0/updUser.js');
 const UserInfoService = {};
 
 /**
- * 获取多个账号的信息
+ * 获取多个资料账号的信息
  * @param   {Array}   user_id_array
  * @return  {Array}   user_info_array
  */
@@ -14,7 +14,12 @@ UserInfoService.getInfoByArray= async function (user_id_array) {
 	var user_info_array = [];
 	for(i = 0,len=user_id_array.length; i < len; i++) {
 		var status = await searchUser({"user_id":user_id_array[i]});
-		user_info_array.push(status);
+		if(status==406){	//用户不存在，push null
+			user_info_array.push(null);
+		}
+		else{
+			user_info_array.push(status);
+		}
 	}
 	return user_info_array;
 };
@@ -48,5 +53,5 @@ UserInfoService.updatePhoto= async function (user_id, user_photo) {
 };
 
 module.exports = UserInfoService;
-//UserInfoService.getInfoByArray(["0080","test2","0090"]);
+//UserInfoService.getInfoByArray(["0080","test1","0090"]);
 //UserInfoService.updateName("0080",1234);
