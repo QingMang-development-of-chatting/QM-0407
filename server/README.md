@@ -69,6 +69,109 @@ URL Example: */path/to/myfile.html?key1=value1&key2=value2*
 
 ---
 
+## /userinfo `POST`
+
+获取资料接口，通过用户的username，查询用户信息
+
+**Kind**
+
+**request**
+
+Body
+
+| Param    | Type     | Description |
+| -------- | -------- | ----------- |
+| users    | `Array`  | 用户名数组  |
+| users[i] | `String` | 用户名      |
+
+**response**
+
+status code
+
+- `200 OK ` - 获取成功
+
+Body
+
+| Param           | Type     | Description        |
+| --------------- | -------- | ------------------ |
+| -               | `Array`  | 用户信息数组       |
+| 若存在          |          |                    |
+| -[i].user_id    | `String` | 用户名             |
+| -[i].user_name  | `String` | 用户昵称           |
+| -[i].user_photo | `String` | 用户头像           |
+| 若不存在        |          |                    |
+| -[i]            | `null`   | 没有该用户名的用户 |
+
+**返回的数组挂载在Body上，且与查询的用户名数组一一对应**
+
+**Example**
+
+```js
+curl -v 127.0.0.1:3000/userinfo -H "Content-Type: application/json" -d @test.json
+```
+
+---
+
+## /userinfo/nickname `PUT`
+
+设置昵称，通过用户的username，设置用户昵称为nickname
+
+**Kind**
+
+**request**
+
+Body
+
+| Param    | Type     | Description |
+| -------- | -------- | ----------- |
+| username | `String` | 用户名      |
+| nickname | `String` | 昵称        |
+
+**response**
+
+status code
+
+- `200 OK ` - 更新成功
+- `400 Bad Request` - 更新失败
+
+**Example**
+
+```js
+curl -v -X PUT 127.0.0.1:3000/userinfo/nickname -H "Content-Type: application/json" -d @test.json
+```
+
+---
+
+## /userinfo/photo `PUT`
+
+修改头像，通过用户的username，设置用户头像为photo
+
+**Kind**
+
+**request**
+
+Body
+
+| Param    | Type     | Description      |
+| -------- | -------- | ---------------- |
+| username | `String` | 用户名           |
+| photo    | `String` | base64转码的头像 |
+
+**response**
+
+status code
+
+- `200 OK ` - 更新成功
+- `400 Bad Request` - 更新失败
+
+**Example**
+
+```js
+curl -v -X PUT 127.0.0.1:3000/userinfo/photo -H "Content-Type: application/json" -d @test.json
+```
+
+---
+
 ## /register `POST`
 
 用户注册
@@ -153,6 +256,10 @@ status code
 ```js
 curl -v 127.0.0.1:3000/logout -c cookies.txt
 ```
+
+---
+
+
 
 
 
