@@ -29,31 +29,41 @@ chat.on('connection', socket => {
 		socket.emit('logout', 'regular');
 	});
 
-	socket.on('message', (friend, text) => {
+	socket.on('v2/message', (friend, message) => {
+		let { text } = message;
+		message.time = new Date().getTime();
+		console.log(message);
 		let friend_socket = user_socket.get(friend);
 		if (friend_socket) {
-			socket.to(friend_socket).emit('message', socket_user.get(socket.id), text);
+			socket.to(friend_socket).emit('v2/message', socket_user.get(socket.id), message);
 		}
 	});
 
-	socket.on('v1/friend/add', friend => {
+	socket.on('v2/friend/add', friend => {
 		let friend_socket = user_socket.get(friend);
 		if (friend_socket) {
-			socket.to(user_socket.get(friend)).emit('v1/friend/add', socket_user.get(socket.id));			
+			socket.to(user_socket.get(friend)).emit('v2/friend/add', socket_user.get(socket.id));			
 		}
 	});
 
-	socket.on('v1/friend/remove', friend => {
+	socket.on('v2/friend/remove', friend => {
 		let friend_socket = user_socket.get(friend);
 		if (friend_socket) {
-			socket.to(user_socket.get(friend)).emit('v1/friend/remove', socket_user.get(socket.id));			
+			socket.to(user_socket.get(friend)).emit('v2/friend/remove', socket_user.get(socket.id));			
 		}
 	});
 
-	socket.on('v1/friend/access', friend => {
+	socket.on('v2/friend/access', friend => {
 		let friend_socket = user_socket.get(friend);
 		if (friend_socket) {
-			socket.to(user_socket.get(friend)).emit('v1/friend/access', socket_user.get(socket.id));			
+			socket.to(user_socket.get(friend)).emit('v2/friend/access', socket_user.get(socket.id));			
+		}
+	});
+
+	socket.on('v1/message read', (friend, chat_id) => {
+		let friend_socket = user_socket.get(friend);
+		if (friend_socket) {
+			socket.to(user_socket.get(friend)).emit('v1/message read', socket_user.get(socket.id), chat_id);			
 		}
 	});
 
