@@ -5,6 +5,7 @@ const compose = require('koa-compose');
 const Router = require('@koa/router');
 const user_controller = require('../controller/user_controller');
 const userinfo_controller = require('../controller/userinfo_controller');
+const friend_controller = require('../controller/friend_controller');
 
 const router = new Router();
 
@@ -37,5 +38,10 @@ router.put('/userinfo/nickname', userinfo_controller.updateNickname);
  * Update the photo of a user
  */
 router.put('/userinfo/photo', userinfo_controller.updatePhoto);
+
+/**
+ * Get the friends of a user
+ */
+router.get('/friends/:username', friend_controller.getFriends);
 
 module.exports = router;
