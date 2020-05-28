@@ -2,6 +2,148 @@
 
 # QingMang
 
+## 2020/05/28
+
+*Socket.IO*模块支持以下事件：
+
+- `login`
+- `logout`
+- `v2/message`
+- `v2/friend/remove`
+- `v2/friend/add`
+- `v2/friend/access`
+
+
+
+**Event** `login`
+
+*Socket.IO*内部注册，方便之后通过username来聊天
+
+**Kind** $CSSC$
+
+**Purpose**
+
+|          | **Client -> Server** | **Server -> Client**             |
+| -------- | -------------------- | -------------------------------- |
+| **emit** | 用户请求登录         | 告知用户登录成功                 |
+| **on**   | 监听是否登录成功     | 在内部建立socket与username的映射 |
+
+**Callback Params**
+
+|                   | **Client -> Server** |      | **Server -> Client** |
+| ----------------- | -------------------- | ---- | -------------------- |
+| username `String` | 用户名               | null |                      |
+
+
+
+**Event** `logout`
+
+*Socket.IO*内部注销
+
+**Kind** $CSSC$
+
+**Purpose**
+
+|          | **Client -> Server** | **Server -> Client**             |
+| -------- | -------------------- | -------------------------------- |
+| **emit** | 用户请求注销         | 告知用户注销成功                 |
+| **on**   | 监听是否注销成功     | 在内部删除socket与username的映射 |
+
+**Callback Params**
+
+|      | **Client -> Server** |      | **Server -> Client** |
+| ---- | -------------------- | ---- | -------------------- |
+| null |                      | null |                      |
+
+
+
+**Event** `v2/message`
+
+发送消息，该版本隐藏了room的信息
+
+**Kind** $CSSC'$
+
+**Purpose**
+
+|          | **Client -> Server** | **Server -> Client** |
+| -------- | -------------------- | -------------------- |
+| **emit** | 用户发消息           | 转发消息             |
+| **on**   | 监听发来的消息       | 监听消息             |
+
+**Callback Params**
+
+|                       | **Client -> Server** |                       | **Server -> Client** |
+| --------------------- | -------------------- | --------------------- | -------------------- |
+| friend `String`       | 好友的用户名         | friend                | 好友的用户名         |
+| message `Object`      |                      | message               |                      |
+| message.text `String` | 文本                 | message.text `String` | 文本                 |
+|                       |                      | message.time `Number` | 距离1970-1-1的毫秒数 |
+
+
+
+**Event** `v2/friend/remove`
+
+删除好友消息
+
+**Kind** $CSSC'$
+
+**Purpose**
+
+|          | **Client -> Server** | **Server -> Client** |
+| -------- | -------------------- | -------------------- |
+| **emit** | 发送删除好友消息     | 转发消息             |
+| **on**   | 接收被删除的消息     | 监听消息             |
+
+**Callback Params**
+
+|                 | **Client -> Server** |        | **Server -> Client** |
+| --------------- | -------------------- | ------ | -------------------- |
+| friend `String` | 好友的用户名         | friend | 好友的用户名         |
+
+
+
+**Event** `v2/friend/add`
+
+添加好友申请消息
+
+**Kind** $CSSC'$
+
+**Purpose**
+
+|          | **Client -> Server** | **Server -> Client** |
+| -------- | -------------------- | -------------------- |
+| **emit** | 发送添加好友申请消息 | 转发消息             |
+| **on**   | 接收好友申请消息     | 监听消息             |
+
+**Callback Params**
+
+|                 | **Client -> Server** |        | **Server -> Client** |
+| --------------- | -------------------- | ------ | -------------------- |
+| friend `String` | 好友的用户名         | friend | 好友的用户名         |
+
+
+
+**Event** `v2/friend/access`
+
+通过好友申请消息
+
+**Kind** $CSSC'$
+
+**Purpose**
+
+|          | **Client -> Server** | **Server -> Client** |
+| -------- | -------------------- | -------------------- |
+| **emit** | 发送通过好友申请消息 | 转发消息             |
+| **on**   | 接收通过好友申请消息 | 监听消息             |
+
+**Callback Params**
+
+|                 | **Client -> Server** |        | **Server -> Client** |
+| --------------- | -------------------- | ------ | -------------------- |
+| friend `String` | 好友的用户名         | friend | 好友的用户名         |
+
+
+
 ## 2020/04/27
 
 在0427版本的「青芒」服务器中：
