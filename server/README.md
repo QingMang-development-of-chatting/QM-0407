@@ -69,6 +69,43 @@ URL Example: */path/to/myfile.html?key1=value1&key2=value2*
 
 ---
 
+## /friends/:username `GET`
+
+获取好友列表，通过用户的username，查询用户的好友
+
+**Kind**
+
+**request**
+
+URL
+
+| Param    | Description |
+| -------- | ----------- |
+| username | 用户名      |
+
+**response**
+
+status code
+
+- `200 OK ` - 获取成功
+
+Body
+
+| Param | Type     | Description  |
+| ----- | -------- | ------------ |
+| -     | `Array`  | 用户信息数组 |
+| -[i]  | `String` | 用户名       |
+
+**返回的数组挂载在Body上
+
+**Example**
+
+```js
+curl -v 127.0.0.1:3000/friends/0080
+```
+
+---
+
 ## /userinfo `POST`
 
 获取资料接口，通过用户的username，查询用户信息
