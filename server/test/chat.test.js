@@ -25,16 +25,17 @@ chat.on('logout', (reason) => {
 	console.log(`u r out, ${reason}`);
 });
 
-chat.on('message', (friend, text) => {
-	console.log(`${friend}: ${text}`);
+chat.on('v2/message', (friend, message) => {
+	let { text, time } = message;
+	console.log(`${friend}: ${text} (${new Date(time)})`);
 });
 
-chat.on('v1/friend/add', friend => {
+chat.on('v2/friend/add', friend => {
 	console.log('new annotation from ' + friend);
 	mailbox.push({type: 'add', name: friend});
 });
 
-chat.on('v1/friend/access', friend => {
+chat.on('v2/friend/access', friend => {
 	console.log('new friend! say hello to ' + friend);
 	friends.push(friend);
 });
@@ -56,7 +57,9 @@ const main = async function() {
 			const friend = await readLine();
 			console.log('say something...');
 			const text = await readLine();
-			chat.emit('message', friend, text);
+			let message = {};
+			message.text = text;
+			chat.emit('v2/message', friend, message);
 		}
 		if (command === 'friends') {
 			console.table(friends);
@@ -67,27 +70,20 @@ const main = async function() {
 		if (command === 'add friend') {
 			console.log('please enter name to be friend...');
 			const friend = await readLine();
-			chat.emit('v1/friend/add', friend);
+			chat.emit('v2/friend/add', friend);
+		}
+		if (command === 'remove friend') {
+			console.log('please enter name to remove...');
+			const friend = await readLine();
+			chat.emit('v2/friend/remove', friend);
 		}
 		if (command === 'new friend') {
 			console.log('please enter name to access...');
 			const friend = await readLine();
-			chat.emit('v1/friend/access', friend);
+			chat.emit('v2/friend/access', friend);
 			friends.push(friend);
 		}
 	}
-	// console.log(`Welcome! ${nickname}`);
-	// while (true) {
-	// 	console.log('join a room!');
-	// 	const room_id = await readLine();
-	// 	chat.emit('v1/join room', room_id);
-	// 	console.log('type something nice! character "&" to leave the current room');
-	// 	while ((text = await readLine()) !== '&') {
-	// 		console.log(`You: ${text}`);
-	// 		chat.emit('v1.1/message', room_id, { sender: nickname, text: text });
-	// 	}
-	// 	chat.emit('v1/leave room', room_id);
-	// }
 };
 
 main();
