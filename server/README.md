@@ -69,6 +69,47 @@ URL Example: */path/to/myfile.html?key1=value1&key2=value2*
 
 ---
 
+## /notifications/:username `GET`
+
+获取历史好友通知列表
+
+**Kind**
+
+**request**
+
+URL
+
+| Param    | Description |
+| -------- | ----------- |
+| username | 用户名      |
+
+**response**
+
+status code
+
+- `200 OK ` - 获取成功
+
+Body
+
+| Param          | Type     | Description                    |
+| -------------- | -------- | ------------------------------ |
+| -              | `Array`  | 好友通知数组                   |
+| -[i]           | `Object` | 通知对象                       |
+| -[i].applicant | `String` | 好友名                         |
+| -[i].answer    | `Number` | -1: 已拒绝 0: 未处理 1: 已接受 |
+
+**返回的数组挂载在Body上**
+
+**Example**
+
+```js
+curl -v 127.0.0.1:3000/notifications/0003
+```
+
+
+
+---
+
 ## /friends/:username `GET`
 
 获取好友列表，通过用户的username，查询用户的好友
@@ -96,7 +137,7 @@ Body
 | -     | `Array`  | 用户信息数组 |
 | -[i]  | `String` | 用户名       |
 
-**返回的数组挂载在Body上
+**返回的数组挂载在Body上**
 
 **Example**
 
