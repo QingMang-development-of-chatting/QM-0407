@@ -9,7 +9,7 @@ const service = require('../service/friendService');
 const Controller = {};
 
 /**
- * Get user's friends'
+ * Get user's friends
  * 
  * static method
  * 
@@ -20,6 +20,20 @@ Controller.getFriends = async function(ctx) {
 	const friends = await service.getFriendArray(username);
 	ctx.status = 200;
 	ctx.body = friends;
+};
+
+/**
+ * Get user's notifications
+ * 
+ * static method
+ * 
+ * @param {Koa.ctx} ctx
+ */
+Controller.getNotifications = async function(ctx) {
+	let { username } = ctx.params;
+	const notifications = await service.getFriendRequest(username);
+	ctx.status = 200;
+	ctx.body = notifications;
 };
 
 module.exports = Controller;
