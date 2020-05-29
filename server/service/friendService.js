@@ -1,6 +1,7 @@
 //Module Dependencies
 const searchUser = require('../query2.0/searchFriend.js');
 const addFriend = require('../query2.0/addFriend.js');
+const insertFriend = require('../query2.0/insertFriend.js');
 //API
 const FriendService = {};
 
@@ -57,6 +58,75 @@ FriendService.getFriendRequest= async function (user_id) {
     return friend_request_array;
 };
 
+/**
+ * 发送添加好友请求
+ * true/false = addFriend(user_id, friend_id) 
+ * @param   {String}    user_id     发送者，自己
+ * @param   {String}    friend_id
+ * @return  {bool}      result
+ */
+FriendService.addFriend= async function (user_id,friend_id) {
+    var result = await addFriend.askHost({"host_id":user_id,"friend_id":friend_id});
+    console.log(result);
+    if(result==300){
+        console.log("已发送申请");
+        return true;
+    }else if(result==303){
+        console.log("已有请求");
+    }
+    console.log("出错");
+    return false;
+};
+
+/**
+ * TODO 删除好友并发送给被删的用户提示
+ * true/false = removeFriend(user_id, friend_id) 
+ * @param   {String}    user_id
+ * @param   {String}    friend_id
+ * @return  {bool}      result
+ */
+FriendService.removeFriend= async function (user_id,friend_id) {
+
+};
+
+/**
+ * 通过/拒绝好友请求，扩列并发送提示给发起人 
+ * true/false = accessFriend(user_id, friend_id，pass) 
+ * @param   {String}    user_id     接收者，用户自己
+ * @param   {String}    friend_id   发送者
+ * @param   {bool}      pass        通过/拒绝
+ * @return  {bool}      result
+ */
+FriendService.accessFriend= async function (user_id,friend_id,pass) {
+    //接收方通过申请
+    if (pass){
+        var result = await addFriend.answerFriend({"host_id":user_id,"friend_id":friend_id,"answer":301});
+        if (result==303||result==304){
+            console.log("申请不存在/不止一条待处理/已处理/bug");
+            return false;
+        }
+        //双方添加好友
+        var result1 = await insertFriend({"host_id":user_id,"friend_id":friend_id});
+        if(result1==405){
+            console.log("好友已存在列表中");
+            return false;
+        }
+        console.log("成功接受该好友申请");
+        return true;
+    }else if(pass==false){
+        var result = await addFriend.answerFriend({"host_id":user_id,"friend_id":friend_id,"answer":302});
+        console.log("成功拒绝该好友申请");
+        return true;
+    }else{
+        console.log("出错");
+        return false;
+    }
+};
+
+
+
 module.exports = FriendService;
 //FriendService.getFriendArray("0080");
 //FriendService.getFriendRequest("0003");
+//FriendService.addFriend("33333","444");
+//FriendService.accessFriend("444","33333",true);
