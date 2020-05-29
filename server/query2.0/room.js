@@ -60,14 +60,13 @@ const searchRoom = async function(info) {
         if (status == 310)
         {
             console.log(310);
-            return 310;
+            result = 310;
         }
         else
         {
             console.log(200);   
             result = status;
             console.log(result);
-            return result;
         }
     })
 
