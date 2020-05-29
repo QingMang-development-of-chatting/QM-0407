@@ -91,12 +91,12 @@ const askHost = async function(info) {
         if (status == 300)
         {
             console.log(300);
-            return 300;
+            result = 300;
         }
         else if (status == 303)
         {
             console.log(303);
-            return 303;
+            result = 303;
         }
     })
 
@@ -132,14 +132,13 @@ const answerFriend = async function(info) {
         if (status == 303 || status == 304)
         {
             console.log("303");
-            return status;
+            result = status;
         }
         else
         {
             console.log(200);
             console.log(status);
             result = status;
-            return result;
         }
     })
 
@@ -172,7 +171,7 @@ const answerHost = async function(info) {
         if (status[0] == null)
         {
             console.log(305);
-            return 305;
+            result = 305;
         }
         else
         {
@@ -181,7 +180,6 @@ const answerHost = async function(info) {
              */
             console.log(status);
             result = status;
-            return result;
         }
     })
 
