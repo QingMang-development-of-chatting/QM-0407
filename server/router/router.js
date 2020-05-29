@@ -44,4 +44,9 @@ router.put('/userinfo/photo', userinfo_controller.updatePhoto);
  */
 router.get('/friends/:username', friend_controller.getFriends);
 
+/**
+ * Get the notifications of a user
+ */
+router.get('/notifications/:username', friend_controller.getNotifications);
+
 module.exports = router;
