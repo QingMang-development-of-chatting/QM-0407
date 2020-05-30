@@ -10,7 +10,7 @@
             <el-avatar id="avatar"  shape="square" :size="120" fit="cover" :src="avatarUrl" ></el-avatar>
 <!--            <el-button class="settingButton"  id="settingButtonAvatar" type="text" icon="el-icon-edit">修改</el-button>-->
 
-            <el-upload class="settingButton" id="settingButtonAvatar" action="#" accept="image/png,image/gif,image/jpg,image/jpeg"  :on-change="changeAvatar" >
+            <el-upload class="settingButton" id="settingButtonAvatar" :action=actionApi :accept=acceptForm  :http-request="changeAvatar" :show-file-list="false" >
                 <i class="el-icon-edit"></i>修改
             </el-upload>
         </div>
@@ -31,13 +31,15 @@
         props: {
             id: String,
             nickname: String,
-            avatarUrl: String
+            avatarUrl: String,
         },
         data(){
             return{
                 isEdit:false,
                 editButtonText:"修改",
                 nicknameEdit:"",
+                actionApi:"",
+                acceptForm:"image/png,image/gif,image/jpg,image/jpeg"
             }
         },
         methods:{
@@ -58,7 +60,7 @@
                 this.$emit('closeInfo');
             },
             //修改头像
-            changeAvatar(res,file){
+            changeAvatar(file){
                 this.$emit('changeAvatar',file);
             }
         }
@@ -97,9 +99,14 @@
     .settingButton{
         font-size: inherit;
     }
-    #info-avatar,#info-id,#info-nickname{
+    #info-avatar,#info-nickname{
         position:relative;
         top:42px;
+        left:110px;
+    }
+    #info-id{
+        position:relative;
+        top:35px;
         left:110px;
     }
     #info-head{
@@ -128,7 +135,7 @@
     #settingButtonAvatar{
         position: relative;
         color: teal;
-        left:270px;
+        left:275px;
         bottom:30px;
     }
 

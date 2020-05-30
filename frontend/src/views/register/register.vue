@@ -7,25 +7,29 @@
             <div class="input-div" @mouseover="showClIdIcon" @mouseleave="showClearIdIcon = false" >
                 <el-input placeholder="请输入用户名" v-model="id" maxlength="15"    prefix-icon="el-icon-user-solid" @input="showClIdIcon">
                      <el-button class="Icon" v-if="showClearIdIcon" slot="suffix" type="text" icon="el-icon-error" @click="clearIdInput"></el-button>
-                 </el-input>-
+                 </el-input>
             </div>
         </el-tooltip>
-        <span  v-if="idRemind" id="idRemind">{{idTips}}</span>
+        <span  v-if="idRemind" id="foundRemind">{{idTips}}</span>
         <br/>
         <el-tooltip class="item" effect="dark" content="输入8到16位字符组合" placement="top-start">
 <!--            <el-input  placeholder="请输入密码"  v-model="password" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>-->
             <div class="input-div"  @mouseover="showPassIcon" @mouseleave="showPasswordIcon = false">
-                <el-input  placeholder="请输入密码" :type="passwordType" v-model="password" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon">
-                    <el-button  class="Icon" v-if="showPasswordIcon" slot="suffix" type="text" icon="el-icon-view" @click="showPass"></el-button>
-                </el-input>
+                <form >
+                    <el-input  placeholder="请输入密码" :type="passwordType" v-model="password" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon">
+                        <el-button  class="Icon" v-if="showPasswordIcon" slot="suffix" type="text" icon="el-icon-view" @click="showPass"></el-button>
+                    </el-input>
+                </form>
             </div>
         </el-tooltip>
         <span  v-if="passwordRemind" id="passwordRemind">{{passwordTips}}</span>
         <br/>
         <div class="input-div" @mouseover="showPassIcon1" @mouseleave="showPasswordIcon1 = false">
-            <el-input  placeholder="请再次输入密码"  :type="passwordConfirmType" v-model="password1" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon1">
-                <el-button  class="Icon" v-if="showPasswordIcon1" slot="suffix" type="text" icon="el-icon-view" @click="showPass1"></el-button>
-            </el-input>
+            <form>
+                <el-input  placeholder="请再次输入密码"  :type="passwordConfirmType" v-model="password1" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon1">
+                    <el-button  class="Icon" v-if="showPasswordIcon1" slot="suffix" type="text" icon="el-icon-view" @click="showPass1"></el-button>
+                </el-input>
+            </form>
         </div>
         <span  v-if="passwordConfirm" id="passwordConfirm">{{confirmTips}}</span>
         <br/>
@@ -117,11 +121,25 @@
                         username: this.id,
                         password: this.password,
                         nickname: this.nickname
-                    }).then((result)=>{
+                    })
+                        .then((result)=>{
                         console.log(result);
-                        this.$message({message:"注册成功",type:"success"});
-                        window.location.href = "login";
-                    }).catch((error)=>{
+                        this.isLoading = false;
+                        this.registerText = "注册";
+                        this.$confirm('注册成功, 是否跳转至登录页面?', '提示', {
+                            confirmButtonText: '是',
+                            cancelButtonText: '否',
+                            confirmButtonClass:'confirmButton',
+                            cancelButtonClass:'cancelButton',
+                            type: 'info',
+                            center: true
+                        })
+                            .then(() => {
+                            this.$message({message:"即将跳转至登录页面",type:"success"});
+                            window.location.href = "login";
+                        });
+                    })
+                        .catch((error)=>{
                         console.log(error.response.status);
                         if(error.response.status === 400)
                             this.$message({message:"注册失败，该账号已被使用",type:"error"});
@@ -312,7 +330,14 @@
         opacity: 1;
         color: rgb(255, 253, 253);
     }
-    #idRemind,#passwordRemind,#passwordConfirm,#nicknameRemind{
+    #foundRemind,#nicknameRemind{
+        position: absolute;
+        margin-top: 60px;
+        margin-left: 30px;
+        font-size: 18px;
+        color: #ff0000c2;
+    }
+    #passwordRemind,#passwordConfirm{
         position: absolute;
         margin-top: 60px;
         margin-left: 30px;
@@ -331,7 +356,26 @@
     .input-div{
         display: inline;
     }
-
-
-
+    form{
+        display: inline-block;
+    }
+</style>
+<style lang="css">
+    .confirmButton{
+        background-color: #53affe !important;
+        margin-left: -150px !important;
+        font-size: 14px;
+    }
+    .confirmButton:hover{
+        background-color: #1c96fe !important;
+    }
+    .cancelButton{
+        font-size: 14px;
+        background-color: #cfcfcf !important;
+        color: white;
+    }
+    .cancelButton:hover{
+        background-color: #b5b5b5 !important;
+        color: white;
+    }
 </style>

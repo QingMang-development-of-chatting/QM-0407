@@ -3,15 +3,15 @@
         <div class="addHead">
             <span class="headText">新的朋友</span>
         </div>
-        <div class="addApply">
+        <div class="addApply" >
             <div class="input-div" @mouseover="showClIcon" @mouseleave="showClearIcon = false">
                 <el-input placeholder="请输入用户账号" v-model="searchId" maxlength="15"  @input="showClIcon">
                     <el-button  class="Icon" v-if="showClearIcon" slot="suffix" type="text" icon="el-icon-error" @click="clearInput"></el-button>
                 </el-input>
                 <el-button id="searchButton" @click="searchUser(searchId)" icon="el-icon-search">查找</el-button>
             </div>
-            <div  v-if="idRemind" id="idRemind">{{idTips}}</div>
-            <div v-if="showFound" id="foundUser">
+            <div v-if="showFoundRemind"  v-loading="loading" id="foundRemind">{{foundTips}}</div>
+            <div v-if="showFound" v-loading="loading"  id="foundUser">
                 <el-avatar  id="foundUserAvatar" shape="square" :size="110" fit="cover" :src="foundUser.avatar" ></el-avatar>
                 <br/>
                 <span id="foundUserId">账号：{{foundUser.id}}</span>
@@ -27,10 +27,10 @@
                 <div class="applyItem" v-for="applyMessage in applyMessages" :key="applyMessage.index">
                     <el-avatar class="applyAvatar" shape="square" :size="60" fit="cover" :src="applyMessage.avatar"></el-avatar>
                     <span class="applyNickname">{{applyMessage.nickname}}</span>
-                    <span class="acceptText" v-if="applyMessage.dispose == 1">已接受</span>
-                    <span class="rejectText" v-if="applyMessage.dispose == -1">已拒绝</span>
-                    <el-button class="acceptButton" circle icon="el-icon-check" v-if="applyMessage.dispose == 0" @click="accept(applyMessage.id)"></el-button>
-                    <el-button class="rejectButton" circle  icon="el-icon-close" v-if="applyMessage.dispose == 0" @click="reject(applyMessage.id)"></el-button>
+                    <span class="acceptText" v-if="applyMessage.dispose === 1">已接受</span>
+                    <span class="rejectText" v-if="applyMessage.dispose === -1">已拒绝</span>
+                    <el-button class="acceptButton" circle icon="el-icon-check" v-if="applyMessage.dispose === 0" @click="accept(applyMessage.id)"></el-button>
+                    <el-button class="rejectButton" circle  icon="el-icon-close" v-if="applyMessage.dispose === 0" @click="reject(applyMessage.id)"></el-button>
                 </div>
             </div>
         </div>
@@ -46,6 +46,10 @@
             foundUser:Object,
             //是否显示查找到的用户
             showFound:Boolean,
+            //是否显示查找结果文本
+            showFoundRemind:Boolean,
+            //是否正在加载
+            loading:Boolean,
         },
         data(){
             return{
@@ -53,11 +57,8 @@
                 searchId:"",
                 //是否显示清除图标
                 showClearIcon:false,
-                //是否显示查找结果提示
-                idRemind:false,
                 //查找结果提示文本
-                idTips:"",
-                //查找结果
+                foundTips:"未查找到该用户",
             }
         },
         methods:{
@@ -88,12 +89,6 @@
             },
         },
         watch:{
-            //检测输入栏是否为空
-            searchId(val){
-                if (val==="")
-                    console.log("账号不能为空");
-            }
-
         }
     };
 </script>
@@ -157,8 +152,9 @@
         border:unset;
         color:white;
     }
-    #idRemind{
-        margin-top: 100px;
+    #foundRemind{
+        width: fit-content;
+        margin:100px auto ;
         font-size: 20px;
         color: #ababab;
     }
