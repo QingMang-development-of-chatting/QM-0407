@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router'
 import Vuex from 'vuex'
 import store from './store/index'
-import VueSocketIO from 'vue-socket.io'
+//import VueSocketIO from 'vue-socket.io'
 //引入element组件
 import './plugins/element.js'
 //引入axios

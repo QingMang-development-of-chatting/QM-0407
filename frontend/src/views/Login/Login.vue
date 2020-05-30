@@ -10,13 +10,15 @@
                 <el-button  class="Icon" v-if="showClearIcon" slot="suffix" type="text" icon="el-icon-error" @click="clearInput"></el-button>
             </el-input>
         </div>
-            <span  v-if="idRemind" id="idRemind">{{idTips}}</span>
+            <span  v-if="idRemind" id="foundRemind">{{idTips}}</span>
             <br/>
 <!--        <el-input  placeholder="请输入密码"  v-model="password" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>-->
         <div class="input-div" @mouseover="showPassIcon" @mouseleave="showPasswordIcon = false" >
-            <el-input  placeholder="请输入密码"  :type="passwordType" v-model="password" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon">
-                <el-button  class="Icon" v-if="showPasswordIcon" slot="suffix" type="text" icon="el-icon-view" @click="showPass"></el-button>
-            </el-input>
+            <form>
+                <el-input  placeholder="请输入密码"  :type="passwordType" v-model="password" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon">
+                    <el-button  class="Icon" v-if="showPasswordIcon" slot="suffix" type="text" icon="el-icon-view" @click="showPass"></el-button>
+                </el-input>
+            </form>
         </div>
              <span  v-if="passwordRemind" id="passwordRemind">{{passwordTips}}</span>
         <br/>
@@ -77,18 +79,22 @@
                     this.$axios.post("/login",{
                         username:this.id,
                         password:this.password
-                    }).then((result)=>{
+                    })
+                        .then((result)=>{
                         console.log(result);
                         this.$message({message:"登录成功",type:"success"});
                         window.localStorage.setItem("username",this.id);
                         this.$store.commit('setUser',this.id);
                         window.location.href = "home";
-                    }).catch((error)=>{
-                        console.log(error.response.status);
+                    })
+                        .catch((error)=>{
+                        // console.log(error.response.status);
                         this.isLoading = false;
                         this.loginText = "登录";
-                        if(error.response.status === 400)
-                            this.$message({message:"登录失败：账号或者密码错误",type:"error"});
+                        if(error.response.status === 401)
+                            this.$message({message:"登录失败：密码错误",type:"error"});
+                        else if(error.response.status === 402)
+                            this.$message({message:"登录失败：账号不存在",type:"error"});
                         else if(error.response.status === 403) {
                             this.$message({message:"该用户已登录",type:"warning"});
                             //setTimeout(function(){window.location.href = "home"},2000);
@@ -211,7 +217,7 @@
         opacity: 1;
         color: rgb(255, 253, 253);
     }
-    #idRemind,#passwordRemind{
+    #foundRemind,#passwordRemind{
         position: absolute;
         margin-top: 60px;
         margin-left: 30px;
@@ -230,7 +236,7 @@
     .input-div{
         display: inline;
     }
-
-
-
+    form{
+        display: inline-block;
+    }
 </style>

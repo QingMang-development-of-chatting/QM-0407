@@ -25,7 +25,9 @@
                 <img id="emojiIcon" :src="emoji" alt="emoji"/>
             </div>
             <div class="inputArea">
-                <textarea v-model = "messageInput" class="inputText" maxlength="180" placeholder="请输入消息内容"/>
+                <label>
+                    <textarea v-model = "messageInput" class="inputText" maxlength="180" placeholder="请输入消息内容"/>
+                </label>
                 <br/>
                 <el-button id="send" size="medium" @click="sendMessage(messageInput)">发送</el-button>
             </div>
@@ -121,6 +123,7 @@
         width: fit-content;
         width: -moz-fit-content;
         word-wrap: break-word;
+        white-space: pre-wrap;
     }
     .friendMessage{
         position: relative;
@@ -135,6 +138,7 @@
         width: fit-content;
         width: -moz-fit-content;
         word-wrap: break-word;
+        white-space: pre-wrap;
     }
     .inputMenu{
         font-size: 20px;
