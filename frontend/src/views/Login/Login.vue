@@ -84,7 +84,6 @@
                         console.log(result);
                         this.$message({message:"登录成功",type:"success"});
                         window.localStorage.setItem("username",this.id);
-                        this.$store.commit('setUser',this.id);
                         window.location.href = "home";
                     })
                         .catch((error)=>{
