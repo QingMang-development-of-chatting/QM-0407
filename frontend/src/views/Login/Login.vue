@@ -32,11 +32,13 @@
     export default {
         name:"login",
         mounted() {
-            this.$store.state.username = window.localStorage.getItem("username");
-            console.log(this.$store.state.username);
-            if(this.$store.state.username != null)
+            let id = window.localStorage.getItem("username");
+            console.log("已登录用户:",id);
+            if(id != null)
             {
-                this.$message({message:"您已登录, 即将跳转至主页",type:"warning"});
+                let tips = "用户"+id;
+                tips += "已登录, 即将跳转至主页";
+                this.$message({message:tips,type:"warning"});
                 setTimeout(function(){window.location.href = "home"},2000);
             }
         },
@@ -90,6 +92,7 @@
                         // console.log(error.response.status);
                         this.isLoading = false;
                         this.loginText = "登录";
+                        console.log(error.response.status);
                         if(error.response.status === 401)
                             this.$message({message:"登录失败：密码错误",type:"error"});
                         else if(error.response.status === 402)
