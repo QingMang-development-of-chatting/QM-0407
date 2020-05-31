@@ -48,6 +48,9 @@
         created() {
             this.init();
         },
+        // mounted() {
+        //     this.$socket.emit('login',this.currentUser.id );
+        // },
         data(){
             return{
                 //初始化图标url
@@ -138,35 +141,41 @@
                 await this.$axios.get('/friends/'+id)
                     .then(async(result)=> {
                         console.log("好友列表返回",result);
-                        await this.$axios.post('userinfo',{users:result.data})
-                            .then((response)=>{
-                                console.log("好友资料返回",response);
-                                let friendInfo={};
-                                for (let i = 0; i < response.data.length; i++)
-                                {
-                                    let avatar = response.data[i].user_photo;
-                                    if(avatar == 0)
-                                        avatar = avatar0;   //好友未设置头像，显示默认头像
-                                    friendInfo[response.data[i].user_id] = {nickname:response.data[i].user_name,avatar:avatar,recentMessage:{},newInfo:false};
-                                }
-                                // console.log(friendInfo);
-                                this.$store.commit('friendInfo/addFriendInfo', friendInfo);
-                                //此处应调用接口获取最近聊天信息用于初始化聊天列表
-                                //设置模拟接口返回数据
-                                let rencentChat = [
-                                    {id:"user00",message:"可达可达？",time:"5月1日",newInfo:true},
-                                    {id:"user01",message:"没干啥",time:"19：49",newInfo:false},
-                                    {id:"user02",message:"就是这样~喵~~~~",time:"昨天",newInfo:true}
-                                ];
-                                this.$store.commit('friendInfo/addRecent',rencentChat);     // 更新最近聊天信息
-                                this.loadingChatBar = false;
-                                // console.log(this.$store.state.friendInfo.friendInfoDic['user00']);
-                                // this.$store.commit('friendInfo/addFriendInfo', temp);
-                            })
-                            .catch((error)=>{
-                                console.log("获取好友资料时，服务器响应错误:",error);
-                                this.loadingChatBar = false;
-                            });
+                        if (result.data.length != 0){   //好友列表非空
+                            await this.$axios.post('userinfo',{users:result.data})
+                                .then((response)=>{
+                                    console.log("好友资料返回",response);
+                                    let friendInfo={};
+                                    for (let i = 0; i < response.data.length; i++)
+                                    {
+                                        let avatar = response.data[i].user_photo;
+                                        if(avatar == 0)
+                                            avatar = avatar0;   //好友未设置头像，显示默认头像
+                                        friendInfo[response.data[i].user_id] = {nickname:response.data[i].user_name,avatar:avatar,recentMessage:{},newInfo:false};
+                                    }
+                                    // console.log(friendInfo);
+                                    this.$store.commit('friendInfo/addFriendInfo', friendInfo);
+                                    //此处应调用接口获取最近聊天信息用于初始化聊天列表
+                                    //设置模拟接口返回数据
+                                    let rencentChat = [
+                                        {id:"user00",message:"可达可达？",time:"5月1日",newInfo:true},
+                                        {id:"user01",message:"没干啥",time:"19：49",newInfo:false},
+                                        {id:"user02",message:"就是这样~喵~~~~",time:"昨天",newInfo:true}
+                                    ];
+                                    this.$store.commit('friendInfo/addRecent',rencentChat);     // 更新最近聊天信息
+                                    this.loadingChatBar = false;
+                                    // console.log(this.$store.state.friendInfo.friendInfoDic['user00']);
+                                    // this.$store.commit('friendInfo/addFriendInfo', temp);
+                                })
+                                .catch((error)=>{
+                                    console.log("获取好友资料时，服务器响应错误:",error);
+                                    this.loadingChatBar = false;
+                                });
+
+                        }
+                        else
+                            this.loadingChatBar = false;    //列表为空不再加载
+
                     })
                     .catch((error)=>{
                         console.log("获取好友列表时，服务器响应错误:",error);
@@ -176,42 +185,35 @@
                 this.$axios.get('/notifications/'+id)
                     .then((result)=>{
                         console.log("好友申请返回",result);
-                        let applyUsers = [];
-                        for(let i = 0;i < result.data.length;i++)
-                            applyUsers.push(result.data[i].applicant);
-                        console.log(applyUsers);
-                        this.$axios.post('userinfo', {users:applyUsers})
-                            .then((response)=>{
-                                console.log("返回申请者资料",response);
-                                let applyInfo=[];
-                                for(let i=0;i<response.data.length;i++)
-                                {
-                                    let id = response.data[i].user_id;
-                                    let nickname = response.data[i].user_name;
-                                    let avatar = response.data[i].user_photo;
-                                    let dispose = result.data[i].answer;
-                                    if (avatar == 0)
-                                        avatar = avatar0;
-                                    applyInfo.push({id:id,nickname:nickname,avatar:avatar,dispose:dispose});
-                                }
-                                this.$store.commit('applyList/set',applyInfo);  //存储好友申请表
-                            })
-                            .catch((error)=>{
-                                console.log("获取申请者资料时出错",error);
-                        });
+                        if(result.data.length !=0){
+                            let applyUsers = [];
+                            for(let i = 0;i < result.data.length;i++)
+                                applyUsers.push(result.data[i].applicant);
+                            console.log(applyUsers);
+                            this.$axios.post('userinfo', {users:applyUsers})
+                                .then((response)=>{
+                                    console.log("返回申请者资料",response);
+                                    let applyInfo=[];
+                                    for(let i=0;i<response.data.length;i++)
+                                    {
+                                        let id = response.data[i].user_id;
+                                        let nickname = response.data[i].user_name;
+                                        let avatar = response.data[i].user_photo;
+                                        let dispose = result.data[i].answer;
+                                        if (avatar == 0)
+                                            avatar = avatar0;
+                                        applyInfo.push({id:id,nickname:nickname,avatar:avatar,dispose:dispose});
+                                    }
+                                    this.$store.commit('applyList/set',applyInfo);  //存储好友申请表
+                                })
+                                .catch((error)=>{
+                                    console.log("获取申请者资料时出错",error);
+                                });
+                        }
                     })
                     .catch((error)=>{
                         console.log(error);
                     });
-                // let temp2 =[
-                //     {id:'user00000',nickname:"可达鸭",avatar:avatar1,dispose:1},
-                //     {id:'user0000x',nickname:"陌生人",avatar:avatar4,dispose:0},
-                //     {id:'user00000',nickname:"可达鸭",avatar:avatar1,dispose:-1},
-                //     {id:'user00001',nickname:"杰尼龟",avatar:avatar2,dispose:1},
-                //     {id:'user00002',nickname:"喵喵怪",avatar:avatar3,dispose:1},
-                // ];
-                // this.$store.commit('applyList/set',temp2);  //存储好友申请表
-
             },
             //显示聊天界面
             showChat(){
@@ -238,6 +240,7 @@
                     .then(()=>{
                         //console.log("已注销");
                         //this.$socket.emit("v1/leave room",this.currentUser);
+                        // this.$socket.emit("logout",this.currentUser.id);
                         window.localStorage.removeItem("username");
                         window.location.href="login";
                     })
@@ -257,6 +260,7 @@
                 if(img){
                     reader.readAsDataURL(img);
                 }
+                //此处调用接口修改头像
                 reader.onload = () => {
                     // let base64Str = reader.result.split(',')[1];
                     let base64Str = reader.result;
@@ -273,10 +277,6 @@
                             this.$message({message:'修改失败',type:'error'});
                         })
                 }
-                //此处需调用接口修改头像
-
-                // this.$store.commit('currentUser/setAvatar',window.URL.createObjectURL(file[0].raw));
-                // this.currentUserAvatar = window.URL.createObjectURL(file[0].raw);
             },
             //修改昵称
             editNickname(nickname){
@@ -357,7 +357,7 @@
                 this.$store.commit('applyList/accept',applyId); //更新申请列表
                 let friendInfo = this.$store.getters['applyList/getApplyUser'](applyId);
                 let friend={applyId:{nickname:friendInfo.nickname,avatar:friendInfo.avatar,recentMessage:{},newInfo:false}};
-                this.$store.commit('friendInfo/addFriendInfo',friend);
+                this.$store.commit('friendInfo/addFriendInfo',friend);  //更新好友列表
                 //console.log(this.$store.state.friendInfo.friendInfoDic);
             },
             //拒绝好友添加请求
@@ -428,16 +428,22 @@
             }
         },
         // sockets:{
-        //     connect() {
-        //         console.log("链接成功");
-        //         this.$socket.emit("v1/join room",this.currentUser);
+        //     // connect() {
+        //     //     console.log("链接成功");
+        //     //     this.$socket.emit("login",this.currentUser.id);
+        //     // },
+        //     // disconnect(){
+        //     //     console.log("断开链接");
+        //     //     this.$socket.emit("logout",this.currentUser.id);
+        //     // },//检测socket断开链接
+        //     // reconnect(){
+        //     //     console.log("重新链接");
+        //     // },
+        //     login(){
+        //         console.log("socket服务已连接");
         //     },
-        //     disconnect(){
-        //         console.log("断开链接");
-        //         this.$socket.emit("v1/leave room",this.currentUser);
-        //     },//检测socket断开链接
-        //     reconnect(){
-        //         console.log("重新链接");
+        //     logout(){
+        //         console.log("socket服务已断开");
         //     },
         // }
     };
