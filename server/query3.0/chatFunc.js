@@ -139,6 +139,7 @@ const searchChat = async function(info) {
             key: info.key,
             date: info.date,
             room: info.room,
+            new: info.new,
         }
     ).then(function(response){
         status = response.data;
