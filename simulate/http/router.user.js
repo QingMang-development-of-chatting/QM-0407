@@ -17,7 +17,8 @@ router.post(HTTP.V1.USER.REGISTER, async ctx => {
 	const is_valid_nickname = typeof(nickname) === 'string';
 	const is_valid = is_valid_username && is_valid_password && is_valid_nickname;
 	if (!is_valid) {
-		return { status: STATUS.BAD_PARAM };
+		ctx.status = 400;
+		return;
 	}
 
 	const result = await user_service.register(username, password, nickname);
