@@ -3,7 +3,9 @@
     <div class="friendbar">
         <el-input  placeholder="请输入好友姓名" v-model="input" clearable suffix-icon="el-icon-search"></el-input>
         <div class="addFriend" @click="showAdd">
-            <i id="addIcon" class="el-icon-circle-plus el-icon--right"></i>
+            <el-badge :value="NewApplyNumber" :hidden="NewApplyNumber<1">
+                <i id="addIcon" class="el-icon-circle-plus el-icon--right"></i>
+            </el-badge>
             <span class="addText">新的朋友</span>
         </div>
         <el-menu class="friendbar-main">
@@ -18,7 +20,10 @@
 <script>
     export default {
         props: {
-            friendList:Object
+            //好友列表
+            friendList:Object,
+            //未处理申请数目
+            NewApplyNumber:Number,
         },
         data(){
             return{
@@ -100,7 +105,11 @@
     }
     .addText{
         position: relative;
-        top:-8px;
-        left:-1px;
+        top:10px;
+    }
+    .el-badge >>> .el-badge__content{
+        right: 40px;
+        top: 15px;
+        background-color: #f51500;
     }
 </style>

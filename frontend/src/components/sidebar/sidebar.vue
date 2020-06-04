@@ -3,11 +3,16 @@
     <div class="sidebar">
         <el-avatar id="avatar" title="修改资料" shape="square" :size="60" fit="cover" v-loading="loadingAvatar" :src="avatarUrl"  @click.native="showInfo" ></el-avatar>
         <br/>
-        <el-link id="chat" v-bind:class="{selected:chatSelect}" title="聊天" :underline="false"  icon="el-icon-chat-line-round" @click="showChat"></el-link>
+        <el-badge  is-dot>
+            <el-link id="chat" v-bind:class="{selected:chatSelect}" title="聊天" :underline="false"  icon="el-icon-chat-line-round" @click="showChat"></el-link>
+        </el-badge>
         <br/>
-        <el-link id="friend" v-bind:class="{selected:friendSelect}" title="通讯录" :underline="false"  icon="el-icon-user-solid" @click="showFriend"></el-link>
+        <el-badge :is-dot="getNewFriend" >
+            <el-link id="friend" v-bind:class="{selected:friendSelect}" title="通讯录" :underline="false"  icon="el-icon-user-solid" @click="showFriend"></el-link>
+        </el-badge>
         <br/>
         <el-link id="logout" title="退出" :underline="false" class="el-icon-switch-button"  @click="logout"></el-link>
+
     </div>
 </template>
 
@@ -17,6 +22,7 @@
         props: {
             avatarUrl:String,   //当前用户头像url
             loadingAvatar:Boolean,  //加载头像中
+            getNewFriend:Boolean,   //是否有好友申请未处理
         },
         data(){
             return {
@@ -69,14 +75,23 @@
         color:red;
     }
     #avatar{
-        position: relative;
-        top:20px;
+        /*position: relative;*/
+        margin-top:20px;
         cursor: pointer;
     }
+
     #chat,#friend{
-        margin-top:30px;
+        margin-top: 30px ;
     }
     #logout{
-        margin-top: 400px;
+        margin-top: 400px ;
     }
+    .el-badge >>>  .el-badge__content{
+        right: 15px;
+        top: 40px;
+        background-color: #f51500;
+        height: 12px;
+        width: 12px;
+    }
+
 </style>

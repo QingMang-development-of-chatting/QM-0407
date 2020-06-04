@@ -2,9 +2,6 @@
 <template>
     <div class="Login">
         <h1>青芒</h1>
-<!--        <el-input placeholder="请输入账号" v-model="id" maxlength="15" prefix-icon="el-icon-user-solid" :clearable="true">-->
-<!--            -->
-<!--        </el-input>-->
         <div class="input-div" @mouseover="showClIcon" @mouseleave="showClearIcon = false">
             <el-input placeholder="请输入账号" v-model="id" maxlength="15" prefix-icon="el-icon-user-solid" @input="showClIcon">
                 <el-button  class="Icon" v-if="showClearIcon" slot="suffix" type="text" icon="el-icon-error" @click="clearInput"></el-button>
@@ -12,7 +9,6 @@
         </div>
             <span  v-if="idRemind" id="foundRemind">{{idTips}}</span>
             <br/>
-<!--        <el-input  placeholder="请输入密码"  v-model="password" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>-->
         <div class="input-div" @mouseover="showPassIcon" @mouseleave="showPasswordIcon = false" >
             <form>
                 <el-input  placeholder="请输入密码"  :type="passwordType" v-model="password" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon">
@@ -29,17 +25,25 @@
 </template>
 
 <script>
+    let Base64 = require('js-base64').Base64;
     export default {
         name:"login",
         mounted() {
             let id = window.localStorage.getItem("username");
-            console.log("已登录用户:",id);
             if(id != null)
             {
+                let decode_id = Base64.decode(id);
+                id = decode_id.substr(3);
                 let tips = "用户"+id;
                 tips += "已登录, 即将跳转至主页";
-                this.$message({message:tips,type:"warning"});
-                setTimeout(function(){window.location.href = "home"},2000);
+                this.$message({message:tips,type:"warning",duration:1000});
+                setTimeout(()=>{
+                    this.$router.push("/Home");
+                },1000);
+            }
+            if(this.$route.params.register_id) {
+                this.id = this.$route.params.register_id;
+                this.password = this.$route.params.register_password;
             }
         },
         data(){
@@ -72,39 +76,44 @@
             //提交登录处理
             login(){
                 if(this.id === "")
-                    this.$message({message:"账号不能为空",type:"warning"});
+                    this.$message({message:"账号不能为空",type:"warning",duration:800});
                 else if(this.password === "")
-                    this.$message({message:"密码不能为空",type:"warning"});
+                    this.$message({message:"密码不能为空",type:"warning",duration:800});
                 else{
                     this.isLoading = true;
                     this.loginText = "登录中...";
-                    this.$axios.post("/login",{
-                        username:this.id,
-                        password:this.password
-                    })
-                        .then((result)=>{
-                        console.log(result);
-                        this.$message({message:"登录成功",type:"success"});
-                        window.localStorage.setItem("username",this.id);
-                        window.location.href = "home";
-                    })
-                        .catch((error)=>{
-                        // console.log(error.response.status);
-                        this.isLoading = false;
-                        this.loginText = "登录";
-                        console.log(error.response.status);
-                        if(error.response.status === 401)
-                            this.$message({message:"登录失败：密码错误",type:"error"});
-                        else if(error.response.status === 402)
-                            this.$message({message:"登录失败：账号不存在",type:"error"});
-                        else if(error.response.status === 403) {
-                            this.$message({message:"该用户已登录",type:"warning"});
-                            //setTimeout(function(){window.location.href = "home"},2000);
-                        }
-                        else
-                            this.$message({message:"服务器未响应",type:"warning"});
-                    })
+                    this.$socket.emit('userLogin',this.id,this.password,this.login_callback);
                 }
+            },
+            //登录回调函数
+            login_callback(result){
+                console.log("登录接口返回:",result);
+                if(result.status === 2)
+                {
+                    let encode_id = Base64.encode(+ "qm3"+this.id );    //加密账号
+                    let t = "q1m4"+this.password;
+                    let encode_password = Base64.encode(t ); //加密密码
+                    window.localStorage.setItem("username",encode_id);  //保存到本地
+                    window.localStorage.setItem("password",encode_password);    //保存到本地
+                    this.$message({message:"登录成功，即将跳转至主页",type:"success",duration:800});
+                    setTimeout(()=>{
+                        this.$router.push("/Home");
+                    },500);
+                }
+                else if(result.status === 1) {
+                    if(result.reason === 0)
+                        this.$message({message:"未查找到该用户",type:"warning",duration:800});
+                    else if(result.reason === 1)
+                        this.$message({message:"密码错误",type:"error",duration:800});
+                    else if(result.reason === 2)
+                        this.$message({message:"您已登录，请不要重复登录",type:"warning",duration:800});
+                }
+                else if(result.status === 0)
+                    this.$message({message:"请求参数错误",type:"error",duration:800});
+                else
+                    this.$message({message:"服务器无响应",type:"warning",duration:800});
+                this.isLoading = false;
+                this.loginText = "登录";
             },
             //跳转至注册页面
             register(){
@@ -151,7 +160,7 @@
                 }
                 else this.passwordRemind = false;
             }
-        }
+        },
     };
 
 </script>
