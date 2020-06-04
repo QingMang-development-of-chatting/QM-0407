@@ -9,6 +9,13 @@ const { PORT } = require('./constant');
 io_server.attach(http_server);
 
 // listens on port
-http_server.listen(PORT, () => {
-	console.log(`Server listening on port ${PORT}`);
-});
+if (!module.parent) {
+	http_server.listen(PORT, () => {
+		console.log(`Server listening on port ${PORT}`);
+	});	
+}
+
+/**
+ * Expose `http_server`
+ */
+module.exports = http_server;

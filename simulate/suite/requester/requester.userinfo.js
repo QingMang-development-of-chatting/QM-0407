@@ -17,14 +17,14 @@ function Requester() {
 Requester.prototype = Object.create(BasicRequester.prototype);
 Requester.prototype.constructor = BasicRequester;
 
-Requester.prototype.getInfo = function(username) {
+Requester.prototype.getInfo = function(username=':username') {
 	return this._axios.get(
 		HTTP.V1.USERINFO.GET_INFO
 			.replace(':username', username)
 		);
 };
 
-Requester.prototype.setPassword = function(username, password) {
+Requester.prototype.setPassword = function(username=':username', password) {
 	return this._axios.put(
 		HTTP.V1.USERINFO.SET_PASSWORD
 		.replace(':username', username)
@@ -32,7 +32,7 @@ Requester.prototype.setPassword = function(username, password) {
 		);
 };
 
-Requester.prototype.setNickname = function(username, nickname) {
+Requester.prototype.setNickname = function(username=':username', nickname) {
 	return this._axios.put(
 		HTTP.V1.USERINFO.SET_NICKNAME
 			.replace(':username', username)
@@ -40,7 +40,7 @@ Requester.prototype.setNickname = function(username, nickname) {
 		);
 };
 
-Requester.prototype.setPhoto = function(username, photo) {
+Requester.prototype.setPhoto = function(username=':username', photo) {
 	return this._axios.put(
 		HTTP.V1.USERINFO.SET_PHOTO
 			.replace(':username', username)

@@ -38,7 +38,7 @@ EventHandler.prototype.onLogin = function() {
 		const is_valid = is_valid_username && is_valid_password;
 		if (!is_valid) {
 			callback({status: SOCKET.STATUS.BAD_PARAM });
-			return;	
+			return;
 		}
 
 		const result = await user_service.isValid(username, password);
@@ -77,7 +77,7 @@ EventHandler.prototype.onLogin = function() {
  * @api public
  */
 EventHandler.prototype.onLogout = function() {
-	this._socket.on(USER.LOGOUT, callback => {
+	this._socket.on(USER.LOGOUT, (callback) => {
 		const result = user_socket_bimap.departUserSocketBySocket(this._socket.id);
 		if (!result) {
 			callback({status: SOCKET.STATUS.REJECT, reason: REASON.LOGOUT.NO_LOGIN});

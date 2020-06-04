@@ -4,7 +4,7 @@
 const { friend_service } = require('../simulate/service.singleton');
 const { BasicEventHandler } = require('../util');
 const user_socket_bimap = require('./usersocketbimap.singleton');
-const { SERVICE, EVENT: { FRIEND: FRIEND }, SOCKET } = require('../constant');
+const { SERVICE, EVENT: { FRIEND: FRIEND }, SOCKET, REASON } = require('../constant');
 
 /**
  * `EventHandler` constructor
@@ -31,19 +31,16 @@ EventHandler.prototype.constructor = BasicEventHandler;
  */
 EventHandler.prototype.onSendApply = function() {
 	this._socket.on(FRIEND.SEND_APPLY, async (responser, callback) => {
-		let requester = user_socket_bimap.getUserBySocket(this._socket.id);
-		if (!requester) {
-			callback({status: SOCKET.STATUS.REJECT, reason: 'no login'});
-			return;
-		}
-
 		const is_valid = typeof(responser) === 'string';
 		if (!is_valid) {
-			callback({
-				status: SOCKET.STATUS.BAD_PARAM,
-				reason: 'bad parameters\nresponser: expect String'
-			});
+			callback({status: SOCKET.STATUS.BAD_PARAM});
 			return;	
+		}
+
+		let requester = user_socket_bimap.getUserBySocket(this._socket.id);
+		if (!requester) {
+			callback({status: SOCKET.STATUS.REJECT, reason: REASON.FRIEND.SEND_APPLY.NO_LOGIN});
+			return;
 		}
 
 		const result = await friend_service.applyUserToBeFriend(requester, responser);
@@ -56,9 +53,6 @@ EventHandler.prototype.onSendApply = function() {
 		}
 		else if (result.status === SERVICE.STATUS.REJECT) {
 			callback({status: SOCKET.STATUS.REJECT, reason: result.reason})
-		}
-		else if (result.status === SERVICE.STATUS.BAD_PARAM) {
-			throw new Error('EventHandler: onSendApply. bad parameters');
 		}
 	});
 
@@ -77,19 +71,16 @@ EventHandler.prototype.onSendApply = function() {
  */
 EventHandler.prototype.onResponseAccess = function() {
 	this._socket.on(FRIEND.SEND_ACCESS, async (requester, callback) => {
-		let responser = user_socket_bimap.getUserBySocket(this._socket.id);
-		if (!responser) {
-			callback({status: SOCKET.STATUS.REJECT, reason: 'no login'});
-			return;
-		}
-
 		const is_valid = typeof(requester) === 'string';
 		if (!is_valid) {
-			callback({
-				status: SOCKET.STATUS.BAD_PARAM,
-				reason: 'bad parameters\nrequester: expect String'
-			});
+			callback({status: SOCKET.STATUS.BAD_PARAM});
 			return;	
+		}
+
+		let responser = user_socket_bimap.getUserBySocket(this._socket.id);
+		if (!responser) {
+			callback({status: SOCKET.STATUS.REJECT, reason: REASON.FRIEND.ACCESS.NO_LOGIN});
+			return;
 		}
 
 		const result = await friend_service.accessUserToBeFriend(responser, requester);
@@ -102,9 +93,6 @@ EventHandler.prototype.onResponseAccess = function() {
 		}
 		else if (result.status === SERVICE.STATUS.REJECT) {
 			callback({status: SOCKET.STATUS.REJECT, reason: result.reason})
-		}
-		else if (result.status === SERVICE.STATUS.BAD_PARAM) {
-			throw new Error('EventHandler: onResponseAccess. bad parameters');
 		}
 	});
 
@@ -123,19 +111,16 @@ EventHandler.prototype.onResponseAccess = function() {
  */
 EventHandler.prototype.onSendDelete = function() {
 	this._socket.on(FRIEND.SEND_DELETE, async (friend, callback) => {
-		let username = user_socket_bimap.getUserBySocket(this._socket.id);
-		if (!username) {
-			callback({status: SOCKET.STATUS.REJECT, reason: 'no login'});
+		const is_valid = typeof(friend) === 'string';
+		if (!is_valid) {
+			callback({status: SOCKET.STATUS.BAD_PARAM});
 			return;
 		}
 
-		const is_valid = typeof(friend) === 'string';
-		if (!is_valid) {
-			callback({
-				status: SOCKET.STATUS.BAD_PARAM,
-				reason: 'bad parameters\nfriend: expect String'
-			});
-			return;	
+		let username = user_socket_bimap.getUserBySocket(this._socket.id);
+		if (!username) {
+			callback({status: SOCKET.STATUS.REJECT, reason: REASON.FRIEND.DELETE.NO_LOGIN});
+			return;
 		}
 
 		const result = await friend_service.deleteFriend(username, friend);
@@ -148,9 +133,6 @@ EventHandler.prototype.onSendDelete = function() {
 		}
 		else if (result.status === SERVICE.STATUS.REJECT) {
 			callback({status: SOCKET.STATUS.REJECT, reason: result.reason})
-		}
-		else if (result.status === SERVICE.STATUS.BAD_PARAM) {
-			throw new Error('EventHandler: onSendDelete. bad parameters');
 		}
 	});
 

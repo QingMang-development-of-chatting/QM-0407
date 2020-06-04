@@ -2,7 +2,7 @@
  * Module dependencies
  */
 const db = require('./db.singleton');
-const { NOTIFICATION, SERVICE: { STATUS: STATUS } } = require('../constant');
+const { NOTIFICATION, SERVICE: { STATUS: STATUS }, REASON } = require('../constant');
 
 /**
  * `Service` constructor
@@ -18,16 +18,11 @@ function Service() {}
  *
  *   service.getFriends('Steve Jobs');
  *
- * @param {*} username
+ * @param {String} username
  * @return {Object{status, reason|data}} for result
  * @api public
  */
 Service.prototype.getFriends = async function(username) {
-	let is_valid = typeof(username) === 'string';
-
-	if (!is_valid) {
-		return { status: STATUS.BAD_PARAM, reason: 'type error' };
-	}
 	const result = await db.friends.readFriendsByUsername(username);
 	if (result === null) {
 		return { status: STATUS.OK, data: [] };
@@ -42,16 +37,11 @@ Service.prototype.getFriends = async function(username) {
  *
  *   service.getNotification('Steve Jobs');
  *
- * @param {*} username
+ * @param {String} username
  * @return {Object{status, reason|data}} for result
  * @api public
  */
 Service.prototype.getNotification = async function(username) {
-	let is_valid = typeof(username) === 'string';
-
-	if (!is_valid) {
-		return { status: STATUS.BAD_PARAM, reason: 'type error' };
-	}
 	const result = await db.notifications.readNotificationsByReceiver(username);
 	if (result === null) {
 		return { status: STATUS.OK, data: [] };
@@ -66,21 +56,14 @@ Service.prototype.getNotification = async function(username) {
  *
  *   service.applyUserToBeFriend('Steve Jobs', 'Tim Cook');
  *
- * @param {*} requester
- * @param {*} responser
+ * @param {String} requester
+ * @param {String} responser
  * @return {Object{status, reason|data}} for result
  * @api public
  */
 Service.prototype.applyUserToBeFriend = async function(requester, responser) {
-	let is_valid = typeof(requester) === 'string';
-	is_valid = is_valid && typeof(responser) === 'string';
-
-	if (!is_valid) {
-		return { status: STATUS.BAD_PARAM, reason: 'type error' };
-	}
-
 	if (requester === responser) {
-		return { status: STATUS.REJECT, reason: 'same user' };
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.SEND_APPLY.SAME_USER };
 	}
 
 	const notification = {
@@ -90,13 +73,13 @@ Service.prototype.applyUserToBeFriend = async function(requester, responser) {
 	};
 	const result1 = await db.friends.readFriendsByUsername(requester);
 	if (result1 !== null && result1.has(responser)) {
-		return { status: STATUS.REJECT, reason: 'already friends' };
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.SEND_APPLY.ALREADY_FRIENDS };
 	}
 	const result2 = await db.notifications.createNotification(notification);
 	if (result2) {
 		return { status: STATUS.OK };
 	}
-	return { status: STATUS.REJECT, reason: 'resent' };
+	return { status: STATUS.REJECT, reason: REASON.FRIEND.SEND_APPLY.RESENT };
 };
 
 /**
@@ -108,33 +91,32 @@ Service.prototype.applyUserToBeFriend = async function(requester, responser) {
  *
  *   service.accessUserToBeFriend('Steve Jobs', 'Tim Cook');
  *
- * @param {*} requester
- * @param {*} responser
+ * @param {String} requester
+ * @param {String} responser
  * @return {Object{status, reason|data}} for result
  * @api public
  */
 Service.prototype.accessUserToBeFriend = async function(responser, requester) {
-	let is_valid = typeof(requester) === 'string';
-	is_valid = is_valid && typeof(responser) === 'string';
-
-	if (!is_valid) {
-		return { status: STATUS.BAD_PARAM, reason: 'type error' };
+	if (responser === requester) {
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.SAME_USER };
 	}
-
 	const notification = {
 		sender: responser,
 		receiver: requester,
 		type: NOTIFICATION.TYPE.ACCESSED
 	};
-	const result1 = await db.notifications.createNotification(notification);
-	const result2 = await db.notifications.updateTypeBySenderAndReceiverAndType(
+	const result_notification_update = await db.notifications.updateTypeBySenderAndReceiverAndType(
 		requester, responser, NOTIFICATION.TYPE.APPLY, NOTIFICATION.TYPE.ACCESS);
-	const result3 = await db.friends.createFriends(responser, requester);
-	await db.privaterooms.createPrivateRoom(responser, requester);
-	if (result1 && result2 && result3) {
-		return { status: STATUS.OK };
+	if (!result_notification_update) {
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.NO_SUCH_APLLICANT };
 	}
-	return { status: STATUS.REJECT, reason: 'may resent or no such applicant or already friends' };
+	const result_friends_make = await db.friends.createFriends(responser, requester);
+	if (!result_friends_make) {
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.ALREADY_FRIENDS };
+	}
+	await db.notifications.createNotification(notification);
+	await db.privaterooms.createPrivateRoom(responser, requester);
+	return { status: STATUS.OK };
 };
 
 /**
@@ -144,25 +126,18 @@ Service.prototype.accessUserToBeFriend = async function(responser, requester) {
  *
  *   service.accessUserToBeFriend('Steve Jobs', 'Tim Cook');
  *
- * @param {*} requester
- * @param {*} responser
+ * @param {String} requester
+ * @param {String} responser
  * @return {Object{status, reason|data}} for result
  * @api public
  */
 Service.prototype.rejectUserToBeFriend = async function(responser, requester) {
-	let is_valid = typeof(requester) === 'string';
-	is_valid = is_valid && typeof(responser) === 'string';
-
-	if (!is_valid) {
-		return { status: STATUS.BAD_PARAM, reason: 'type error' };
-	}
-
 	const result = await db.notifications.updateTypeBySenderAndReceiverAndType(
 		requester, responser, NOTIFICATION.TYPE.APPLY, NOTIFICATION.TYPE.REJECT);
 	if (result) {
 		return { status: STATUS.OK };
 	}
-	return { status: STATUS.REJECT, reason: 'may no such applicant' };
+	return { status: STATUS.REJECT, reason: REASON.FRIEND.REJECT.NO_SUCH_APLLICANT };
 };
 
 /**
@@ -179,14 +154,8 @@ Service.prototype.rejectUserToBeFriend = async function(responser, requester) {
  * @api public
  */
 Service.prototype.deleteFriend = async function(username1, username2) {
-	let is_valid = typeof(username1) === 'string';
-	is_valid = is_valid && typeof(username2) === 'string';
-
-	if (!is_valid) {
-		return { status: STATUS.BAD_PARAM, reason: 'type error' };
-	}
 	if (username1 === username2) {
-		return { status: STATUS.REJECT, reason: 'same user' };
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.DELETE.SAME_USER };
 	}
 
 	const notification = {
@@ -194,12 +163,12 @@ Service.prototype.deleteFriend = async function(username1, username2) {
 		receiver: username2,
 		type: NOTIFICATION.TYPE.DELETED
 	};
-	const result1 = await db.notifications.createNotification(notification);
-	const result2 = await db.friends.deleteFriendsByUsernames(username1, username2);
-	if (result1 && result2) {
-		return { status: STATUS.OK };
+	const result_friend_delete = await db.friends.deleteFriendsByUsernames(username1, username2);
+	if (!result_friend_delete) {
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.DELETE.NO_SUCH_FRIEND };
 	}
-	return { status: STATUS.REJECT, reason: 'not friends or resent' };
+	await db.notifications.createNotification(notification);
+	return { status: STATUS.OK };
 };
 
 /**

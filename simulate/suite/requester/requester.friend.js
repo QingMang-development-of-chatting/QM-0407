@@ -17,14 +17,14 @@ function Requester() {
 Requester.prototype = Object.create(BasicRequester.prototype);
 Requester.prototype.constructor = BasicRequester;
 
-Requester.prototype.getFriends = function(username) {
+Requester.prototype.getFriends = function(username=':username') {
 	return this._axios.get(
 		HTTP.V1.FRIEND.GET_FRIENDS
 			.replace(':username', username)
 		);
 };
 
-Requester.prototype.rejectApplicant = function(username, applicant) {
+Requester.prototype.rejectApplicant = function(username=':username', applicant=':applicant') {
 	return this._axios.put(
 		HTTP.V1.FRIEND.REJECT_APPLICANT
 			.replace(':username', username)
@@ -32,7 +32,7 @@ Requester.prototype.rejectApplicant = function(username, applicant) {
 		);
 };
 
-Requester.prototype.getApplicants = function(username) {
+Requester.prototype.getApplicants = function(username=':username') {
 	return this._axios.get(
 		HTTP.V1.FRIEND.GET_APPLICANTS
 			.replace(':username', username)

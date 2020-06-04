@@ -17,7 +17,7 @@ function Requester() {
 Requester.prototype = Object.create(BasicRequester.prototype);
 Requester.prototype.constructor = BasicRequester;
 
-Requester.prototype.register = function(username) {
+Requester.prototype.register = function(username, password, nickname) {
 	return this._axios.post(HTTP.V1.USER.REGISTER, { username, password, nickname });
 };
 

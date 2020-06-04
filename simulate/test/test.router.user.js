@@ -5,6 +5,10 @@ const expect = require('expect.js');
 const axios = require('axios').default;
 const UserRequester = require('../suite/requester/requester.user');
 const { PORT, AXIOS: { HOST: HOST }, REASON } = require('../constant');
+const server = require('../server');
+
+// activates server
+server.listen(PORT);
 
 // sets default base URL
 axios.defaults.baseURL = `${HOST}:${PORT}`;
@@ -67,5 +71,9 @@ describe('User', function() {
 				expect(error.response.data).to.eql(REASON.REGISTER.USER_DUPLICATE);
 			});
 		});
-	})
+	});
+
+	after(function() {
+		server.close();
+	});
 });
