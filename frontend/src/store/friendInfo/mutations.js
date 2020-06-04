@@ -12,11 +12,12 @@ export default {
             Vue.set(state.friendInfoDic,key,info[key]);
         }
     },
-    //修改最近聊天信息info:[{id:~,newInfo:~,message:~,time:~},...]
+    //修改最近聊天信息info:[{id:~,newInfo:~,unread_num:~,message:~,time:~},...]
     addRecent(state,info){
         for (let i=0;i<info.length;i++)
         {
-            Vue.set(state.friendInfoDic[info[i].id], 'newInfo' , info[i].newInfo);
+            Vue.set(state.friendInfoDic[info[i].id],'newInfo' , info[i].newInfo);
+            Vue.set(state.friendInfoDic[info[i].id], 'unread_num' , info[i].unread_num);
             Vue.set(state.friendInfoDic[info[i].id],'recentMessage' ,{message:info[i].message,time:info[i].time});
         }
     },

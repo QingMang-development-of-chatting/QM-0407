@@ -94,61 +94,60 @@
             register(){
                 if(this.id === "")
                 {
-                    this.$message({message:"账号不能为空",type:"warning"});
+                    this.$message({message:"账号不能为空",type:"warning",duration:800});
                 }
                 else if(!usernamePat.test(this.id)){
-                    this.$message({message:"账号不合法",type:"warning"});
+                    this.$message({message:"账号不合法",type:"warning",duration:800});
                 }
                 else if(this.password === "")
                 {
-                    this.$message({message:"密码不能为空",type:"warning"});
+                    this.$message({message:"密码不能为空",type:"warning",duration:800});
                 }
                 else if(this.password.length < 8){
-                    this.$message({message:"密码过短",type:"warning"});
+                    this.$message({message:"密码过短",type:"warning",duration:800});
                 }
                 else if(this.passwordConfirm === true)
                 {
-                    this.$message({message:"两次密码输入不一致", type:"warning"});
+                    this.$message({message:"两次密码输入不一致", type:"warning",duration:800});
                 }
                 else if(this.nickname === "")
                 {
-                    this.$message({message:"昵称不能为空", type:"warning"});
+                    this.$message({message:"昵称不能为空", type:"warning",duration:800});
                 }
                 else{
                     this.isLoading = true;
                     this.registerText = "提交注册中...";
-                    this.$axios.post("register",  {
+                    this.$axios.post('/v1/user/register/',  {
                         username: this.id,
                         password: this.password,
                         nickname: this.nickname
                     })
                         .then((result)=>{
-                        console.log(result);
-                        this.isLoading = false;
-                        this.registerText = "注册";
-                        this.$confirm('注册成功, 是否跳转至登录页面?', '提示', {
-                            confirmButtonText: '是',
-                            cancelButtonText: '否',
-                            confirmButtonClass:'confirmButton',
-                            cancelButtonClass:'cancelButton',
-                            type: 'info',
-                            center: true
-                        })
+                            console.log("注册成功返回：",result);
+                            this.isLoading = false;
+                            this.registerText = "注册";
+                            this.$confirm('注册成功, 是否跳转至登录页面?', '提示', {
+                                confirmButtonText: '是',
+                                cancelButtonText: '否',
+                                confirmButtonClass:'confirmButton',
+                                cancelButtonClass:'cancelButton',
+                                type: 'info',
+                                center: true
+                            })
                             .then(() => {
-                            this.$message({message:"即将跳转至登录页面",type:"success"});
-                            window.location.href = "login";
+                            this.$router.push({name:'Login',params:{register_id:this.id,register_password:this.password}});
                         });
                     })
                         .catch((error)=>{
-                        console.log(error.response.status);
-                        if(error.response.status === 400)
-                            this.$message({message:"注册失败，该账号已被使用",type:"error"});
-                        else if(error.response.status == 403)
-                            this.$message({message:"您已登录，不可注册",type:"warning"});
-                        else
-                            this.$message({message:"服务器未响应",type:"warning"});
-                        this.isLoading = false;
-                        this.registerText = "注册";
+                            console.log("注册时返回错误",error.response);
+                            if(error.response.status == 400)
+                                this.$message({message:"注册失败，请求参数有误",type:"error",duration:800});
+                            else if(error.response.status == 409)
+                                this.$message({message:"注册失败，该账号已被使用",type:"warning",duration:800});
+                            else
+                                this.$message({message:"服务器未响应",type:"warning",duration:800});
+                            this.isLoading = false;
+                            this.registerText = "注册";
                     })
                 }
             },
