@@ -12,7 +12,7 @@ const router = new Router();
 router.get(HTTP.V1.USERINFO.GET_INFO, async ctx => {
 	const { username } = ctx.params;
 
-	const is_valid = typeof(username) === 'string' && username !== ':username';
+	const is_valid = username !== ':username';
 
 	if (!is_valid) {
 		ctx.status = 400;
@@ -34,7 +34,7 @@ router.put(HTTP.V1.USERINFO.SET_PASSWORD, async ctx => {
 	const { username } = ctx.params;
 	const { password } = ctx.request.body;
 
-	const is_valid_username = typeof(username) === 'string' && username !== ':username';
+	const is_valid_username = username !== ':username';
 	const is_valid_password = typeof(password) === 'string';
 	const is_valid = is_valid_username && is_valid_password;
 
@@ -57,7 +57,7 @@ router.put(HTTP.V1.USERINFO.SET_NICKNAME, async ctx => {
 	const { username } = ctx.params;
 	const { nickname } = ctx.request.body;
 
-	const is_valid_username = typeof(username) === 'string' && username !== ':username';
+	const is_valid_username = username !== ':username';
 	const is_valid_nickname = typeof(nickname) === 'string';
 	const is_valid = is_valid_username && is_valid_nickname;
 
@@ -80,7 +80,7 @@ router.put(HTTP.V1.USERINFO.SET_PHOTO, async ctx => {
 	const { username } = ctx.params;
 	const { photo } = ctx.request.body;
 
-	const is_valid_username = typeof(username) === 'string' && username !== ':username';
+	const is_valid_username = username !== ':username';
 	const is_valid_photo = typeof(photo) === 'string';
 	const is_valid = is_valid_username && is_valid_photo;
 

@@ -76,26 +76,6 @@ Table.prototype.readPrivateMessagesByRoomAndTime = async function(room, time) {
 };
 
 /**
- * Get the time of the alst chat in `room`.
- *
- * Examples:
- *
- *   table.readTimeByRoom('...');
- *
- * @param {String} room
- * @return {Array|NULL} for result
- * @api public
- */
-Table.prototype.readTimeByRoom = async function(room) {
-	await delay();
-	if (!this._rooms.has(room)) {
-		return null;
-	}
-	const messages = this._rooms.get(room);
-	return messages.slice(-1)[0].time;
-};
-
-/**
  * Get the number of the un_read chat in `room`.
  *
  * Examples:
@@ -118,23 +98,23 @@ Table.prototype.readUnreadCountByRoom = async function(room) {
 };
 
 /**
- * Get the sender of the last chat in `room`.
+ * Get the last message in `room`.
  *
  * Examples:
  *
- *   table.readTimeByRoom('...');
+ *   table.readLastPrivateMessageByRoom('...');
  *
  * @param {String} room
- * @return {String|NULL} for result
+ * @return {Object|NULL} for result
  * @api public
  */
-Table.prototype.readLastSendertByRoom = async function(room) {
+Table.prototype.readLastPrivateMessageByRoom = async function(room) {
 	await delay();
 	if (!this._rooms.has(room)) {
 		return null;
 	}
-	const message = this._rooms.get(room);
-	return message.slice(-1)[0].sender;
+	const last_messages = this._rooms.get(room).slice(-1)[0];
+	return last_messages;
 };
 
 /**
@@ -160,7 +140,7 @@ Table.prototype.updateIsReadBySenderAndRoom = async function(sender, room) {
 	let is_modified = false;
 	
 	const modify_room = _room.map(message => {
-		if (message.sender === sender) {
+		if (message.sender === sender && message.is_read === false) {
 			message.is_read = true;
 			is_modified = true;
 		}

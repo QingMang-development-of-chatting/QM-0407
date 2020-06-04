@@ -150,7 +150,7 @@ const getChatList = async function(username) {
 	.catch(error => {
 		if (error.response.status === 400) {
 			const reason = error.response.data;
-			console.log(`GetInfo fail, status: ${error.response.status} reason ${reason}`);
+			console.log(`GetChatList fail, status: ${error.response.status} reason ${reason}`);
 		}
 	});
 };
@@ -166,7 +166,7 @@ const getHistory = async function(username, friend, time) {
 	.catch(error => {
 		if (error.response.status === 400 || error.response.status === 409) {
 			const reason = error.response.data;
-			console.log(`SetPassword fail, status: ${error.response.status} reason ${reason}`);
+			console.log(`GetHistoryfail, status: ${error.response.status} reason ${reason}`);
 		}
 	});
 };

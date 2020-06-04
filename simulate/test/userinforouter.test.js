@@ -141,7 +141,7 @@ const setPassword = async function(username, password) {
 			const reason = error.response.data;
 			console.log(`SetPassword fail, status: ${error.response.status} reason ${reason}`);
 		}
-		else if (error.response.status === 408) {
+		else if (error.response.status === 404) {
 			console.log(`SetPassword fail, status: ${error.response.status}`);
 		}
 	});
@@ -170,7 +170,7 @@ const setNickname = async function(username, nickname) {
 			const reason = error.response.data;
 			console.log(`SetNickname fail, status: ${error.response.status} reason ${reason}`);
 		}
-		else if (error.response.status === 408) {
+		else if (error.response.status === 404) {
 			console.log(`SetNickname fail, status: ${error.response.status}`);
 		}
 	});
@@ -199,7 +199,7 @@ const setPhoto = async function(username, photo) {
 			const reason = error.response.data;
 			console.log(`SetPhoto fail, status: ${error.response.status} reason ${reason}`);
 		}
-		else if (error.response.status === 408) {
+		else if (error.response.status === 404) {
 			console.log(`SetPhoto fail, status: ${error.response.status}`);
 		}
 	});
@@ -233,7 +233,7 @@ async function test() {
 	await getInfo('Juncheng Zeng');
 	await setPhoto('Juncheng Zeng', '!#$%');
 	await getInfo('Juncheng Zeng');
-	console.log('\nExpect fail, status 408');
+	console.log('\nExpect fail, status 404');
 	await setPassword('Yunic', '1234');
 	await setNickname('Yunic', 'ZengJia2020');
 	await setPhoto('Yunic', '!#$%');

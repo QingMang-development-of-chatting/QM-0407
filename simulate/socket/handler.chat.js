@@ -4,7 +4,7 @@
 const { chat_service } = require('../simulate/service.singleton');
 const { BasicEventHandler } = require('../util');
 const user_socket_bimap = require('./usersocketbimap.singleton');
-const { SERVICE, EVENT: { CHAT: CHAT }, SOCKET } = require('../constant');
+const { SERVICE, EVENT: { CHAT: CHAT }, SOCKET, REASON } = require('../constant');
 
 /**
  * `EventHandler` constructor
@@ -74,7 +74,7 @@ EventHandler.prototype.onSendMessage = function() {
 	this._socket.on(CHAT.SEND_MESSAGE, async (message, callback) => {
 		let sender = user_socket_bimap.getUserBySocket(this._socket.id);
 		if (!sender) {
-			callback({status: SOCKET.STATUS.REJECT, reason: 'no login'});
+			callback({status: SOCKET.STATUS.REJECT, reason: REASON.SEND_MESSAGE.NO_LOGIN});
 			return;
 		}
 
@@ -84,17 +84,7 @@ EventHandler.prototype.onSendMessage = function() {
 		const is_valid_time = typeof(time) === 'number';
 		const is_valid = is_valid_receiver && is_valid_text && is_valid_time;
 		if (!is_valid) {
-			let reason = 'bad parameters';
-			if (!is_valid_receiver) {
-				reason += '\nreceiver: expect String';
-			}
-			if (!is_valid_text) {
-				reason += '\ntext: expect String';
-			}
-			if (!is_valid_time) {
-				reason += '\ntime: expect Number';
-			}
-			callback({status: SOCKET.STATUS.BAD_PARAM, reason: reason});
+			callback({status: SOCKET.STATUS.BAD_PARAM});
 			return;	
 		}
 
@@ -106,9 +96,6 @@ EventHandler.prototype.onSendMessage = function() {
 		}
 		else if (result.status === SERVICE.STATUS.REJECT) {
 			callback({status: SOCKET.STATUS.REJECT, reason: result.reason});
-		}
-		else if (result.status === SERVICE.STATUS.BAD_PARAM) {
-			throw new Error('EventHandler: onSendMessage. bad parameters');
 		}
 	});
 
@@ -129,14 +116,13 @@ EventHandler.prototype.onSendReadMessage = function() {
 	this._socket.on(CHAT.SEND_READ_MESSAGE, async (sender, callback) => {
 		let receiver = user_socket_bimap.getUserBySocket(this._socket.id);
 		if (!receiver) {
-			callback({status: SOCKET.STATUS.REJECT, reason: 'no login'});
+			callback({status: SOCKET.STATUS.REJECT, reason: REASON.SEND_READ_MESSAGE.NO_LOGIN});
 			return;
 		}
 
 		const is_valid = typeof(sender) === 'string';
 		if (!is_valid) {
-			const reason = 'bad parameters\nsender: expect String';
-			callback({status: SOCKET.STATUS.BAD_PARAM, reason: reason});
+			callback({status: SOCKET.STATUS.BAD_PARAM});
 			return;	
 		}
 
@@ -147,9 +133,6 @@ EventHandler.prototype.onSendReadMessage = function() {
 		}
 		else if (result.status === SERVICE.STATUS.REJECT) {
 			callback({status: SOCKET.STATUS.REJECT, reason: result.reason});
-		}
-		else if (result.status === SERVICE.STATUS.BAD_PARAM) {
-			throw new Error('EventHandler: onSendReadMessage. bad parameters');
 		}
 	});
 

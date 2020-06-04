@@ -11,21 +11,37 @@ const router = new Router();
 // sets routes, get user's recent chatlist
 router.get(HTTP.V1.CHAT.GET_CHATLIST, async ctx => {
 	const { username } = ctx.params;
+
+	const is_valid = typeof(username) !== ':username';
+	if (!is_valid) {
+		ctx.status = 400;
+		return;
+	}
 	
 	const result = await chat_service.getRecentChatList(username);
 	if (result.status === STATUS.OK) {
 		ctx.status = 200;
 		ctx.body = result.data;
 	}
-	else if (result.status === STATUS.BAD_PARAM) {
-		ctx.status = 400;
-		ctx.body = result.reason;
+	else if (result.status === STATUS.NOT_FOUND) {
+		ctx.status = 200;
+		ctx.body = [];
 	}
 });
 
 // sets routes, get user's recent chatlist
 router.get(HTTP.V1.CHAT.GET_HISTORY, async ctx => {
 	const { username, friend, time } = ctx.params;
+
+	const is_valid_username = username !== ':username';
+	const is_valid_friend = friend !== ':friend';
+	const is_valid_time = /(^[0-9]*[1-9][0-9]*)/.test(time);
+	const is_valid = is_valid_username && is_valid_friend && is_valid_time;
+
+	if (!is_valid) {
+		ctx.status = 400;
+		return;
+	}
 	const modify_time = Number.parseInt(time);
 	
 	const result = await chat_service.getMessages(username, friend, modify_time);
@@ -33,12 +49,8 @@ router.get(HTTP.V1.CHAT.GET_HISTORY, async ctx => {
 		ctx.status = 200;
 		ctx.body = result.data;
 	}
-	else if (result.status === STATUS.BAD_PARAM) {
-		ctx.status = 400;
-		ctx.body = result.reason;
-	}
 	else if (result.status === STATUS.REJECT) {
-		ctx.status = 408;
+		ctx.status = 409;
 		ctx.body = result.reason;
 	}
 });

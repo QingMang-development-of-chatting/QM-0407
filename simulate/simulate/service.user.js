@@ -68,11 +68,6 @@ Service.prototype.isValid = async function(username, password) {
  * @api public
  */
 Service.prototype.getInfo = async function(username) {
-	let is_valid = typeof(username) === 'string';
-
-	if (!is_valid) {
-		return { status: STATUS.BAD_PARAM, reason: 'type error' };
-	}
 	const result = await db.users.readUserByUsername(username);
 	if (result === null) {
 		return { status: STATUS.NOT_FOUND };
@@ -101,7 +96,7 @@ Service.prototype.setPassword = async function(username, password) {
 	}
 	const result = await db.users.updatePasswordByUsername(username, password);
 	if (!result) {
-		return { status: STATUS.REJECT };
+		return { status: STATUS.NOT_FOUND };
 	}
 	return { status: STATUS.OK };
 };
@@ -119,15 +114,9 @@ Service.prototype.setPassword = async function(username, password) {
  * @api public
  */
 Service.prototype.setNickname = async function(username, nickname) {
-	let is_valid = typeof(username) === 'string';
-	is_valid = is_valid && typeof(nickname) === 'string';
-
-	if (!is_valid) {
-		return { status: STATUS.BAD_PARAM, reason: 'type error' };
-	}
 	const result = await db.users.updateNicknameByUsername(username, nickname);
 	if (!result) {
-		return { status: STATUS.REJECT };
+		return { status: STATUS.NOT_FOUND };
 	}
 	return { status: STATUS.OK };
 };
@@ -145,15 +134,9 @@ Service.prototype.setNickname = async function(username, nickname) {
  * @api public
  */
 Service.prototype.setPhoto = async function(username, photo) {
-	let is_valid = typeof(username) === 'string';
-	is_valid = is_valid && typeof(photo) === 'string';
-
-	if (!is_valid) {
-		return { status: STATUS.BAD_PARAM, reason: 'type error' };
-	}
 	const result = await db.users.updatePhotoByUsername(username, photo);
 	if (!result) {
-		return { status: STATUS.REJECT };
+		return { status: STATUS.NOT_FOUND };
 	}
 	return { status: STATUS.OK };
 };
