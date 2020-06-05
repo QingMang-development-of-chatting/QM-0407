@@ -105,7 +105,7 @@ Service.prototype.getInfo = async function(username) {
  *
  * @param {String} username
  * @param {String} password
- * @return {Object{status, reason|data}} for result
+ * @return {Object{status, reason}} for result
  * @api public
  */
 Service.prototype.setPassword = async function(username, password) {
@@ -114,7 +114,7 @@ Service.prototype.setPassword = async function(username, password) {
 
 	// TODO: case: not vaild
 	if (!is_valid) {
-		return { status: STATUS.REJECT, reason: REASON.REGISTER.PASSWORD_ERROR };
+		return { status: STATUS.REJECT, reason: REASON.USERINFO.PASSWORD_ERROR };
 	}
 
 	// TODO: update in DB
@@ -135,7 +135,7 @@ Service.prototype.setPassword = async function(username, password) {
  *
  * @param {String} username
  * @param {String} photo
- * @return {Object{status, reason|data}} for result
+ * @return {Object{status, reason}} for result
  * @api public
  */
 Service.prototype.setNickname = async function(username, nickname) {
@@ -144,7 +144,7 @@ Service.prototype.setNickname = async function(username, nickname) {
 
 	// TODO: case: not vaild
 	if (!is_valid) {
-		return { status: STATUS.REJECT, reason: REASON.REGISTER.NICKNAME_ERROR };
+		return { status: STATUS.REJECT, reason: REASON.USERINFO.NICKNAME_ERROR };
 	}
 	// TODO: update in DB
 
@@ -164,7 +164,7 @@ Service.prototype.setNickname = async function(username, nickname) {
  *
  * @param {String} username
  * @param {String} photo
- * @return {Object{status, reason|data}} for result
+ * @return {Object{status}} for result
  * @api public
  */
 Service.prototype.setPhoto = async function(username, photo) {
