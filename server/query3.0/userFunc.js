@@ -222,7 +222,35 @@ const searchUser = async function(info) {
     return result;
 }
 
+/**
+ * params:
+ * --info.user_id
+ *   info.user_key
+ * return:
+ * --400 user not exist
+ * --200 right key
+ * --401 wrong key
+ */
+const checkKey = async function(info) {
+    result = false;
+
+    await axios.post(
+        'https://afusuj.toutiao15.com/checkKey',
+        {    
+            id: info.user_id,
+            key: info.user_key,
+        }
+    ).then(function(response){
+        status = response.data;
+        result = status;
+
+        console.log(result);
+    })
+    return result;
+}
+
 exports.searchUser = searchUser;
 exports.logUser = logUser;
 exports.updUser = updUser;
 exports.insertUser = insertUser;
+exports.checkKey = checkKey;
