@@ -93,6 +93,8 @@ Service.prototype.getInfo = async function(username) {
 	return { status: STATUS.NOT_FOUND };
 
 	// TODO: case: succeed
+	// TODO: convert query result to {username(String), nickname(String), photo(String)}
+	// TODO: expect `photo` to be '' if not set
 	return { status: STATUS.OK, data: ... };
 };
 
