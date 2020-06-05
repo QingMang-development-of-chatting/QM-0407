@@ -83,7 +83,7 @@ Service.prototype.isValid = async function(username, password) {
  *
  * @param {String} username
  * @param {String} password
- * @return {Object{status, reason|data}} for result
+ * @return {Object{status, data}} for result
  * @api public
  */
 Service.prototype.getInfo = async function(username) {
