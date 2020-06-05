@@ -38,105 +38,67 @@ Service.prototype.register = async function(username, password, nickname) {
 	return { status: STATUS.OK };
 };
 
-// /**
-//  * username、password的有效性检测
-//  *
-//  * Examples:
-//  *
-//  *   service.isValid('Steve Jobs', 'Apple');
-//  *
-//  * @param {String} username
-//  * @param {String} password
-//  * @return {Object{status}} for result
-//  * @api public
-//  */
-// Service.prototype.isValid = async function(username, password) {
-// 	// TODO: query
-// 	// 这里芊愉没有支持，不过给的query的login也可以曲折实现；或者叫芊愉改一下
+/**
+ * 检测username的用户是否存在，以及password是否对应
+ *
+ * Examples:
+ *
+ *   service.isValid('Steve Jobs', 'Apple');
+ *
+ * @param {String} username
+ * @param {String} password
+ * @return {Object{status}} for result
+ * @api public
+ */
+Service.prototype.isValid = async function(username, password) {
+	//query
+    var status = await userFunc.checkKey({"user_id":username,"user_key":password});
+    //case:用户不存在
+    if(status==400){
+        console.log("用户不存在");
+        return { status: STATUS.NOT_FOUND };
+    }
+    if(status==200){
+        console.log("用户存在，且密码正确");
+        return { status: STATUS.OK };
+    }
+    if(status==401){
+        console.log("用户存在，但密码错误");
+        return { status: STATUS.REJECT };
+    }
+    console.log("其他错误");
+};
 
-// 	// TODO: case: no such user
-// 	return { status: STATUS.NOT_FOUND };
-	
-// 	// TODO: case: right password
-// 	return { status: STATUS.OK };
+/**
+ * 获取用户info，精确搜索username
+ *
+ * Examples:
+ *
+ *   service.getInfo('Steve Jobs');
+ *
+ * @param {String} username
+ * @return {Object{status, data}} for result
+ * @api public
+ */
+Service.prototype.getInfo = async function(username) {
+    //query
+    var result = await userFunc.searchUser({"user_id":username});
+    //case:用户不存在
+    if(result==401||username!=result[0].user_id){
+        console.log("用户不存在");
+        return { status: STATUS.NOT_FOUND };
+    }
+    //成功找到用户
+    var info = result[0];
+	// 格式适配     {username(String), nickname(String), photo(String)}
+    var data = {username:info.user_id,nickname:info.user_name,photo:info.user_photo};
+    if(data.photo=="0"){
+        data.photo = '';
+    }
+	return { status: STATUS.OK, data: data };
+};
 
-// 	// TODO: case: error password
-// 	return { status: STATUS.REJECT };
-// };
 
-// /**
-//  * 获取用户info，精确搜索username
-//  *
-//  * Examples:
-//  *
-//  *   service.getInfo('Steve Jobs');
-//  *
-//  * @param {String} username
-//  * @return {Object{status, data}} for result
-//  * @api public
-//  */
-// Service.prototype.getInfo = async function(username) {
-//     //query
-//     var status = await userFunc.searchUser({"user_id":username});
-//     //case:用户不存在
-//     var isexist =false ;
-//     if(status!=401){
-//         for(i = 0;i<status.length;i++){
-//             if(username==status[i]){
-//                 isexist()
-//             }
-//         }
-//     }
-    
-//     if(! username in status){
-//         console.log("用户不存在");
-//         return { status: STATUS.NOT_FOUND };
-//     }
-//     if(isexist)
-//     var a = 1;
-
-// 	// TODO: case: succeed
-// 	// TODO: convert query result to {username(String), nickname(String), photo(String)}
-// 	// TODO: expect `photo` to be '' if not set
-// 	// return { status: STATUS.OK, data: ... };
-// };
-
-// /**
-//  * 获取用户info，模糊搜索username
-//  *
-//  * Examples:
-//  *
-//  *   service.getInfo('Steve Jobs');
-//  *
-//  * @param {String} username
-//  * @return {Object{status, data}} for result
-//  * @api public
-//  */
-// Service.prototype.getInfos_fuzzy = async function(username) {
-//     //query
-//     var status = await userFunc.searchUser({"user_id":username});
-//     //case:用户不存在
-//     var isexist =false ;
-//     // if(status!=401){
-//     //     for(i = 0;i<status.length;i++){
-//     //         if(username==status[i]){
-//     //             isexist=true;
-//     //         }
-//     //     }
-//     // }
-    
-//     if(! username in status){
-//         console.log("用户不存在");
-//         return { status: STATUS.NOT_FOUND };
-//     }
-//     if(isexist)
-//     var a = 1;
-
-// 	// TODO: case: succeed
-// 	// TODO: convert query result to {username(String), nickname(String), photo(String)}
-// 	// TODO: expect `photo` to be '' if not set
-// 	// return { status: STATUS.OK, data: ... };
-// };
 
 /**
  * 修改username用户的password
@@ -217,7 +179,7 @@ Service.prototype.setPhoto = async function(username, photo) {
  */
 module.exports = Service;
 //Service.prototype.register("t","tp","tt");
-//Service.prototype.getInfo("test");
-//Service.prototype.setPassword("t","tttt");
+Service.prototype.isValid('test_user', 'test_password');
+//Service.prototype.setPassword('test_user', 'test_password');
 // Service.prototype.setNickname("t","123");
 // Service.prototype.setPhoto("t","photo");
