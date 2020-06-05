@@ -21,7 +21,7 @@ function Service() {}
  * @param {String} username
  * @param {String} password
  * @param {String} nickname
- * @return {Object{status, reason|data}} for result
+ * @return {Object{status, reason}} for result
  * @api public
  */
 Service.prototype.register = async function(username, password, nickname) {
