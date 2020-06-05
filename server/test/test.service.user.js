@@ -1,4 +1,11 @@
 /**
+ * Warning:
+ * 
+ *   This test requires there is no user called `test_user` or `test_none` in databse.
+ *   This test will create a user called `test_user` in database.
+ */
+
+/**
  * Module dependencies
  */
 const expect = require('expect.js');
@@ -10,7 +17,36 @@ const user_service = new UserService();
 describe('User', function() {
 	describe('#register()', function() {
 		it('should response REJECT for type error', async function() {
+			// username too short
+			const result_username_too_short = await user_service.register('12', 'test_password', 'test_nickname');
+			expect(result_username_too_short.status).to.eql(STATUS.REJECT);
+			expect(result_username_too_short.reason).to.eql(REASON.REGISTER.USERNAME_ERROR);
 
+			// username too long
+			const result_username_too_long = await user_service.register('1234567890123456', 'test_password', 'test_nickname');
+			expect(result_username_too_long.status).to.eql(STATUS.REJECT);
+			expect(result_username_too_long.reason).to.eql(REASON.REGISTER.USERNAME_ERROR);
+
+			// username with characters deposed
+			const result_username_char = await user_service.register('#123', 'test_password', 'test_nickname');
+			expect(result_username_char.status).to.eql(STATUS.REJECT);
+			expect(result_username_char.reason).to.eql(REASON.REGISTER.USERNAME_ERROR);
+
+			// password too short
+			const result_password_too_short = await user_service.register('123456789012345', '1234567', 'test_nickname');
+			expect(result_password_too_short.status).to.eql(STATUS.REJECT);
+			expect(result_password_too_short.reason).to.eql(REASON.REGISTER.PASSWORD_ERROR);
+
+			// empty nickname
+			const result_nickname_empty = await user_service.register('123', '12345678', '');
+			expect(result_nickname_empty.status).to.eql(STATUS.REJECT);
+			expect(result_nickname_empty.reason).to.eql(REASON.USERINFO.NICKNAME_ERROR);
+
+			// all error
+			const result_all_error = await user_service.register('12', '1234567', '');
+			expect(result_all_error.status).to.eql(STATUS.REJECT);
+			expect(result_all_error.reason).to.eql(
+				REASON.REGISTER.USERNAME_ERROR | REASON.REGISTER.PASSWORD_ERROR | REASON.USERINFO.NICKNAME_ERROR);
 		});
 
 		it('should response OK', async function() {
@@ -63,7 +99,9 @@ describe('User', function() {
 
 	describe('#setPassword()', function() {
 		it('should response REJECT for type error', async function() {
-
+			const result_password_too_short = await user_service.setPassword('test_user', '1234567');
+			expect(result_password_too_short.status).to.eql(STATUS.REJECT);
+			expect(result_password_too_short.reason).to.eql(REASON.USERINFO.PASSWORD_ERROR);
 		});
 
 		it('should response NOT FOUND', async function() {
@@ -74,20 +112,22 @@ describe('User', function() {
 
 		it('should response OK and receive correct data', async function() {
 			// sets new password
-			const result_set_password = await user_service.setPassword('test_user', 'test_password_new');
+			const result_set_password = await user_service.setPassword('test_user', '12345678');
 			expect(result_set_password.status).to.eql(STATUS.OK);
 
 			// checks if vaild
 			const result_is_valid1 = await user_service.isValid('test_user', 'test_password');
 			expect(result_is_valid1.status).to.eql(STATUS.REJECT);
-			const result_is_valid2 = await user_service.isValid('test_user', 'test_password_new');
+			const result_is_valid2 = await user_service.isValid('test_user', '12345678');
 			expect(result_is_valid2.status).to.eql(STATUS.OK);
 		});
 	});
 
 	describe('#setNickname()', function() {
 		it('should response REJECT for type error', async function() {
-
+			const result = await user_service.setNickname('test_user', '');
+			expect(result.status).to.eql(STATUS.REJECT);
+			expect(result.reason).to.eql(REASON.USERINFO.NICKNAME_ERROR);
 		});
 
 		it('should response NOT FOUND', async function() {
@@ -97,7 +137,7 @@ describe('User', function() {
 		});
 
 		it('should response OK and receive correct data', async function() {
-			// sets new password
+			// sets new nickname
 			const result = await user_service.setNickname('test_user', 'test_nickname_new');
 			expect(result.status).to.eql(STATUS.OK);
 			// checks if vaild
@@ -107,10 +147,6 @@ describe('User', function() {
 	});
 
 	describe('#setPhoto()', function() {
-		it('should response REJECT for type error', async function() {
-
-		});
-
 		it('should response NOT FOUND', async function() {
 			// the user called `test_none` should not be created
 			const result = await user_service.setPhoto('test_none', '#!@$%^');
@@ -118,7 +154,7 @@ describe('User', function() {
 		});
 
 		it('should response OK and receive correct data', async function() {
-			// sets new password
+			// sets new photo
 			const result = await user_service.setPhoto('test_user', '#!@$%^');
 			expect(result.status).to.eql(STATUS.OK);
 			// checks if vaild
