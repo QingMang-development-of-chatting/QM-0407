@@ -13,6 +13,61 @@ const { SERVICE: { STATUS: STATUS }, REASON } = require('../constant');
 function Service() {}
 
 /**
+ * 登录
+ *
+ * Examples:
+ *
+ *   Service.prototype.login('Steve Jobs', 'Apple');
+ *
+ * @param {String} username
+ * @param {String} password
+ * @return {Object{status, reason}} for result
+ * @api public
+ */
+Service.prototype.login = async function(username, password) {
+    var status = await userFunc.logUser({"user_id":username,"user_key":password});	
+    if(status==400){
+        console.log("登录失败，用户不存在")
+        return { status: STATUS.REJECT, reason: REASON.LOGIN.USER_NOTFOUND };
+    }
+    if(status==401){
+        console.log("登录失败，密码错误")
+        return { status: STATUS.REJECT, reason: REASON.LOGIN.PASSWORD_ERROR };
+    }
+    if(status==403){
+        console.log("登录失败，用户已登录")
+        return { status: STATUS.REJECT, reason: REASON.LOGIN.ALREADY_LOGIN };
+    }
+    console.log("成功登录")
+    return { status: STATUS.OK };
+};
+
+/**
+ * 登出
+ *
+ * Examples:
+ *
+ *   Service.prototype.logout('Steve Jobs');
+ *
+ * @param {String} username
+ * @return {Object{status, reason}} for result
+ * @api public
+ */
+Service.prototype.logout = async function(username) {
+    var status = await userFunc.logUser({"user_id":username});	
+    if(status==400){
+        console.log("登出失败，用户不存在")
+        return { status: STATUS.REJECT, reason: REASON.LOGOUT.USER_NOTFOUND };
+    }
+    if(status==403){
+        console.log("登出失败，用户未登录")
+        return { status: STATUS.REJECT, reason: REASON.LOGOUT.NO_LOGIN };
+    }
+    console.log("成功登出")
+    return { status: STATUS.OK };
+};
+
+/**
  * 注册
  *
  * Examples:
@@ -241,3 +296,5 @@ module.exports = Service;
 //Service.prototype.setPassword('test_user', 'test_password');
 // Service.prototype.setNickname("t","123");
 // Service.prototype.setPhoto("t","photo");
+//Service.prototype.login("t","tttt");
+//Service.prototype.logout("t");
