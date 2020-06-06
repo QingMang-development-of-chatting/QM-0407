@@ -26,7 +26,18 @@ function Service() {}
  * @api public
  */
 Service.prototype.register = async function(username, password, nickname) {
-	//valid check
+    //合法性检测
+    var un_isvalid = username_validate(username);
+    var pw_isvalid = password_validate(password);
+    var nn_isvalid = nickname_validate(nickname);
+    var is_valid=un_isvalid&&pw_isvalid&&nn_isvalid;
+    if (!is_valid) {
+        let reason = 0;
+        reason = reason | (un_isvalid ? 0 : REASON.REGISTER.USERNAME_ERROR);
+		reason = reason | (pw_isvalid ? 0 : REASON.REGISTER.PASSWORD_ERROR);
+        reason = reason | (nn_isvalid ? 0 : REASON.REGISTER.NICKNAME_ERROR);
+		return { status: STATUS.REJECT, reason: reason };
+	}
 
     //注册用户
 	var status = await userFunc.insertUser({"user_id":username,"user_key":password,"user_name":nickname});
@@ -112,7 +123,11 @@ Service.prototype.getInfo = async function(username) {
  * @api public
  */
 Service.prototype.setPassword = async function(username, password) {
-	//TODO:validcheck
+    //合法性检测
+    var pw_isvalid = password_validate(password);
+    if (!pw_isvalid) {
+		return { status: STATUS.REJECT, reason: REASON.REGISTER.PASSWORD_ERROR };
+	}
     //query
     var result = await userFunc.updUser({"user_id":username,"user_key":password});
     if(result==400){
@@ -136,7 +151,11 @@ Service.prototype.setPassword = async function(username, password) {
  * @api public
  */
 Service.prototype.setNickname = async function(username, nickname) {
-	//TODO:validcheck
+    //合法性检测
+    var nn_isvalid = nickname_validate(nickname);
+    if (!nn_isvalid) {
+		return { status: STATUS.REJECT, reason: REASON.REGISTER.NICKNAME_ERROR };
+	}
     //query
     var result = await userFunc.updUser({"user_id":username,"user_name":nickname});
     if(result==400){
@@ -160,7 +179,7 @@ Service.prototype.setNickname = async function(username, nickname) {
  * @api public
  */
 Service.prototype.setPhoto = async function(username, photo) {
-	//TODO:validcheck
+	//TODO:validcheck,暂无要求
     //query
     var result = await userFunc.updUser({"user_id":username,"user_photo":photo});
     if(result==400){
@@ -172,14 +191,53 @@ Service.prototype.setPhoto = async function(username, photo) {
     }
 };
 
+/**
+ * 各类合法性检测
+ * @api private
+ */
+function username_validate(name){
+    //      /^[a-zA-Z0-9_-]{3,15}$/ 
+    var result = name.search(/^[a-zA-Z0-9_-]{3,15}$/i);
+    if(result!=-1){ //合法
+        console.log("username检测通过");
+        return true;
+    }
+    console.log("username检测不通过");
+    return false;
+}
+function password_validate(pw){
+    //长度限制  16  ,且不为空
+    var len = pw.length;
+    if(len!=0&&len<=16){
+        console.log("password检测通过");
+        return true;
+    }
+    console.log("password检测不通过");
+    return false;
+}
+
+function nickname_validate(nickname){
+    //长度限制  10  ,且不为空
+    var len = nickname.length;
+    if(len!=0&&len<=10){
+        console.log("password检测通过");
+        return true;
+    }
+    console.log("password检测不通过");
+    return false;
+}
+
 
 
 /**
  * Expose `Service`
  */
 module.exports = Service;
-//Service.prototype.register("t","tp","tt");
-Service.prototype.isValid('test_user', 'test_password');
+
+
+//test
+//Service.prototype.register("t@","test","");
+//Service.prototype.isValid('test_user', 'test_password');
 //Service.prototype.setPassword('test_user', 'test_password');
 // Service.prototype.setNickname("t","123");
 // Service.prototype.setPhoto("t","photo");
