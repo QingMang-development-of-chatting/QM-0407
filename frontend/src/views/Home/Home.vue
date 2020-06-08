@@ -20,7 +20,7 @@
                 <add-friend v-if="showAddFriend" :loading="searchLoading" :apply-messages="applyMessages" :found-user="foundUser" :show-found="showFound" :showFoundRemind='showFoundRemind' @accept="acceptApply" @reject="rejectApply" @addFriend="sendAddFriend" @searchUser="searchUser"></add-friend>
             </el-main>
         </el-container>
-        <setting-window v-if="showSetting" :id="currentUser.id" :nickname="currentUser.nickname" :avatar-url="currentUser.avatar"  @closeInfo="closeSetting" @changeAvatar="editAvatar" @changeNickname="editNickname"></setting-window>
+        <setting-window v-if="showSetting" :id="currentUser.id" :nickname="currentUser.nickname" :avatar-url="currentUser.avatar"  :changing-password="changingPassword" @switchShow="switchShow" @closeInfo="closeSetting" @changeAvatar="editAvatar" @changeNickname="editNickname" @changePassword="changePassword"></setting-window>
     </div>
 </template>
 
@@ -65,6 +65,8 @@
                 isShowFriend:false,
                 //是否展示个人资料设置
                 showSetting:false,
+                //是否显示修改密码:
+                changingPassword:false,
                 //是否展示聊天对话框
                 showChatArea:false,
                 //是否显示添加好友窗口
@@ -146,22 +148,22 @@
                             else
                                 console.log("重复登录");
                         }
-                            else if(result.status === 0)
-                            {
-                                this.$message({message:"请求参数错误",type:"error",duration:800});
-                                setTimeout(()=>{
-                                    this.$router.push("/Login");
+                        else if(result.status === 0)
+                        {
+                            this.$message({message:"请求参数错误",type:"error",duration:800});
+                            setTimeout(()=>{
+                                this.$router.push("/Login");
                                 },800);
-                            }
-                            else
-                            {
-                                this.$message({message:"服务器无响应",type:"warning",duration:800});
-                                window.localStorage.removeItem("username");
-                                window.localStorage.removeItem("password");
-                                setTimeout(()=>{
-                                    this.$router.push("/Login");
+                        }
+                        else
+                        {
+                            this.$message({message:"服务器无响应",type:"warning",duration:800});
+                            window.localStorage.removeItem("username");
+                            window.localStorage.removeItem("password");
+                            setTimeout(()=>{
+                                this.$router.push("/Login");
                                 },800);
-                            }
+                        }
                     });
                 }
                 //初始化
@@ -177,10 +179,9 @@
                             avatar = default_avatar;
                         this.$store.commit('currentUser/setUser',{id:id,nickname:nickname,avatar:avatar});
                         this.loadingAvatar = false;
-                        // console.log(this.$store.state.currentUser.id);
                     })
                     .catch((error)=>{
-                        this.$message({message:'服务器响应错误',type:"warning",duration:800});
+                        this.$message({message:'获取用户资料时，服务器响应错误',type:"warning",duration:800});
                         console.log('获取用户资料时，服务器响应错误:',error.response);
                         this.loadingAvatar = false;
                     });
@@ -280,6 +281,10 @@
                 this.isShowFriend = false;
                 this.showSetting = false;
             },
+            //切换用户资料及修改密码显示
+            switchShow(){
+                this.changingPassword = !this.changingPassword;
+            },
             //显示个人资料
             showInfo(){
                 this.showSetting = true;
@@ -316,6 +321,7 @@
             },
             //隐藏个人资料
             closeSetting(){
+                this.changingPassword = false;
                 this.showSetting=false;
             },
             //修改头像
@@ -346,13 +352,35 @@
                 //此处需调用接口修改昵称
                 this.$axios.put('/v1/userinfo/'+this.currentUser.id+'/nickname', {
                     nickname:nickname
-                }).then(()=> {
+                })
+                    .then(()=> {
                     this.$store.commit('currentUser/setNickname', nickname);
                     this.$message({message:'修改成功',type:'success',duration:800});
-                }).catch((error)=> {
+                })
+                    .catch((error)=> {
                     console.log("修改昵称返回错误:",error);
                     this.$message({message:'修改失败,服务器响应错误',type:'warning',duration:800});
                 })
+            },
+            //修改密码
+            changePassword(newPassword){
+                console.log(newPassword);
+                this.$axios.put('/v1/userinfo/'+this.currentUser.id+'/password',{
+                    password:newPassword
+                })
+                    .then((result)=> {
+                        console.log("修改密码成功返回:",result);
+                        let encode_password = 'q1m4'+newPassword;
+                        encode_password = Base64.encode(encode_password);
+                        window.localStorage.setItem('password',encode_password);
+                        this.$message({message:'密码修改成功',type:'success',duration:1000});
+
+                })
+                    .catch((error)=>{
+                        console.log("修改密码失败返回:",error);
+                        this.$message({message:'密码修改失败',type:'error',duration:1000});
+                })
+
             },
             //载入好友聊天对话框
             toChat(id,nickname,avatar){
@@ -426,8 +454,16 @@
                         friend[applyId]={nickname:friendInfo.nickname,avatar:friendInfo.avatar,newInfo:false,unread_num:0,recentMessage:{}};
                         this.$store.commit('friendInfo/addFriendInfo',friend);  //更新好友列表
                     }
-                    else if(result.status === 1)
-                        this.$message({message:"服务器拒绝服务",type:"warning"});
+                    else if(result.status === 1){
+                        if(result.reason === 0)
+                            this.$message({message:"服务器拒绝服务:未登录",type:"warning",duration:800});
+                        else if(result.reason === 1)
+                            this.$message({message:"服务器拒绝服务:申请者为自身",type:"warning",duration:800});
+                        else if(result.reason === 2)
+                            this.$message({message:"服务器拒绝服务:申请者不存在",type:"warning",duration:800});
+                        else if(result.reason === 3)
+                            this.$message({message:"服务器拒绝服务:申请者已是您的好友",type:"warning",duration:800});
+                    }
                     else
                         this.$message({message:"请求参数错误",type:"error"});
                 });
@@ -490,7 +526,7 @@
             sendAddFriend(id){
                 ///console.log(id);
                 //此处需要调用发送好友请求接口（提供添加者ID、昵称以及被添加者ID参数）
-                console.log(this.$store.getters['friendInfo/getFriend'](id));
+                //console.log(this.$store.getters['friendInfo/getFriend'](id));
                 if(id === this.currentUser.id)
                     this.$message({message:'不可添加自己为好友',type:'warning',duration:800});
                 else if(this.$store.getters['friendInfo/getFriend'](id) === undefined)

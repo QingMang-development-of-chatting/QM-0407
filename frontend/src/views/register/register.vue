@@ -3,7 +3,6 @@
     <div class="register">
         <h1>青芒</h1>
         <el-tooltip class="item" effect="dark" content="输入3到15位字母、数字、下划线组合" placement="top-start">
-<!--            <el-input placeholder="请输入用户名" v-model="id" maxlength="15"    prefix-icon="el-icon-user-solid" clearable></el-input>-->
             <div class="input-div" @mouseover="showClIdIcon" @mouseleave="showClearIdIcon = false" >
                 <el-input placeholder="请输入用户名" v-model="id" maxlength="15"    prefix-icon="el-icon-user-solid" @input="showClIdIcon">
                      <el-button class="Icon" v-if="showClearIdIcon" slot="suffix" type="text" icon="el-icon-error" @click="clearIdInput"></el-button>
@@ -13,7 +12,6 @@
         <span  v-if="idRemind" id="foundRemind">{{idTips}}</span>
         <br/>
         <el-tooltip class="item" effect="dark" content="输入8到16位字符组合" placement="top-start">
-<!--            <el-input  placeholder="请输入密码"  v-model="password" maxlength="16" prefix-icon="el-icon-lock" show-password></el-input>-->
             <div class="input-div"  @mouseover="showPassIcon" @mouseleave="showPasswordIcon = false">
                 <form >
                     <el-input  placeholder="请输入密码" :type="passwordType" v-model="password" maxlength="16" prefix-icon="el-icon-lock" @input="showPassIcon">
@@ -34,7 +32,6 @@
         <span  v-if="passwordConfirm" id="passwordConfirm">{{confirmTips}}</span>
         <br/>
         <el-tooltip class="item" effect="dark" content="输入1到10位中英字符组合" placement="top-start">
-<!--            <el-input  placeholder="请输入昵称"  v-model="nickname" maxlength="10" prefix-icon="el-icon-edit-outline" clearable></el-input>-->
             <div class="input-div" @mouseover="showClNickIcon" @mouseleave="showClearNickIcon=false">
                 <el-input  placeholder="请输入昵称"  v-model="nickname" maxlength="10" prefix-icon="el-icon-edit-outline" @input="showClNickIcon">
                     <el-button class="Icon" v-if="showClearNickIcon" slot="suffix" type="text" icon="el-icon-error" @click="clearNickInput"></el-button>
