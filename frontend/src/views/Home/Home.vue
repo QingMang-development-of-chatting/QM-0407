@@ -457,13 +457,13 @@
                     }
                     else if(result.status === 1){
                         if(result.reason === 0)
-                            this.$message({message:"服务器拒绝服务:未登录",type:"warning",duration:1000});
+                            this.$message({message:"服务器拒绝服务:未登录",type:"warning",duration:duration_time});
                         else if(result.reason === 1)
-                            this.$message({message:"服务器拒绝服务:申请者为自身",type:"warning",duration:1000});
+                            this.$message({message:"服务器拒绝服务:申请者为自身",type:"warning",duration:duration_time});
                         else if(result.reason === 2)
-                            this.$message({message:"服务器拒绝服务:申请者不存在",type:"warning",duration:1000});
+                            this.$message({message:"服务器拒绝服务:申请者不存在",type:"warning",duration:duration_time});
                         else if(result.reason === 3)
-                            this.$message({message:"服务器拒绝服务:申请者已是您的好友",type:"warning",duration:1000});
+                            this.$message({message:"服务器拒绝服务:申请者已是您的好友",type:"warning",duration:duration_time});
                     }
                     else
                         this.$message({message:"请求参数错误",type:"error",duration:duration_time});
