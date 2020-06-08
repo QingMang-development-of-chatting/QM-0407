@@ -161,6 +161,8 @@ describe('User', function() {
 	});
 
 	after(function() {
+		socket1.close();
+		socket2.close();
 		server.close();
 	});
 });

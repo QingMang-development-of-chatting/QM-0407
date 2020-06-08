@@ -17,7 +17,7 @@ function Table() {
 }
 
 /**
- * Create notification.
+ * Create notification or update the old one and sort it.
  *
  * Examples:
  *
@@ -29,7 +29,7 @@ function Table() {
  * @param {String} notification.sender
  * @param {String} notification.receiver
  * @param {Number} notification.type
- * @return {True} always succeed
+ * @return {Boolean} for result
  * @api public
  */
 Table.prototype.createNotification = async function(notification) {
@@ -40,7 +40,18 @@ Table.prototype.createNotification = async function(notification) {
 		this._notifications.set(receiver, []);
 	}
 	const _notification = this._notifications.get(receiver);
-	_notification.push({ sender, type });
+	let i = 0;
+	for (let { sender: _sender, type: _type } of _notification) {
+		if (_sender === sender) {
+			if (_type === type) {
+				return false;
+			}
+			_notification.splice(i, 1);
+			break;
+		}
+		i++;
+	}
+	_notification.unshift({ sender, type });
 	return true;
 };
 

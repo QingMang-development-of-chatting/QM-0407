@@ -100,11 +100,7 @@ Service.prototype.accessUserToBeFriend = async function(responser, requester) {
 	if (responser === requester) {
 		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.SAME_USER };
 	}
-	const notification = {
-		sender: responser,
-		receiver: requester,
-		type: NOTIFICATION.TYPE.ACCESSED
-	};
+
 	const result_notification_update = await db.notifications.updateTypeBySenderAndReceiverAndType(
 		requester, responser, NOTIFICATION.TYPE.APPLY, NOTIFICATION.TYPE.ACCESS);
 	if (!result_notification_update) {
@@ -114,7 +110,7 @@ Service.prototype.accessUserToBeFriend = async function(responser, requester) {
 	if (!result_friends_make) {
 		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.ALREADY_FRIENDS };
 	}
-	await db.notifications.createNotification(notification);
+
 	await db.privaterooms.createPrivateRoom(responser, requester);
 	return { status: STATUS.OK };
 };
@@ -132,6 +128,10 @@ Service.prototype.accessUserToBeFriend = async function(responser, requester) {
  * @api public
  */
 Service.prototype.rejectUserToBeFriend = async function(responser, requester) {
+	if (responser === requester) {
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.REJECT.SAME_USER };
+	}
+	
 	const result = await db.notifications.updateTypeBySenderAndReceiverAndType(
 		requester, responser, NOTIFICATION.TYPE.APPLY, NOTIFICATION.TYPE.REJECT);
 	if (result) {
@@ -158,16 +158,10 @@ Service.prototype.deleteFriend = async function(username1, username2) {
 		return { status: STATUS.REJECT, reason: REASON.FRIEND.DELETE.SAME_USER };
 	}
 
-	const notification = {
-		sender: username1,
-		receiver: username2,
-		type: NOTIFICATION.TYPE.DELETED
-	};
 	const result_friend_delete = await db.friends.deleteFriendsByUsernames(username1, username2);
 	if (!result_friend_delete) {
 		return { status: STATUS.REJECT, reason: REASON.FRIEND.DELETE.NO_SUCH_FRIEND };
 	}
-	await db.notifications.createNotification(notification);
 	return { status: STATUS.OK };
 };
 

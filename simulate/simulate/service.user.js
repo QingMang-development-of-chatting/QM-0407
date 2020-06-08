@@ -21,7 +21,7 @@ function Service() {}
  * @param {String} username
  * @param {String} password
  * @param {String} nickname
- * @return {Object{status, reason|data}} for result
+ * @return {Object{status, reason}} for result
  * @api public
  */
 Service.prototype.register = async function(username, password, nickname) {
@@ -64,7 +64,7 @@ Service.prototype.isValid = async function(username, password) {
  *
  * @param {*} username
  * @param {*} password
- * @return {Object{status, reason|data}} for result
+ * @return {Object{status, data}} for result
  * @api public
  */
 Service.prototype.getInfo = async function(username) {
@@ -84,7 +84,7 @@ Service.prototype.getInfo = async function(username) {
  *
  * @param {*} username
  * @param {*} password
- * @return {Object{status, reason|data}} for result
+ * @return {Object{status, reason}} for result
  * @api public
  */
 Service.prototype.setPassword = async function(username, password) {
@@ -110,7 +110,7 @@ Service.prototype.setPassword = async function(username, password) {
  *
  * @param {*} username
  * @param {*} photo
- * @return {Object{status, reason|data}} for result
+ * @return {Object{status, reason}} for result
  * @api public
  */
 Service.prototype.setNickname = async function(username, nickname) {
@@ -130,7 +130,7 @@ Service.prototype.setNickname = async function(username, nickname) {
  *
  * @param {*} username
  * @param {*} photo
- * @return {Object{status, reason|data}} for result
+ * @return {Object{status, reason}} for result
  * @api public
  */
 Service.prototype.setPhoto = async function(username, photo) {

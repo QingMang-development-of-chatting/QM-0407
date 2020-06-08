@@ -195,12 +195,6 @@ describe('Friend', function() {
 				expect(response.data).to.eql([{sender: 'default user2', type: NOTIFICATION.TYPE.ACCESS}]);
 			});
 
-			await friend_requester.getApplicants('default user2')
-			.then(response => {
-				expect(response.status).to.eql(200);
-				expect(response.data).to.eql([{sender: 'default user1', type: NOTIFICATION.TYPE.ACCESSED}]);
-			});
-
 			await friend_requester.getFriends('default user1')
 			.then(response => {
 				expect(response.status).to.eql(200);
@@ -272,15 +266,6 @@ describe('Friend', function() {
 			this.timeout(50000);
 			await sleep(2000);
 			expect(g_friend).to.eql('default user1');
-
-			await friend_requester.getApplicants('default user2')
-			.then(response => {
-				expect(response.status).to.eql(200);
-				expect(response.data).to.eql([
-					{sender: 'default user1', type: NOTIFICATION.TYPE.ACCESSED},
-					{sender: 'default user1', type: NOTIFICATION.TYPE.DELETED},
-					]);
-			});
 
 			await friend_requester.getFriends('default user1')
 			.then(response => {
