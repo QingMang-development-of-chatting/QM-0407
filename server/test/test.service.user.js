@@ -17,6 +17,7 @@ const user_service = new UserService();
 describe('User', function() {
 	describe('#register()', function() {
 		it('should response REJECT for type error', async function() {
+			this.timeout(50000);
 			// username too short
 			const result_username_too_short = await user_service.register('12', 'test_password', 'test_nickname');
 			expect(result_username_too_short.status).to.eql(STATUS.REJECT);
@@ -50,12 +51,14 @@ describe('User', function() {
 		});
 
 		it('should response OK', async function() {
+			this.timeout(50000);
 			// creates a new user called `test_user`
 			const result = await user_service.register('test_user', 'test_password', 'test_nickname');
 			expect(result.status).to.eql(STATUS.OK);
 		});
 
 		it('should response REJECT for user duplicate', async function() {
+			this.timeout(50000);
 			// the user called `test_user` is occupied
 			const result = await user_service.register('test_user', 'test_password', 'test_nickname');
 			expect(result.status).to.eql(STATUS.REJECT);
@@ -65,17 +68,20 @@ describe('User', function() {
 
 	describe('#isValid()', function() {
 		it('should response NOT FOUND', async function() {
+			this.timeout(50000);
 			// the user called `test_none` should not be created
 			const result = await user_service.isValid('test_none', 'test_password', 'test_nickname');
 			expect(result.status).to.eql(STATUS.NOT_FOUND);
 		});
 
 		it('should response OK', async function() {
+			this.timeout(50000);
 			const result = await user_service.isValid('test_user', 'test_password');
 			expect(result.status).to.eql(STATUS.OK);
 		});
 
 		it('should response REJECT', async function() {
+			this.timeout(50000);
 			const result = await user_service.isValid('test_user', 'test_error', 'test_nickname');
 			expect(result.status).to.eql(STATUS.REJECT);
 		});
@@ -83,12 +89,14 @@ describe('User', function() {
 
 	describe('#getInfo()', function() {
 		it('should response NOT FOUND', async function() {
+			this.timeout(50000);
 			// the user called `test_none` should not be created
 			const result = await user_service.getInfo('test_none');
 			expect(result.status).to.eql(STATUS.NOT_FOUND);
 		});
 
 		it('should response OK with correct data', async function() {
+			this.timeout(50000);
 			const result = await user_service.getInfo('test_user');
 			expect(result.status).to.eql(STATUS.OK);
 
@@ -99,18 +107,21 @@ describe('User', function() {
 
 	describe('#setPassword()', function() {
 		it('should response REJECT for type error', async function() {
+			this.timeout(50000);
 			const result_password_too_short = await user_service.setPassword('test_user', '1234567');
 			expect(result_password_too_short.status).to.eql(STATUS.REJECT);
 			expect(result_password_too_short.reason).to.eql(REASON.USERINFO.PASSWORD_ERROR);
 		});
 
 		it('should response NOT FOUND', async function() {
+			this.timeout(50000);
 			// the user called `test_none` should not be created
 			const result = await user_service.setPassword('test_none', 'test_password_new');
 			expect(result.status).to.eql(STATUS.NOT_FOUND);
 		});
 
 		it('should response OK and receive correct data', async function() {
+			this.timeout(50000);
 			// sets new password
 			const result_set_password = await user_service.setPassword('test_user', '12345678');
 			expect(result_set_password.status).to.eql(STATUS.OK);
@@ -125,18 +136,21 @@ describe('User', function() {
 
 	describe('#setNickname()', function() {
 		it('should response REJECT for type error', async function() {
+			this.timeout(50000);
 			const result = await user_service.setNickname('test_user', '');
 			expect(result.status).to.eql(STATUS.REJECT);
 			expect(result.reason).to.eql(REASON.USERINFO.NICKNAME_ERROR);
 		});
 
 		it('should response NOT FOUND', async function() {
+			this.timeout(50000);
 			// the user called `test_none` should not be created
 			const result = await user_service.setNickname('test_none', 'test_nickname_new');
 			expect(result.status).to.eql(STATUS.NOT_FOUND);
 		});
 
 		it('should response OK and receive correct data', async function() {
+			this.timeout(50000);
 			// sets new nickname
 			const result = await user_service.setNickname('test_user', 'test_nickname_new');
 			expect(result.status).to.eql(STATUS.OK);
@@ -148,12 +162,14 @@ describe('User', function() {
 
 	describe('#setPhoto()', function() {
 		it('should response NOT FOUND', async function() {
+			this.timeout(50000);
 			// the user called `test_none` should not be created
 			const result = await user_service.setPhoto('test_none', '#!@$%^');
 			expect(result.status).to.eql(STATUS.NOT_FOUND);
 		});
 
 		it('should response OK and receive correct data', async function() {
+			this.timeout(50000);
 			// sets new photo
 			const result = await user_service.setPhoto('test_user', '#!@$%^');
 			expect(result.status).to.eql(STATUS.OK);
