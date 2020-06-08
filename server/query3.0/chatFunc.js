@@ -65,7 +65,6 @@ const insertRoom = async function(info) {
         }
         else
         {
-            console.log(200);
             console.log(status);
             result = status;
         }
@@ -77,7 +76,6 @@ const insertRoom = async function(info) {
 
 /**
  * 已读操作
- * 阅读一条指定的chat
  * 根据时间，阅读重置所有已读
  * 读一条消息=全部已读
  * 输入：
@@ -141,7 +139,6 @@ const searchChat = async function(info) {
             key: info.key,
             date: info.date,
             room: info.room,
-            new: info.new,
         }
     ).then(function(response){
         status = response.data;
@@ -168,6 +165,41 @@ const searchChat = async function(info) {
     })
 
     return status;
+}
+
+/**
+ * 首页返回
+ * 返回每个房间一条消息和未读消息数
+ * 输入：
+ * --info.user_id
+ * 返回:
+ * --Array()
+ *   --result[i].room_id
+ *     result[i].num
+ *     result[i].chat  最后一条消息
+ *     **如果num=chat=0
+ *     **意味着该房间没有任何消息记录
+ *     **下面几项都不会进行返回
+ *     result[i].host_id 最后一条消息的发言人
+ *     result[i].date 发言时间，这里没有做时间排序
+ *                             请前端或者service辛苦一下
+ * --400查找的用户不在user_info库
+ */
+const unreadRoom = async function(info) {
+    var result = false;
+
+    await axios.post(
+        'https://afusuj.toutiao15.com/tread',
+        {    
+            user_id: info.user_id,
+        }
+    ).then(function(response){
+        status = response.data; 
+        result = status;
+        console.log(result);
+    });
+
+    return result;
 }
 
 /**
@@ -217,3 +249,4 @@ exports.searchRoom = searchRoom;
 exports.insertRoom = insertRoom;
 exports.insertChat = insertChat;
 exports.readChat = readChat;
+exports.unreadRoom = unreadRoom;
