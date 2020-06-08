@@ -35,6 +35,7 @@
     import friendInfo from "../../components/friendInfo/friendInfo";
     import AddFriend from "../../components/addFriend/addFriend";
     let Base64 = require('js-base64').Base64;
+    const duration_time = 1000;
     export default {
         name: "home",
         components: {
@@ -138,31 +139,31 @@
                         else if(result.status === 1)
                         {
                             if(result.reason === 0 || result.reason === 1){
-                                this.$message({message:"登录信息已过期",type:"warning",duration:1000});
+                                this.$message({message:"登录信息已过期",type:"warning",duration:duration_time});
                                 window.localStorage.removeItem("username");
                                 window.localStorage.removeItem("password");
                                 setTimeout(()=>{
                                     this.$router.push("/Login");
-                                },1000);
+                                },duration_time);
                             }
                             else
                                 console.log("重复登录");
                         }
                         else if(result.status === 0)
                         {
-                            this.$message({message:"请求参数错误",type:"error",duration:800});
+                            this.$message({message:"请求参数错误",type:"error",duration:duration_time});
                             setTimeout(()=>{
                                 this.$router.push("/Login");
-                                },800);
+                                },duration_time);
                         }
                         else
                         {
-                            this.$message({message:"服务器无响应",type:"warning",duration:800});
+                            this.$message({message:"服务器无响应",type:"warning",duration:duration_time});
                             window.localStorage.removeItem("username");
                             window.localStorage.removeItem("password");
                             setTimeout(()=>{
                                 this.$router.push("/Login");
-                                },800);
+                                },duration_time);
                         }
                     });
                 }
@@ -181,7 +182,7 @@
                         this.loadingAvatar = false;
                     })
                     .catch((error)=>{
-                        this.$message({message:'获取用户资料时，服务器响应错误',type:"warning",duration:800});
+                        this.$message({message:'获取用户资料时，服务器响应错误',type:"warning",duration:duration_time});
                         console.log('获取用户资料时，服务器响应错误:',error.response);
                         this.loadingAvatar = false;
                     });
@@ -303,19 +304,19 @@
                     if(result.status === 2){
                         window.localStorage.removeItem("username");
                         window.localStorage.removeItem('password');
-                        this.$message({message:"已注销,即将跳转至登录页",type:"success",duration:800});
+                        this.$message({message:"已注销,即将跳转至登录页",type:"success",duration:duration_time});
                         setTimeout(()=>{
                             this.$router.push("/Login");
                         },800);
                     }
                     else if(result.status === 1){
-                        this.$message({message:"未登录",type:"warning",duration:800});
+                        this.$message({message:"未登录",type:"warning",duration:duration_time});
                         setTimeout(()=>{
                             this.$router.push("/Login");
                         },800);
                     }
                     else{
-                        this.$message({message:"服务器未响应",type:"warning",duration:800});
+                        this.$message({message:"服务器未响应",type:"warning",duration:duration_time});
                     }
                 });
             },
@@ -339,10 +340,10 @@
                     })
                         .then(()=>{
                             this.$store.commit('currentUser/setAvatar',base64Str);
-                            this.$message({message:'修改成功',type:'success',duration:800});
+                            this.$message({message:'修改成功',type:'success',duration:duration_time});
                         })
                         .catch((error)=>{
-                            this.$message({message:'修改失败',type:'error'});
+                            this.$message({message:'修改失败',type:'error',duration:duration_time});
                             console.log("修改头像返回错误，",error);
                         })
                 }
@@ -355,11 +356,11 @@
                 })
                     .then(()=> {
                     this.$store.commit('currentUser/setNickname', nickname);
-                    this.$message({message:'修改成功',type:'success',duration:800});
+                    this.$message({message:'修改成功',type:'success',duration:duration_time});
                 })
                     .catch((error)=> {
                     console.log("修改昵称返回错误:",error);
-                    this.$message({message:'修改失败,服务器响应错误',type:'warning',duration:800});
+                    this.$message({message:'修改失败,服务器响应错误',type:'warning',duration:duration_time});
                 })
             },
             //修改密码
@@ -373,12 +374,12 @@
                         let encode_password = 'q1m4'+newPassword;
                         encode_password = Base64.encode(encode_password);
                         window.localStorage.setItem('password',encode_password);
-                        this.$message({message:'密码修改成功',type:'success',duration:1000});
+                        this.$message({message:'密码修改成功',type:'success',duration:duration_time});
 
                 })
                     .catch((error)=>{
                         console.log("修改密码失败返回:",error);
-                        this.$message({message:'密码修改失败',type:'error',duration:1000});
+                        this.$message({message:'密码修改失败',type:'error',duration:duration_time});
                 })
 
             },
@@ -456,16 +457,16 @@
                     }
                     else if(result.status === 1){
                         if(result.reason === 0)
-                            this.$message({message:"服务器拒绝服务:未登录",type:"warning",duration:800});
+                            this.$message({message:"服务器拒绝服务:未登录",type:"warning",duration:1000});
                         else if(result.reason === 1)
-                            this.$message({message:"服务器拒绝服务:申请者为自身",type:"warning",duration:800});
+                            this.$message({message:"服务器拒绝服务:申请者为自身",type:"warning",duration:1000});
                         else if(result.reason === 2)
-                            this.$message({message:"服务器拒绝服务:申请者不存在",type:"warning",duration:800});
+                            this.$message({message:"服务器拒绝服务:申请者不存在",type:"warning",duration:1000});
                         else if(result.reason === 3)
-                            this.$message({message:"服务器拒绝服务:申请者已是您的好友",type:"warning",duration:800});
+                            this.$message({message:"服务器拒绝服务:申请者已是您的好友",type:"warning",duration:1000});
                     }
                     else
-                        this.$message({message:"请求参数错误",type:"error"});
+                        this.$message({message:"请求参数错误",type:"error",duration:duration_time});
                 });
             },
             //拒绝好友添加请求
@@ -474,25 +475,25 @@
                 this.$axios.put('/v1/friend/'+this.currentUser.id+'/applicants/reject/'+applyId)
                     .then((result)=>{
                         console.log("拒绝好友申请返回",result);
-                        this.$message({message:"已拒绝",type:"success",duration:800});
+                        this.$message({message:"已拒绝",type:"success",duration:duration_time});
                         this.$store.commit('applyList/reject',applyId); //更新申请列表
                     })
                     .catch((error)=>{
                         console.log("拒绝申请返回出错,",error.response);
                         if(error.response.status === 408)
-                            this.$message({message:"申请者不存在",type:"warning"});
+                            this.$message({message:"申请者不存在",type:"warning",duration:duration_time});
                         else if(error.response.status === 400)
-                            this.$message({message:"请求参数错误",type:"error"});
+                            this.$message({message:"请求参数错误",type:"error",duration:duration_time});
                         else
-                            this.$message({message:"服务器无响应",type:"error"});
+                            this.$message({message:"服务器无响应",type:"error",duration:duration_time});
                     });
             },
             //查找用户
             searchUser(id){
                 if (id==="")
-                    this.$message({message:"账号不能为空",type:'warning',duration:800});
+                    this.$message({message:"账号不能为空",type:'warning',duration:duration_time});
                 else if(id.length<3)
-                    this.$message({message:'输入账号过短',type:'warning',duration:800});
+                    this.$message({message:'输入账号过短',type:'warning',duration:duration_time});
                 else{
                     this.searchLoading = true;
                     //此处调用接口查找用户
@@ -516,7 +517,7 @@
                                 this.showFoundRemind = true;
                             }
                             else
-                                this.$message({message:'服务器响应错误',type:'warning',duration:800});
+                                this.$message({message:'服务器响应错误',type:'warning',duration:duration_time});
                         })
                 }
 
@@ -528,18 +529,20 @@
                 //此处需要调用发送好友请求接口（提供添加者ID、昵称以及被添加者ID参数）
                 //console.log(this.$store.getters['friendInfo/getFriend'](id));
                 if(id === this.currentUser.id)
-                    this.$message({message:'不可添加自己为好友',type:'warning',duration:800});
+                    this.$message({message:'不可添加自己为好友',type:'warning',duration:duration_time});
                 else if(this.$store.getters['friendInfo/getFriend'](id) === undefined)
                     this.$socket.emit('friendApplySend',id,
                         (result)=>{
                         console.log("发送好友请求返回",result);
                         if (result.status === 2)
-                            this.$message({message:"已发送",type:"success",duration:800});
+                            this.$message({message:"已发送",type:"success",duration:duration_time});
+                        else if(result.status === 1 && result.reason===3)
+                            this.$message({message:"存在重复好友申请，请待对方处理",type:"warning",duration:duration_time});
                         else
-                            this.$message({message:"发送失败,服务器响应错误",type:"error",duration:800});
+                            this.$message({message:"发送失败,服务器响应错误",type:"error",duration:duration_time});
                     });
                 else
-                    this.$message({message:'该用户已在您的好友列表中',type:'warning',duration:800});
+                    this.$message({message:'该用户已在您的好友列表中',type:'warning',duration:duration_time});
             },
             //载入好友资料
             toFriend(){
@@ -572,7 +575,7 @@
             },
             //收到好友申请
             friendApplyRece(requester){
-                this.$message({message:'收到新好友申请:'+requester,type:"info",duration:1000});
+                this.$message({message:'收到新好友申请:'+requester,type:"info",duration:duration_time});
                 this.$axios.get('v1/userinfo/'+requester).then(
                     (result)=>{
                         let avatar = result.data.photo;
@@ -589,7 +592,7 @@
             //好友申请反馈事件
             friendAccessdRece(response){
                 console.log("好友申请反馈",response);
-                this.$message({message:response+"通过了你的好友请求",type:"info",duration:800});
+                this.$message({message:response+"通过了你的好友请求",type:"info",duration:duration_time});
                 let avatar,nickname;
                 this.$axios.get('v1/userinfo/'+response)
                     .then((result)=>{
@@ -604,12 +607,12 @@
                         this.$store.commit('friendInfo/addFriendInfo',friend);  //更新好友列表
                     })
                     .catch((error)=>{
-                        this.$message({message:'服务器响应错误',type:"warning",duration:800});
+                        this.$message({message:'服务器响应错误',type:"warning",duration:duration_time});
                         console.log('处理申请反馈时，服务器响应错误:',error.response);
                     });
             },
             disconnect(){
-                this.$message({message:"服务器已断开连接",type:"error",duration:800});
+                this.$message({message:"服务器已断开连接",type:"error",duration:duration_time});
             },
         },
 

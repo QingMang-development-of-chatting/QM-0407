@@ -47,7 +47,8 @@
 </template>
 
 <script>
-    const usernamePat = /^[a-zA-Z0-9_-]{3,15}$/;
+    const usernamePat = /^[a-zA-Z0-9_-]{3,15}$/;    //用户ID正则表达式
+    const duration_time = 1000; //提示持续时间
     export default {
         name: "register",
         data(){
@@ -91,25 +92,25 @@
             register(){
                 if(this.id === "")
                 {
-                    this.$message({message:"账号不能为空",type:"warning",duration:800});
+                    this.$message({message:"账号不能为空",type:"warning",duration:duration_time});
                 }
                 else if(!usernamePat.test(this.id)){
-                    this.$message({message:"账号不合法",type:"warning",duration:800});
+                    this.$message({message:"账号不合法",type:"warning",duration:duration_time});
                 }
                 else if(this.password === "")
                 {
-                    this.$message({message:"密码不能为空",type:"warning",duration:800});
+                    this.$message({message:"密码不能为空",type:"warning",duration:duration_time});
                 }
                 else if(this.password.length < 8){
-                    this.$message({message:"密码过短",type:"warning",duration:800});
+                    this.$message({message:"密码过短",type:"warning",duration:duration_time});
                 }
                 else if(this.passwordConfirm === true)
                 {
-                    this.$message({message:"两次密码输入不一致", type:"warning",duration:800});
+                    this.$message({message:"两次密码输入不一致", type:"warning",duration:duration_time});
                 }
                 else if(this.nickname === "")
                 {
-                    this.$message({message:"昵称不能为空", type:"warning",duration:800});
+                    this.$message({message:"昵称不能为空", type:"warning",duration:duration_time});
                 }
                 else{
                     this.isLoading = true;
@@ -137,12 +138,12 @@
                     })
                         .catch((error)=>{
                             console.log("注册时返回错误",error.response);
-                            if(error.response.status == 400)
-                                this.$message({message:"注册失败，请求参数有误",type:"error",duration:800});
-                            else if(error.response.status == 409)
-                                this.$message({message:"注册失败，该账号已被使用",type:"warning",duration:800});
+                            if(error.response.status === 400)
+                                this.$message({message:"注册失败，请求参数有误",type:"error",duration:duration_time});
+                            else if(error.response.status === 409)
+                                this.$message({message:"注册失败，该账号已被使用",type:"warning",duration:duration_time});
                             else
-                                this.$message({message:"服务器未响应",type:"warning",duration:800});
+                                this.$message({message:"服务器未响应",type:"warning",duration:duration_time});
                             this.isLoading = false;
                             this.registerText = "注册";
                     })

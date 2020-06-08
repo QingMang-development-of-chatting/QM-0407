@@ -26,6 +26,7 @@
 
 <script>
     let Base64 = require('js-base64').Base64;
+    const duration_time = 1000; //提示持续时间
     export default {
         name:"login",
         mounted() {
@@ -36,10 +37,10 @@
                 id = decode_id.substr(3);
                 let tips = "用户"+id;
                 tips += "已登录, 即将跳转至主页";
-                this.$message({message:tips,type:"warning",duration:1000});
+                this.$message({message:tips,type:"warning",duration:duration_time});
                 setTimeout(()=>{
                     this.$router.push("/Home");
-                },1000);
+                },duration_time);
             }
             if(this.$route.params.register_id) {
                 this.id = this.$route.params.register_id;
@@ -76,9 +77,9 @@
             //提交登录处理
             login(){
                 if(this.id === "")
-                    this.$message({message:"账号不能为空",type:"warning",duration:800});
+                    this.$message({message:"账号不能为空",type:"warning",duration:duration_time});
                 else if(this.password === "")
-                    this.$message({message:"密码不能为空",type:"warning",duration:800});
+                    this.$message({message:"密码不能为空",type:"warning",duration:duration_time});
                 else{
                     this.isLoading = true;
                     this.loginText = "登录中...";
@@ -95,23 +96,23 @@
                     let encode_password = Base64.encode(t ); //加密密码
                     window.localStorage.setItem("username",encode_id);  //保存到本地
                     window.localStorage.setItem("password",encode_password);    //保存到本地
-                    this.$message({message:"登录成功，即将跳转至主页",type:"success",duration:800});
+                    this.$message({message:"登录成功，即将跳转至主页",type:"success",duration:duration_time});
                     setTimeout(()=>{
                         this.$router.push("/Home");
                     },500);
                 }
                 else if(result.status === 1) {
                     if(result.reason === 0)
-                        this.$message({message:"未查找到该用户",type:"warning",duration:800});
+                        this.$message({message:"未查找到该用户",type:"warning",duration:duration_time});
                     else if(result.reason === 1)
-                        this.$message({message:"密码错误",type:"error",duration:800});
+                        this.$message({message:"密码错误",type:"error",duration:duration_time});
                     else if(result.reason === 2)
-                        this.$message({message:"您已登录，请不要重复登录",type:"warning",duration:800});
+                        this.$message({message:"您已登录，请不要重复登录",type:"warning",duration:duration_time});
                 }
                 else if(result.status === 0)
-                    this.$message({message:"请求参数错误",type:"error",duration:800});
+                    this.$message({message:"请求参数错误",type:"error",duration:duration_time});
                 else
-                    this.$message({message:"服务器无响应",type:"warning",duration:800});
+                    this.$message({message:"服务器无响应",type:"warning",duration:duration_time});
                 this.isLoading = false;
                 this.loginText = "登录";
             },
