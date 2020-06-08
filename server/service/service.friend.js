@@ -7,6 +7,8 @@ const addFriend = require('../query3.0/addFriend.js');
 //constant
 const { NOTIFICATION, SERVICE: { STATUS: STATUS }, REASON } = require('../constant');
 
+
+
 /**
  * `Service` constructor
  *
@@ -133,7 +135,7 @@ Service.prototype.accessUserToBeFriend = async function(responser, requester) {
 		console.log("请求不存在");	
 		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.NO_SUCH_APLLICATION };
 	}
-	//双方添加好友
+	//双方添加好友，并创建房间
 	var result1 = await friendFunc.insertFriend({"host_id":responser,"friend_id":requester});
 	if(result1==405){
 		console.log("好友已存在列表中");	
@@ -202,6 +204,6 @@ module.exports = Service;
 //Service.prototype.getFriends("444");
 //Service.prototype.getNotification("0001");
 //Service.prototype.applyUserToBeFriend("0001","1234");
-//Service.prototype.accessUserToBeFriend("0001","0004");
+//Service.prototype.accessUserToBeFriend("1234","0001");
 //Service.prototype.rejectUserToBeFriend("0001","0003")
 //Service.prototype.deleteFriend("0001","0004");

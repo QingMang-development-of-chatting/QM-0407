@@ -7,6 +7,7 @@ const friendService = require('../service/service.friend.js');	//TODO 这个要�
 //constant
 const { SERVICE: { STATUS: STATUS }, REASON } = require('../constant');
 
+
 /**
  * `Service` constructor
  *
@@ -31,10 +32,9 @@ Service.prototype.getRecentChatList = async function(username) {
 	friends = friends.data;
 	//对每个获取room
 	var rooms = [];
-	var len = friends.length;
     for(i = 0;i<friends.length;i++){
         var res = await chatFunc.searchRoom({"user_id":[username,friends[i]]});
-		if(res==401||res==310){  //room不存在，即没聊过天，略过
+		if(res==401||res==310){  //一般是不会出现这个情况的
 			rooms.push(null);
             continue;
         }
@@ -44,10 +44,13 @@ Service.prototype.getRecentChatList = async function(username) {
 	//获取每个room的最新一条chat，格式：[{ friend(String), last_text(String), last_time(Number), unread_cnt(Number), sender(String) }](Array)
     var data = [];
     for(i = 0;i<rooms.length;i++){
-		if(rooms[i]==null){	//没聊过天的情况
+		if(rooms[i]==null){	//room不存在的情况。一般不会出现。
 			continue;
 		}
 		var result = await chatFunc.searchChat({"room":rooms[i]});
+		if(result==401){	//没聊过天
+			continue;
+		}
 		var lastmsg = result[result.length-1];
 		var temp = {};
 		//最后一条信息相关
@@ -120,13 +123,13 @@ Service.prototype.getMessages = async function(username1, username2, time) {
 
 	//获取房间
     var res = await chatFunc.searchRoom({"user_id":[username1,username2]});
-    if(res==401||res==310){  //如果room不存在
+    if(res==401||res==310){  //如果room不存在。（正常不会出现这种情况）
         console.log("不存在消息记录");
         return { status: STATUS.OK, data: [] };
     }
     var room_id = res[0].room_id;
 
-    //尝试获取消息记录（TODO？时间的部分好像query有提供，可以改进一下）
+    //尝试获取消息记录（TODO？时间处理的部分好像query有提供，可以改进一下）
     var result = await chatFunc.searchChat({"room":room_id});
     var msgs = [];	//格式适配：[{sender(String), text(String), time(Number), is_read(Boolean)}](Array)
 	for(i=result.length-1;i>=0;i--){	//按照从新到旧的顺序
@@ -156,7 +159,7 @@ Service.prototype.getMessages = async function(username1, username2, time) {
 };
 
 /**
- * TODO插入msg，一条
+ * 插入msg，一条
  *
  * Examples:
  *
@@ -178,20 +181,18 @@ Service.prototype.addMessage = async function(message) {
 
 	//获取房间
     var res = await chatFunc.searchRoom({"user_id":[sender,receiver]});
-	if(res==401||res==310){  //如果room不存在，则创建room
-        console.log("room不存在，创建room");
-        var res = await chatFunc.insertRoom({"host_id":sender,"user_id":[receiver]});
-    }
+	if(res==401||res==310){  //case：不是朋友时
+        console.log("不是朋友");
+        return { status: STATUS.REJECT, reason: REASON.SEND_MESSAGE.NOT_FRIENDS };
+	}
 	var room_id = res[0].room_id;
-	//case：room这部分有问题时
-	if(!room_id){
+	var status = await chatFunc.insertChat({"host_id":sender,"room":room_id,"chat":[text],"date":[time]});
+	if(status==200){		// case：OK
+		return { status: STATUS.OK };
+	}else{
 		return { status: STATUS.REJECT, reason: REASON.SEND_MESSAGE.NOT_FRIENDS };
 	}
 	
-	// case：OK
-	//TODO 需要插入时间。根据query调整格式
-	var status = await chatFunc.insertChat({"host_id":user_id,"room":room_id,"chat":[msg["text"]]});
-	return { status: STATUS.OK };
 };
 
 /**
@@ -240,6 +241,7 @@ function sortbytime(msg1,msg2){
  */
 module.exports = Service;
 
-//Service.prototype.getRecentChatList("333");
+//Service.prototype.getRecentChatList("1234",'0001');
 //Service.prototype.getMessages("333","444",1590995796111);
 //Service.prototype.readMessage("333","444");
+//Service.prototype.addMessage({sender:"1234",receiver:"0001",text:"666",time:114514});
