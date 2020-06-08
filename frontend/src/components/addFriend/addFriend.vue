@@ -226,7 +226,7 @@
         background-color: #44fc34;
         position: absolute;
         left:340px;
-        bottom: 20px;
+        bottom: 18px;
         color: white;
     }
     .acceptButton:hover{
