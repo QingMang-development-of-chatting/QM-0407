@@ -168,7 +168,7 @@
                     });
                 }
                 //初始化
-                //此处应调用接口获取当前用户资料
+                //此处调用接口获取当前用户资料
                 let nickname;
                 let avatar;
                 await this.$axios.get('v1/userinfo/'+id)
@@ -217,15 +217,36 @@
                                 let recentChat = [];
                                 for(let i=0; i<result2.data.length;i++)
                                 {
+                                    //处理是否有新消息
                                     let newInfo = false;
                                     if (result2.data[i].sender !== id)
                                         newInfo = true;
+                                    //处理消息内容
+                                    let recentInfo = result2.data[i].last_txt;
+                                    if(recentInfo.length > 18)  //消息内容过长省略部分内容
+                                    {
+                                        recentInfo = recentInfo.substr(0,18);
+                                        recentInfo +="...";
+                                    }
+                                    //处理时间显示
+                                    let time_show = "";     //侧边栏显示的时间
+                                    let time = new Date(result2.data[i].last_time);
+                                    let now = new Date();
+                                    let yesterday = new Date(now.getTime()-24*60*60*1000);
+                                    if(time.getFullYear() !== now.getFullYear())
+                                        time_show = time.getFullYear().toString()+"年"+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日";
+                                    else if(time.getMonth() === now.getMonth() && time.getDate() === now.getDate())
+                                        time_show = time.getHours().toString()+":"+time.getMinutes().toString();
+                                    else if(time.getMonth() === yesterday.getMonth() && time.getDate() === yesterday.getDate())
+                                        time_show = "昨天";
+                                    else
+                                        time_show = (time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日";
                                     let t ={
                                         id:result2.data[i].friend,
                                         newInfo:newInfo,
                                         unread_num:result2.data[i].unread_cnt,
-                                        message:result2.data[i].last_txt,
-                                        time:result2.data[i].last_time,
+                                        message:recentInfo,
+                                        time:time_show,
                                     };
                                     recentChat.push(t);
                                 }
@@ -397,7 +418,7 @@
                 //console.log(this.chatInfo[id]);
                 if(this.chatInfo[id]===undefined){
                     let temp ={
-                        "user00":[
+                        "test0":[
                             {message:"可达",isFriend:true,isRead:true,time:"5月1日"},
                             {message:"可达可达",isFriend:true,isRead:true,time:"5月1日"},
                             {message:"可达可达可达",isFriend:true,isRead:true,time:"5月1日"},
@@ -406,7 +427,7 @@
                             {message:"？？？",isFriend:false,isRead:true,time:"5月1日"},
                             {message:"可达可达？",isFriend:true,isRead:true,time:"5月1日"},
                         ],
-                        "user01":[
+                        "test2":[
                             {message:"Baby baby baby baby O baby baby o baby 是不是拥有以后 就会开始要失去 给你的越多 你却越想要躲 爱已无法回答所有的问题",isFriend:true,isRead:true,time:"19:48"},
                             {message:"离开你是傻  是对是错  是看破是软弱  这结果是爱是恨  或者是什么",isFriend:false,isRead:true,time:"19:48"},
                             {message:"最爱你的人是我  你怎么舍得我难过  对你付出了这么多  你却没有感动过",isFriend:true,isRead:true,time:"19:49"},
@@ -414,7 +435,7 @@
                             {message:"干啥呢？",isFriend:false,isRead:true,time:"19:48"},
                             {message:"没干啥",isFriend:true,isRead:true,time:"19:49"},
                         ],
-                        "user02":[
+                        "test3":[
                             {message:"在？",isFriend:true,isRead:true,time:"昨天"},
                             {message:"既然你诚心诚意的发问了",isFriend:false,isRead:true,time:"昨天"},
                             {message:"我们就大发慈悲的告诉你! ",isFriend:true,isRead:true,time:"昨天"},
