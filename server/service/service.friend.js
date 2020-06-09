@@ -110,7 +110,7 @@ Service.prototype.applyUserToBeFriend = async function(requester, responser) {
 	if(result==200){
 		console.log("对方已发送申请，这里直接加为好友");
 		await friendFunc.insertFriend({"host_id":responser,"friend_id":requester});
-		return { status: STATUS.OK };
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.SEND_APPLY.MULT_ROLES }
 	}
 	console.log("成功发送申请");
     return { status: STATUS.OK };
