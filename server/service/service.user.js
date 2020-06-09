@@ -126,7 +126,7 @@ Service.prototype.setPassword = async function(username, password) {
     //合法性检测
     var pw_isvalid = password_validate(password);
     if (!pw_isvalid) {
-		return { status: STATUS.REJECT, reason: REASON.REGISTER.PASSWORD_ERROR };
+		return { status: STATUS.REJECT, reason: REASON.USERINFO.PASSWORD_ERROR };
 	}
     //query
     var result = await userFunc.updUser({"user_id":username,"user_key":password});
@@ -154,7 +154,7 @@ Service.prototype.setNickname = async function(username, nickname) {
     //合法性检测
     var nn_isvalid = nickname_validate(nickname);
     if (!nn_isvalid) {
-		return { status: STATUS.REJECT, reason: REASON.REGISTER.NICKNAME_ERROR };
+		return { status: STATUS.REJECT, reason: REASON.USERINFO.NICKNAME_ERROR };
 	}
     //query
     var result = await userFunc.updUser({"user_id":username,"user_name":nickname});
@@ -206,9 +206,9 @@ function username_validate(name){
     return false;
 }
 function password_validate(pw){
-    //长度限制  16  ,且不为空
+    //长度限制  8~16
     var len = pw.length;
-    if(len!=0&&len<=16){
+    if(len>=8&&len<=16){
         console.log("password检测通过");
         return true;
     }
@@ -220,10 +220,10 @@ function nickname_validate(nickname){
     //长度限制  10  ,且不为空
     var len = nickname.length;
     if(len!=0&&len<=10){
-        console.log("password检测通过");
+        console.log("nickname检测通过");
         return true;
     }
-    console.log("password检测不通过");
+    console.log("nickname检测不通过");
     return false;
 }
 
