@@ -52,6 +52,12 @@ EventHandler.prototype.onSendApply = function() {
 			callback({status: SOCKET.STATUS.OK});
 		}
 		else if (result.status === SERVICE.STATUS.REJECT) {
+			if (result.reason === REASON.FRIEND.SEND_APPLY.MULT_ROLES) {
+				const responser_socket_id = user_socket_bimap.getSocketByUser(responser);
+				if (responser_socket_id) {
+					this._socket.to(responser_socket_id).emit(FRIEND.RECE_ACCESSED, requester);
+				}
+			}
 			callback({status: SOCKET.STATUS.REJECT, reason: result.reason})
 		}
 	});

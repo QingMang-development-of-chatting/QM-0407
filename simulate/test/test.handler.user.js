@@ -44,7 +44,7 @@ describe('User', function() {
 		it('should response 201', async function() {
 			this.timeout(50000);
 			// case: perform well when new user
-			await user_requester.register('default user', 'default password', 'default nickname')
+			await user_requester.register('test_user', 'default password', 'default nickname')
 			.then(response => {
 				expect(response.status).to.eql(201);
 			});
@@ -61,7 +61,7 @@ describe('User', function() {
 			});
 
 			// case: type error
-			await user_emitter1.login('default user', 1, function({status}, resolve) {
+			await user_emitter1.login('test_user', 1, function({status}, resolve) {
 				expect(status).to.eql(SOCKET.STATUS.BAD_PARAM);
 				resolve();
 			});
@@ -70,7 +70,7 @@ describe('User', function() {
 		it('should response OK', async function() {
 			this.timeout(50000);
 			// case: perform well when login unlogined user
-			await user_emitter1.login('default user', 'default password', function({status}, resolve) {
+			await user_emitter1.login('test_user', 'default password', function({status}, resolve) {
 				expect(status).to.eql(SOCKET.STATUS.OK);
 				resolve();
 			});
@@ -79,20 +79,20 @@ describe('User', function() {
 		it('should response REJECT', async function() {
 			this.timeout(50000);
 			// case: already login
-			await user_emitter1.login('default user', 'default password', function({status, reason}, resolve) {
+			await user_emitter1.login('test_user', 'default password', function({status, reason}, resolve) {
 				expect(status).to.eql(SOCKET.STATUS.REJECT);
 				expect(reason).to.eql(REASON.LOGIN.ALREADY_LOGIN);
 				resolve();
 			});
 
 			// case: user not found
-			await user_emitter2.login('no such user', 'default password', function({status, reason}, resolve) {
+			await user_emitter2.login('no_such_user', 'default password', function({status, reason}, resolve) {
 				expect(status).to.eql(SOCKET.STATUS.REJECT);
 				expect(reason).to.eql(REASON.LOGIN.USER_NOTFOUND);
 				resolve();
 			});
 
-			await user_emitter2.login('default user', 'wrong password', function({status, reason}, resolve) {
+			await user_emitter2.login('test_user', 'wrong password', function({status, reason}, resolve) {
 				expect(status).to.eql(SOCKET.STATUS.REJECT);
 				expect(reason).to.eql(REASON.LOGIN.PASSWORD_ERROR);
 				resolve();
@@ -125,12 +125,12 @@ describe('User', function() {
 		it('should fire a hint.', async function() {
 			this.timeout(5000);
 
-			await user_emitter1.login('default user', 'default password', function({status}, resolve) {
+			await user_emitter1.login('test_user', 'default password', function({status}, resolve) {
 				expect(status).to.eql(SOCKET.STATUS.OK);
 				resolve();
 			});
 
-			await user_emitter2.login('default user', 'default password', function({status}, resolve) {
+			await user_emitter2.login('test_user', 'default password', function({status}, resolve) {
 				expect(status).to.eql(SOCKET.STATUS.OK);
 				resolve();
 			});
@@ -153,7 +153,7 @@ describe('User', function() {
 				resolve();
 			});
 
-			await user_emitter1.login('default user', 'default password', function({status}, resolve) {
+			await user_emitter1.login('test_user', 'default password', function({status}, resolve) {
 				expect(status).to.eql(SOCKET.STATUS.OK);
 				resolve();
 			});

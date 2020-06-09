@@ -1,7 +1,7 @@
 /**
  * Module dependencies
  */
-const { chat_service } = require('../simulate/service.singleton');
+const { chat_service, nlp_service } = require('../simulate/service.singleton');
 const { BasicEventHandler } = require('../util');
 const user_socket_bimap = require('./usersocketbimap.singleton');
 const { SERVICE, EVENT: { CHAT: CHAT }, SOCKET, REASON } = require('../constant');
@@ -33,11 +33,11 @@ EventHandler.prototype.constructor = BasicEventHandler;
  * @param {Number} message.time
  * @api private
  */
-EventHandler.prototype._transmitPrivateMessage = function(sender, receiver, message) {
+EventHandler.prototype._transmitPrivateMessage = async function(sender, receiver, message) {
 	const receiver_socket_id = user_socket_bimap.getSocketByUser(receiver);
 	if (receiver_socket_id) {
-		const { text, time } = message;
-		const modify_message = { sender, text, time };
+		const { text, time, sentiment } = message;
+		const modify_message = { sender, text, time, sentiment };
 		this._socket.to(receiver_socket_id).emit(CHAT.RECE_MESSAGE, modify_message);
 	}
 };
@@ -88,10 +88,11 @@ EventHandler.prototype.onSendMessage = function() {
 			return;	
 		}
 
-		const modify_message = { sender, receiver, text, time };
+		let modify_message = { sender, receiver, text, time };
 		const result = await chat_service.addMessage(modify_message);
 		if (result.status === SERVICE.STATUS.OK) {
-			this._transmitPrivateMessage(sender, receiver, message);
+			modify_message = { text: result.data.text, time, sentiment: result.data.sentiment };
+			this._transmitPrivateMessage(sender, receiver, modify_message);
 			callback({status: SOCKET.STATUS.OK});
 		}
 		else if (result.status === SERVICE.STATUS.REJECT) {

@@ -17,25 +17,28 @@ function Emitter() {
 Emitter.prototype = Object.create(BasicEmitter.prototype);
 Emitter.prototype.constructor = BasicEmitter;
 
-Emitter.prototype.login = function(username, password, callback) {
+Emitter.prototype.sendMessage = function(message, callback) {
 	return new Promise(resolve => {
-		this._socket.emit(EVENT.USER.LOGIN, username, password, param => {
+		this._socket.emit(EVENT.CHAT.SEND_MESSAGE, message, param => {
 			callback(param, resolve);
 		});
 	});
 };
 
-Emitter.prototype.logout = function(callback) {
+Emitter.prototype.sendReadMessage = function(sender, callback) {
 	return new Promise(resolve => {
-		this._socket.emit(EVENT.USER.LOGOUT, param => {
+		this._socket.emit(EVENT.CHAT.SEND_READ_MESSAGE, sender, param => {
 			callback(param, resolve);
 		});
 	});
 };
 
-Emitter.prototype.listenLogout = function(callback) {
-	this._socket.on(EVENT.USER.LOGOUT, callback);
-	return this;
+Emitter.prototype.listenReceiveMessage = function(callback) {
+	this._socket.on(EVENT.CHAT.RECE_MESSAGE, callback);
+};
+
+Emitter.prototype.listenReceiveReadMessage = function(callback) {
+	this._socket.on(EVENT.CHAT.RECE_READ_MESSAGE, callback);
 };
 
 /**

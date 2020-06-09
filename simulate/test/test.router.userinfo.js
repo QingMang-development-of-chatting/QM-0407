@@ -22,8 +22,8 @@ const userinfo_requester = new UserInfoRequester();
 user_requester.bindAxios(axios);
 userinfo_requester.bindAxios(axios);
 
-// registers a default user before tests
-user_requester.register('default user', 'default password', 'default nickname');
+// registers a test_user before tests
+user_requester.register('test_user', 'default password', 'default nickname');
 
 describe('UserInfo', function() {
 	describe('#getInfo()', function() {
@@ -40,17 +40,17 @@ describe('UserInfo', function() {
 		it('should response 200', async function() {
 			this.timeout(50000);
 			// case: perform well when new user
-			await userinfo_requester.getInfo('default user')
+			await userinfo_requester.getInfo('test_user')
 			.then(response => {
 				expect(response.status).to.eql(200);
-				expect(response.data).to.eql({ username: 'default user', nickname: 'default nickname', photo: '' });
+				expect(response.data).to.eql({ username: 'test_user', nickname: 'default nickname', photo: '' });
 			});
 		});
 
 		it('should response 404', async function() {
 			this.timeout(50000);
 			// case: user duplicate
-			await userinfo_requester.getInfo('no such user')
+			await userinfo_requester.getInfo('no_such_user')
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(404);
@@ -76,7 +76,7 @@ describe('UserInfo', function() {
 			});
 
 			// case: type error
-			await userinfo_requester.setPassword('default user', 1)
+			await userinfo_requester.setPassword('test_user', 1)
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(400);
@@ -86,7 +86,7 @@ describe('UserInfo', function() {
 		it('should response 200', async function() {
 			this.timeout(50000);
 			// case: perform well when new user
-			await userinfo_requester.setPassword('default user', 'new password')
+			await userinfo_requester.setPassword('test_user', 'new password')
 			.then(response => {
 				expect(response.status).to.eql(200);
 			});
@@ -95,7 +95,7 @@ describe('UserInfo', function() {
 		it('should response 404', async function() {
 			this.timeout(50000);
 			// case: user duplicate
-			await userinfo_requester.setPassword('no such user', 'new password')
+			await userinfo_requester.setPassword('no_such_user', 'new password')
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(404);
@@ -121,7 +121,7 @@ describe('UserInfo', function() {
 			});
 
 			// case: type error
-			await userinfo_requester.setNickname('default user', 1)
+			await userinfo_requester.setNickname('test_user', 1)
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(400);
@@ -131,22 +131,22 @@ describe('UserInfo', function() {
 		it('should response 200', async function() {
 			this.timeout(50000);
 			// case: perform well when new user
-			await userinfo_requester.setNickname('default user', 'new nickname')
+			await userinfo_requester.setNickname('test_user', 'new nickname')
 			.then(response => {
 				expect(response.status).to.eql(200);
 			});
 
-			await userinfo_requester.getInfo('default user')
+			await userinfo_requester.getInfo('test_user')
 			.then(response => {
 				expect(response.status).to.eql(200);
-				expect(response.data).to.eql({ username: 'default user', nickname: 'new nickname', photo: '' });
+				expect(response.data).to.eql({ username: 'test_user', nickname: 'new nickname', photo: '' });
 			});
 		});
 
 		it('should response 404', async function() {
 			this.timeout(50000);
 			// case: user duplicate
-			await userinfo_requester.setNickname('no such user', 'new nickname')
+			await userinfo_requester.setNickname('no_such_user', 'new nickname')
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(404);
@@ -172,7 +172,7 @@ describe('UserInfo', function() {
 			});
 
 			// case: type error
-			await userinfo_requester.setPhoto('default user', 1)
+			await userinfo_requester.setPhoto('test_user', 1)
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(400);
@@ -182,22 +182,22 @@ describe('UserInfo', function() {
 		it('should response 200', async function() {
 			this.timeout(50000);
 			// case: perform well when new user
-			await userinfo_requester.setPhoto('default user', 'default photo')
+			await userinfo_requester.setPhoto('test_user', 'default photo')
 			.then(response => {
 				expect(response.status).to.eql(200);
 			});
 
-			await userinfo_requester.getInfo('default user')
+			await userinfo_requester.getInfo('test_user')
 			.then(response => {
 				expect(response.status).to.eql(200);
-				expect(response.data).to.eql({ username: 'default user', nickname: 'new nickname', photo: 'default photo' });
+				expect(response.data).to.eql({ username: 'test_user', nickname: 'new nickname', photo: 'default photo' });
 			});
 		});
 
 		it('should response 404', async function() {
 			this.timeout(50000);
 			// case: user duplicate
-			await userinfo_requester.setPhoto('no such user', 'default photo')
+			await userinfo_requester.setPhoto('no_such_user', 'default photo')
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(404);

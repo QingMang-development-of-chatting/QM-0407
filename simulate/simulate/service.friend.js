@@ -75,8 +75,15 @@ Service.prototype.applyUserToBeFriend = async function(requester, responser) {
 	if (result1 !== null && result1.has(responser)) {
 		return { status: STATUS.REJECT, reason: REASON.FRIEND.SEND_APPLY.ALREADY_FRIENDS };
 	}
-	const result2 = await db.notifications.createNotification(notification);
+	const result2 = await db.notifications.updateTypeBySenderAndReceiverAndType(
+		responser, requester, NOTIFICATION.TYPE.APPLY, NOTIFICATION.TYPE.ACCESS);
 	if (result2) {
+		await db.friends.createFriends(responser, requester);
+		await db.privaterooms.createPrivateRoom(responser, requester);
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.SEND_APPLY.MULT_ROLES };
+	}
+	const result3 = await db.notifications.createNotification(notification);
+	if (result3) {
 		return { status: STATUS.OK };
 	}
 	return { status: STATUS.REJECT, reason: REASON.FRIEND.SEND_APPLY.RESENT };
@@ -106,10 +113,7 @@ Service.prototype.accessUserToBeFriend = async function(responser, requester) {
 	if (!result_notification_update) {
 		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.NO_SUCH_APLLICANT };
 	}
-	const result_friends_make = await db.friends.createFriends(responser, requester);
-	if (!result_friends_make) {
-		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.ALREADY_FRIENDS };
-	}
+	await db.friends.createFriends(responser, requester);
 
 	await db.privaterooms.createPrivateRoom(responser, requester);
 	return { status: STATUS.OK };

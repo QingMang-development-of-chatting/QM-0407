@@ -12,7 +12,7 @@ const router = new Router();
 router.get(HTTP.V1.CHAT.GET_CHATLIST, async ctx => {
 	const { username } = ctx.params;
 
-	const is_valid = typeof(username) !== ':username';
+	const is_valid = username !== ':username';
 	if (!is_valid) {
 		ctx.status = 400;
 		return;

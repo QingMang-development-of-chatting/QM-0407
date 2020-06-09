@@ -3,6 +3,7 @@
  */
 const db = require('./db.singleton');
 const { SERVICE: { STATUS: STATUS }, REASON } = require('../constant');
+const nlp = require('../nlp/nlp.singleton');
 
 /**
  * `Service` constructor
@@ -25,11 +26,16 @@ Service.prototype.getRecentChatList = async function(username) {
 		}
 		const last_message = await db.privatemessages.readLastPrivateMessageByRoom(room_id);
 		const { text: last_text, time: last_time, sender } = last_message;
-		rooms.push({ friend: room[0], last_text, last_time, unread_cnt, sender });
+		modify_last_text = await nlp.textfilter(last_text);
+		rooms.push({ friend: room[0], last_text: modify_last_text, last_time, unread_cnt, sender });
 	}
 	const rooms_sort = rooms.sort((room1, room2) => {
 		return room2.last_time - room1.last_time;
 	});
+
+	if (rooms_sort.length === 0) {
+		return { status: STATUS.NOT_FOUND };
+	}
 
 	return { status: STATUS.OK, data: rooms_sort };
 };
@@ -62,6 +68,10 @@ Service.prototype.getMessages = async function(username1, username2, time) {
 	if (result === null) {
 		return { status: STATUS.OK, data: [] };
 	}
+	for (let message of result) {
+		message.sentiment = await nlp.sentiment(message.text);
+		message.text = await nlp.textfilter(message.text);
+	}
 	return { status: STATUS.OK, data: result };
 };
 
@@ -90,17 +100,21 @@ Service.prototype.addMessage = async function(message) {
 		return { status: STATUS.REJECT, reason: REASON.SEND_MESSAGE.NOT_FRIENDS };
 	}
 	const modify_message = { room, sender, text, time };
-	let result = await db.privatemessages.createPrivateMessage(modify_message);
-	return { status: STATUS.OK };
+	await db.privatemessages.createPrivateMessage(modify_message);
+	const sentiment = await nlp.sentiment(text);
+	const modify_text = await nlp.textfilter(text);
+	return { status: STATUS.OK, data: { text: modify_text, sentiment } };
 };
 
 Service.prototype.readMessage = async function(sender, receiver) {
+	if (sender === receiver) {
+		return { status: STATUS.REJECT, reason: REASON.SEND_READ_MESSAGE.SAME_USER };
+	}
 	const room = await db.privaterooms.readPrivateRoomsByUsername1AndUsername2(sender, receiver);
 	if (room === null) {
 		return { status: STATUS.REJECT, reason: REASON.SEND_READ_MESSAGE.NOT_FRIENDS};
 	}
 	const result = await db.privatemessages.updateIsReadBySenderAndRoom(sender, room);
-	console.log(result);
 	if (!result) {
 		return { status: STATUS.REJECT, reason: REASON.SEND_READ_MESSAGE.NO_UPDATE};
 	}

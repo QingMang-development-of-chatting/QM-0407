@@ -72,7 +72,7 @@ Table.prototype.readPrivateMessagesByRoomAndTime = async function(room, time) {
 		return o1.time - o2.time;
 	});
 
-	return messagesSort.slice(-21);
+	return messagesSort.slice(-20);
 };
 
 /**
@@ -115,6 +115,19 @@ Table.prototype.readLastPrivateMessageByRoom = async function(room) {
 	}
 	const last_messages = this._rooms.get(room).slice(-1)[0];
 	return last_messages;
+};
+
+Table.prototype.readAllPrivateMessageByRoomAndSender = async function(room, sender) {
+	await delay();
+	if (!this._rooms.has(room)) {
+		return null;
+	}
+	const messages = this._rooms.get(room).filter(message => {
+		if (message.sender === sender) {
+			return message;
+		}
+	});
+	return messages;
 };
 
 /**
