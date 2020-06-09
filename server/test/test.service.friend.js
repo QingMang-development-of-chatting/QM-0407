@@ -3,8 +3,9 @@
  * 
  *   This test requires there is no user called `test_user1`, `test_user2` or `test_user3` in databse.
  *   This test will create a user called `test_user1`, `test_user2` and `test_user3` in database.
- */
-
+ *	 db: friend_answer、room_info、user_info、friend_info
+ * /
+// mocha -t 5000 test.service.friend.js
 /**
  * Module dependencies
  */

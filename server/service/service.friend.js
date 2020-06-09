@@ -99,19 +99,22 @@ Service.prototype.applyUserToBeFriend = async function(requester, responser) {
 	}
 	//query
 	var result = await addFriend.sendRequest({"host_id":requester,"friend_id":responser});
-    if(result==300){
-        console.log("成功发送申请");
-        return { status: STATUS.OK };
-	}
 	if(result==401){
         console.log("已经在好友列表里");
         return { status: STATUS.REJECT, reason: REASON.FRIEND.SEND_APPLY.ALREADY_FRIENDS };
 	}
 	if(result==402){
-        console.log("已经申请过了");
+        console.log("重复申请，更新时间并返回提示");
         return { status: STATUS.REJECT, reason: REASON.FRIEND.SEND_APPLY.RESENT };
-    }
-	console.log("不明错误");
+	}
+	if(result==200){
+		console.log("对方已发送申请，这里直接加为好友");
+		await friendFunc.insertFriend({"host_id":responser,"friend_id":requester});
+		return { status: STATUS.OK };
+	}
+	console.log("成功发送申请");
+    return { status: STATUS.OK };
+
 };
 
 /**
@@ -128,12 +131,13 @@ Service.prototype.applyUserToBeFriend = async function(requester, responser) {
  */
 Service.prototype.accessUserToBeFriend = async function(responser, requester) {
 	if (responser === requester) {
+		console.log("responser和requester重名")
 		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.SAME_USER };
 	}
 	var result = await addFriend.sendAnswer({"host_id":responser,"friend_id":requester,"answer":301});
 	if (result==400){
 		console.log("请求不存在");	
-		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.NO_SUCH_APLLICATION };
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.NO_SUCH_APLLICANT };
 	}
 	//双方添加好友，并创建房间
 	var result1 = await friendFunc.insertFriend({"host_id":responser,"friend_id":requester});
@@ -158,12 +162,12 @@ Service.prototype.accessUserToBeFriend = async function(responser, requester) {
  */
 Service.prototype.rejectUserToBeFriend = async function(responser, requester) {
 	if (responser === requester) {
-		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.SAME_USER };
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.REJECT.SAME_USER };
 	}
 	var result = await addFriend.sendAnswer({"host_id":responser,"friend_id":requester,"answer":302});
 	if (result==400){
 		console.log("请求不存在");	
-		return { status: STATUS.REJECT, reason: REASON.FRIEND.ACCESS.NO_SUCH_APLLICATION };
+		return { status: STATUS.REJECT, reason: REASON.FRIEND.REJECT.NO_SUCH_APLLICANT };
 	}
 	console.log("成功拒绝该好友申请");
 	return { status: STATUS.OK };
@@ -203,7 +207,7 @@ module.exports = Service;
 
 //Service.prototype.getFriends("444");
 //Service.prototype.getNotification("0001");
-//Service.prototype.applyUserToBeFriend("0001","1234");
-//Service.prototype.accessUserToBeFriend("1234","0001");
+//Service.prototype.applyUserToBeFriend('test_user1', 'test_user2');
+//Service.prototype.accessUserToBeFriend("0001","0001");
 //Service.prototype.rejectUserToBeFriend("0001","0003")
 //Service.prototype.deleteFriend("0001","0004");
