@@ -22,6 +22,8 @@ HTTP.V1.FRIEND.REJECT_APPLICANT = '/v1/friend/:username/applicants/reject/:appli
 HTTP.V1.CHAT = {};
 HTTP.V1.CHAT.GET_CHATLIST = '/v1/chat/:username/chatlist';
 HTTP.V1.CHAT.GET_HISTORY = '/v1/chat/:username/history/:friend/:time';
+HTTP.V1.NLP = {};
+HTTP.V1.NLP.CLOUD = '/v1/nlp/:username/cloud';
 
 /**
  * Expose `Event`

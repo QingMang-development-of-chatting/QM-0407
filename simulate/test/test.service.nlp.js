@@ -59,6 +59,31 @@ describe('Chat', function() {
 		});
 	});
 
+	describe('#messages_less_than_20', async function() {
+		it('should response OK', async function() {
+			this.timeout(120000);
+			let i = 0;
+			while (i < 10) {
+				const message = {
+					sender: 'test_user1',
+					receiver: 'test_user2',
+					text: `获取时保证顺序就得获取全部消息再进行类似排序的工序了`,
+					time: new Date().getTime()
+				};
+				i++;
+				const result = await chat_service.addMessage(message);
+				expect(result.status).to.eql(STATUS.OK);
+			}
+		});
+
+		it('should receiver REJECT for few messages', async function() {
+			this.timeout(120000);
+			const result = await nlp_service.cloud('test_user1');
+			expect(result.status).to.eql(STATUS.REJECT);
+			expect(result.reason).to.eql(REASON.CLOUD.FEW);
+		});
+	});
+
 	describe('#multiple_messages', async function() {
 		it('should response OK', async function() {
 			this.timeout(120000);
@@ -96,10 +121,11 @@ describe('Chat', function() {
 	});
 
 	describe('#cloud()', function() {
-		it('should write file', async function() {
+		it('should receive OK', async function() {
+			this.timeout(120000);
 			const result = await nlp_service.cloud('test_user1');
-			expect(result.satus).to.eql(STATUS.OK);
-			expect(result.data).to.eql(STATUS.OK);
+			expect(result.status).to.eql(STATUS.OK);
+			expect(result.data).to.be.a('string')
 		});
 	});
 });

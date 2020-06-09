@@ -45,8 +45,8 @@ Service.prototype.cloud = async function(username) {
 	const messages_sort = messages.sort((message1, message2) => {
 		return message2.time - message1.time;
 	});
-
-	if (messages_sort.length < 10) {
+	
+	if (messages_sort.length <= 10) {
 		return { status: STATUS.REJECT, reason: REASON.CLOUD.FEW };
 	}
 

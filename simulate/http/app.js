@@ -7,6 +7,7 @@ const user_router = require('./router.user');
 const user_info_router = require('./router.userinfo');
 const friend_router = require('./router.friend');
 const chat_router = require('./router.chat');
+const nlp_router = require('./router.nlp');
 
 /**
  * Application
@@ -28,9 +29,13 @@ app.use(user_info_router.allowedMethods());
 app.use(friend_router.routes());
 app.use(friend_router.allowedMethods());
 
-// sets friend router
+// sets chat router
 app.use(chat_router.routes());
 app.use(chat_router.allowedMethods());
+
+// sets nlp router
+app.use(nlp_router.routes());
+app.use(nlp_router.allowedMethods());
 
 /**
  * Expose `app`
