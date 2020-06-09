@@ -1,9 +1,9 @@
 //聊天侧边栏组件
 <template>
     <div class="chatbar" >
-        <el-input  placeholder="请输入好友姓名" v-model="input" clearable suffix-icon="el-icon-search"></el-input>
+        <el-input  class="searchBar" placeholder="输入好友昵称查找好友" v-model="searchInput" clearable prefix-icon="el-icon-search"></el-input>
         <el-menu class="chatbar-main" v-loading="loadingChatBar">
-            <el-menu-item class="chatListClass" v-for="(message,key) in chatLists" :key="key" @click="toChat(key,message.nickname,message.avatar)">
+            <el-menu-item class="chatListClass" v-for="(message,key) in chatLists" :key="key" v-show="search(message.nickname)" @click="toChat(key,message.nickname,message.avatar)">
                 <el-avatar class="avatar" shape="square" :size="58" fit="cover" :src="message.avatar"></el-avatar>
                 <span class="nickname">{{message.nickname}}</span>
                 <span class="time">{{message.recentMessage.time}}</span>
@@ -23,7 +23,7 @@
         },
         data(){
             return{
-                input: "",  //搜索栏输入
+                searchInput: "",  //搜索栏输入
             }
         },
         computed:{
@@ -44,7 +44,20 @@
             //展示好友对话框
             toChat(id,nickname,avatar){
                 this.$emit('toChat',id,nickname,avatar);
-            }
+            },
+            //搜索框筛选匹配
+            search(nickname){
+                if(this.searchInput !== "") {
+                    let t = '/' + this.searchInput +'/';
+                    let pattern = eval(t);
+                    if (pattern.test(nickname))
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                    return true;
+            },
         }
     };
 </script>
@@ -91,6 +104,7 @@
         color: #7e7878;
     }
     .chatbar>>>.el-input{
+        font-size: 15px;
         width:80% ;
         height: 8%;
         box-sizing: border-box;
@@ -104,5 +118,12 @@
     .chatbar-main{
         height:92%;
         overflow-y: auto;
+    }
+    .searchBar >>> .el-input__inner{
+        padding-left: 45px !important;
+    }
+    .searchBar >>> .el-input__prefix{
+        padding-top: 4px;
+        padding-left: 10px !important;
     }
 </style>
