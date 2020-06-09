@@ -1,7 +1,7 @@
 //好友侧边栏组件
 <template>
     <div class="friendbar">
-        <el-input  placeholder="请输入好友姓名" v-model="input" clearable suffix-icon="el-icon-search"></el-input>
+        <el-input  class="searchBar" placeholder="输入好友昵称查找好友" v-model="searchInput" maxlength="10" clearable prefix-icon="el-icon-search"></el-input>
         <div class="addFriend" @click="showAdd">
             <el-badge :value="NewApplyNumber" :hidden="NewApplyNumber<1">
                 <i id="addIcon" class="el-icon-circle-plus el-icon--right"></i>
@@ -9,7 +9,7 @@
             <span class="addText">新的朋友</span>
         </div>
         <el-menu class="friendbar-main">
-            <el-menu-item class="friendList" v-for="(friend,key) in friendList" :key="key" @click="showFriend()">
+            <el-menu-item class="friendList" v-for="(friend,key) in friendList" v-show="search(friend.nickname)" :key="key" @click="showFriend()">
                 <el-avatar class="avatar" shape="square" :size="58" fit="cover" :src="friend.avatar"></el-avatar>
                 <span class="nickname">{{friend.nickname}}</span>
             </el-menu-item>
@@ -27,7 +27,7 @@
         },
         data(){
             return{
-                input: "",
+                searchInput: "",
             }
         },
         methods:{
@@ -36,7 +36,20 @@
             },
             showFriend(){
                 this.$emit('showFriend');
-            }
+            },
+            //搜索框筛选匹配
+            search(nickname){
+                if(this.searchInput !== "") {
+                    let t = '/' + this.searchInput +'/';
+                    let pattern = eval(t);
+                    if (pattern.test(nickname))
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                    return true;
+            },
         }
 
     };
@@ -80,6 +93,7 @@
         top:10px;
     }
     .friendbar>>>.el-input{
+        font-size: 15px;
         width:80% ;
         height: 9%;
         box-sizing: border-box;
@@ -111,5 +125,11 @@
         right: 40px;
         top: 15px;
         background-color: #f51500;
+    }
+    .searchBar >>> .el-input__inner{
+        padding-left: 45px !important;
+    }
+    .searchBar >>> .el-input__prefix{
+        padding-left: 10px !important;
     }
 </style>
