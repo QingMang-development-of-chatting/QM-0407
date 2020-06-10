@@ -62,7 +62,7 @@ Service.prototype.getNotification = async function(username) {
     var friend_request_array = [];
     for(i = 0;i<result.length;i++){ //调整格式
 		var rqs = {};
-		rqs.sender = result[i]["friend_id"]
+		rqs.sender = result[i]["host_id"]
         var answer = result[i]["answer"];
 		if(answer==301){        //已接受
 			console.log("已接受");
@@ -206,8 +206,8 @@ Service.prototype.deleteFriend = async function(username1, username2) {
 module.exports = Service;
 
 //Service.prototype.getFriends("444");
-//Service.prototype.getNotification("0001");
-//Service.prototype.applyUserToBeFriend('test_user1', 'test_user2');
+//Service.prototype.getNotification("1234");
+//Service.prototype.applyUserToBeFriend('0002', '1234');
 //Service.prototype.accessUserToBeFriend("0001","0001");
 //Service.prototype.rejectUserToBeFriend("0001","0003")
 //Service.prototype.deleteFriend("0001","0004");
