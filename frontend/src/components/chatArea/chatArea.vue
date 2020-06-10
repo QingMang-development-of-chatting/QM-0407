@@ -22,10 +22,18 @@
                     <div class="friendMessage">{{piece.message}}</div>
                  </div>
             </div>
+
+            <!-- 表情区域 -->
+            <div class="browBox" v-if="faceShow">
+                <ul>
+                    <li v-for="(item,index) in faceList" :key="index" @click="getBrow(index)">{{item}}</li>
+                </ul>
+            </div>
+
         </div>
         <div class="chatAreaInput">
             <div class="inputMenu">
-                <img id="emojiIcon" :src="emoji" alt="emoji"/>
+                <img id="emojiIcon" :src="emoji" alt="emoji" @click="faceContent"/>
                 <img id="worldCloudIcon" :src="mangoIcon">
             </div>
             <div class="inputArea">
@@ -42,6 +50,7 @@
 <script>
     import emoji from'../../assets/emoji.png'
     import mangoIcon from'../../assets/mango2.png'
+    const appData = require("@/assets/emojis.json");
     export default {
         props: {
             friendID:String,    //好友ID
@@ -60,6 +69,9 @@
                 overIndex:-1,
                 //词云按钮图标
                 mangoIcon: mangoIcon,
+                faceList: [],
+                faceShow: false,
+                getBrowString: "",
             }
         },
         watch:{
@@ -96,7 +108,28 @@
                     return "visibility:visible";
                 else
                     return "visibility:hidden";
-            }
+            },
+
+            faceContent() {
+                this.faceShow = !this.faceShow;
+                if (this.faceShow == true) {
+                    for (let i in appData) {
+                    this.faceList.push(appData[i].char);
+                    }
+                } else {
+                this.faceList = [];
+                }
+            },
+            // 获取用户点击之后的标签 ，存放到输入框内
+            getBrow(index) {
+                for (let i in this.faceList) {
+                    if (index == i) {
+                        this.getBrowString = this.faceList[index];
+                        this.messageInput += this.getBrowString;
+                     }
+                }
+            },
+
 
         }
     };
@@ -250,4 +283,40 @@
         height: 15px;
         color: #525252;
     }
+
+    #chatAreaInfo{
+        position:relative;
+    }
+    .browBox{
+        position:absolute;
+        bottom:0px;
+        left:5px;
+        height:200px;
+        width:400px;
+        overflow-y: scroll;
+        /*text-align: left;*/
+        padding-left: 0px;
+
+        /*overflow: scroll;*/
+        background: #ffffff;
+        border-radius:15px 15px 15px 15px;
+
+        
+    }
+    .browBox ul {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 5px;
+        margin: 10px;
+        /*background:#6625aa;*/
+            
+    }
+    .browBox ul li {
+        /*border: 1px solid;*/
+        width: 50px;
+        font-size: 20px;
+        list-style: none;
+        text-align: center;
+     }
 </style>
