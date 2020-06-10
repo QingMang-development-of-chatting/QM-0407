@@ -262,13 +262,13 @@
                                     };
                                     recentChat.push(t);
                                 }
-                                let test = {
-                                    id:"test0",
-                                    newInfo:true,
-                                    unread_num:1,
-                                    message:"哈哈哈哈哈哈",
-                                    time:"昨天",
-                                };
+                                //let test = {
+                                //    id:"test0",
+                                //    newInfo:true,
+                                //    unread_num:1,
+                                //    message:"哈哈哈哈哈哈",
+                                //    time:"昨天",
+                                // };
                                 // let test1 = {
                                 //     id:"test2",
                                 //     newInfo:true,
@@ -283,7 +283,7 @@
                                 //     message:"哈哈哈哈哈哈",
                                 //     time:"昨天",
                                 // };
-                                recentChat.push(test);
+                                //recentChat.push(test);
                                 //recentChat.push(test1);
                                 //recentChat.push(test2);
                                 this.$store.commit('friendInfo/addRecent',recentChat);  //更新好友信息
