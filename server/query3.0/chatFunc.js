@@ -12,6 +12,7 @@ const axios = require('axios');
  * --info.host_id (string) 用户账号
  *   info.chat (Array["text1", "text2"..]) 聊天内容
  *   info.date (Array["date1", "date2"..]) 聊天时间，推荐使用getTime函数转换一下
+ *   info.sentiment 同上
  *   info.room (string) 聊天室
  * 输出：
  * --200 成功
@@ -27,6 +28,7 @@ const insertChat = async function(info) {
             chat: info.chat,
             date: info.date,
             room: info.room,
+            sentiment: info.sentiment,
         }
     ).then(function(response){
         status = response.data;

@@ -685,7 +685,7 @@
                     console.log("发送聊天信息回执status",result.status);
                     console.log("发送聊天信息回执reason",result.reason);
                     if(result.status == 2){
-                        //this.$message({message:"发送成功",type:"success",duration:500});
+                        this.$message({message:"发送成功",type:"success",duration:800});
                         let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show,utcTime:time}};
                         this.$store.commit('chatInfo/sendUpdate',UpdateInfo);
                         this.$refs.chatArea.scrollBottom();
@@ -790,6 +790,7 @@
                 //将自己发送给该好友信息修改为已读
                 this.$store.commit('chatInfo/readMeUpdate',receiver);
             },
+            //接收消息反馈事件
             messageRece(response){
                 //----------------response:sender,text,time,sentiment---------------
                 console.log("接收体",response);
@@ -802,9 +803,9 @@
                 let Sender = response.sender;
                 let Text = response.text;
                 let time_show="";
-                // let Time = new Date(response.time);
+                let Time = new Date(response.time);
                 time_show = this.utcTimeToString(response.time);
-                //console.log("收到新的信息Time:",Time)
+                console.log("收到新的信息Time:",Time)
                 console.log("收到新的信息time_show:",time_show)
                 let ActiveRate = response.sentiment;
                 let Is_read = true;
@@ -823,26 +824,31 @@
                     this.$socket.emit('messageReadSend',Sender);
                     this.$refs.chatArea.scrollBottom();
                 }
-                let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,utcTime:response.time,activeRate:ActiveRate}};
+                let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,utcTime:Time.getTime() ,activeRate:ActiveRate}};
+
                 //*****************
                 //********查看chatInfo有没有sender,没有则增加
                 //************
-                //if(this.chatInfo[Sender]===undefined)
-                //{this.$store.commit('chatInfo/addChatInfo',info);}
+                if(this.chatInfo[Sender]===undefined)
+                    {
+                    console.log("新增sender的info",info);
+                    this.$store.commit('friendInfo/addRecent',info);
+                    }
+
                 //console.log("收到新的信息is_Friend:",Is_friend);
                 //console.log("收到新的信息Sender:",Sender);
-                //else
-
+                else
+                {
                 this.$store.commit('chatInfo/sendUpdate',info);
-
-
+                }
                 //修改最近聊天信息info:[{id:~,newInfo:~,unread_num:~,message:~,time:~},...]
                 /*
                 let recentChat = {
                     id:Sender,
                     newInfo:Is_read,
                     unread_num:this.chatList[Sender].unread_num,
-                    time:time_show
+                    time:time_show,
+                    recentMessage:{message:Text,time:time_show}
                 }
                 let arrrayRecent = [];
                 arrrayRecent.push(recentChat);
