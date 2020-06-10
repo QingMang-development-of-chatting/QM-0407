@@ -716,7 +716,8 @@
                     console.log("发送聊天信息回执result.reason",result.reason);
                     if(result.status == 2){
                         this.$message({message:"发送成功",type:"success",duration:800});
-                        this.$store.commit('chatInfo/sendUpdate',info);
+                        let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show}};
+                        this.$store.commit('chatInfo/sendUpdate',UpdateInfo);
                         this.$refs.chatArea.scrollBottom();
                     }
                     else{
