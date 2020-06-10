@@ -3,7 +3,7 @@
  */
 //query
 const chatFunc = require('../query3.0/chatFunc.js');
-const friendService = require('../service/service.friend.js');	//TODO 这个要改成service.friend
+const friendService = require('../service/service.friend.js');	
 //constant
 const { SERVICE: { STATUS: STATUS }, REASON } = require('../constant');
 
@@ -17,7 +17,7 @@ function Service() {}
 
 /**
  * 获取聊天的列表。
- *
+ *TOTEST
  * Examples:
  *
  *   service.getRecentChatList('...');
@@ -47,9 +47,12 @@ Service.prototype.getRecentChatList = async function(username) {
 		if(rooms[i]==null){	//room不存在的情况。一般不会出现。
 			continue;
 		}
-		var result = await chatFunc.searchChat({"room":rooms[i]});
+		var result = await chatFunc.searchChat({"room":rooms[i],"param":"room"});
 		if(result==401){	//没聊过天
 			continue;
+		}
+		if(result==400){
+			console.log("query调用错误");
 		}
 		var lastmsg = result[result.length-1];
 		var temp = {};
@@ -62,14 +65,7 @@ Service.prototype.getRecentChatList = async function(username) {
 		temp.unread_cnt = 0;	
 		for(ri=result.length-1;ri>=0;ri--){
 			var readlist = result[ri].user_read;
-			var findread = false;
-			for(j = 0;j<readlist.length;j++){
-				if(username==readlist[j]){
-					findread = true;	//如果找到读了，就直接break
-					break;
-				}
-			}
-			if(findread){	//因为是按顺序的，如果找到读了，表示更早的也都读了。所以直接break
+			if(readlist.length==2){	//找到读了，表示更早的也都读了。所以直接break
 				break;
 			}else{
 				temp.unread_cnt+=1;
@@ -89,7 +85,7 @@ Service.prototype.getRecentChatList = async function(username) {
 
 
 /**
- * 根据u1、u2，获取指定时间之前的msgs
+ * TODO 根据u1、u2，获取指定时间之前的msgs
  * msgs的数量不超过20, is_read判断的是u1是否已读
  *
  * Examples:
@@ -129,10 +125,10 @@ Service.prototype.getMessages = async function(username1, username2, time) {
     }
     var room_id = res[0].room_id;
 
-    //尝试获取消息记录（TODO？时间处理的部分好像query有提供，可以改进一下）
-    var result = await chatFunc.searchChat({"room":room_id});
+    //尝试获取消息记录
+    var result = await chatFunc.searchChat({"room":room_id,"param":"room","param2":"date"});
     var msgs = [];	//格式适配：[{sender(String), text(String), time(Number), is_read(Boolean)}](Array)
-	for(i=result.length-1;i>=0;i--){	//按照从新到旧的顺序
+	for(i=0;i<result.length;i++){	//time递增
 		if(msgs.length>=20){
 			console.log("已获取20条msg，break");
 			break;
@@ -145,10 +141,15 @@ Service.prototype.getMessages = async function(username1, username2, time) {
         temp.text = msg.chat;
 		temp.time = msg.date;
 		temp.sender = msg.host_id;
-		temp.is_read = false;	//判断username1用户是否已读
+		//判断receiver是否已读（sender的反面）
+		var receiver = username1;
+		if(receiver===temp.sender){
+			receiver=username2;
+		}
+		temp.is_read = false;	
         var readlist = msg.user_read;
         for(j = 0;j<readlist.length;j++){
-            if(username1==readlist[j]){
+            if(receiver==readlist[j]){
                 temp.is_read = true;
                 break;
             }
@@ -210,17 +211,17 @@ Service.prototype.addMessage = async function(message) {
  */
 Service.prototype.readMessage = async function(sender, receiver) {
 	if (sender === receiver) {
-		return { status: STATUS.REJECT, reason: REASON.SEND_MESSAGE.SAME_USER };
+		return { status: STATUS.REJECT, reason: REASON.SEND_READ_MESSAGE.SAME_USER };
 	}
 	//获取房间
-    var res = await chatFunc.searchRoom({"user_id":[sender,receiver]});
-    if(res==401||res==310){  //如果room不存在
+    var res1 = await chatFunc.searchRoom({"user_id":[sender,receiver]});
+    if(res1==401||res1==310){  //如果room不存在
         console.log("不存在消息记录");
         return { status: STATUS.REJECT, reason: REASON.SEND_READ_MESSAGE.NOT_FRIENDS};
     }
-    var room_id = res[0].room_id;
-	var res = await chatFunc.readChat({user_id:sender,room_id:room_id});
-	if(res==401){	//case: 过去已经都已读了
+    var room_id = res1[0].room_id;
+	var res2 = await chatFunc.readChat({user_id:sender,room_id:room_id});
+	if(res2==401){	//case: 过去已经都已读了
 		console.log("no msgs upd");
 		return { status: STATUS.REJECT, reason: REASON.SEND_READ_MESSAGE.NO_UPDATE};
 	}
@@ -241,7 +242,7 @@ function sortbytime(msg1,msg2){
  */
 module.exports = Service;
 
-//Service.prototype.getRecentChatList("1234",'0001');
-//Service.prototype.getMessages("333","444",1590995796111);
-//Service.prototype.readMessage("333","444");
+//Service.prototype.getRecentChatList('test_user1');
+//Service.prototype.getMessages('test_user1', 'test_user2', new Date().getTime());
+//Service.prototype.readMessage('test_user2', 'test_user1');
 //Service.prototype.addMessage({sender:"1234",receiver:"0001",text:"666",time:114514});

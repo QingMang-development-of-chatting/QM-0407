@@ -4,6 +4,7 @@
  *   This test requires there is no user called `test_user1`, `test_user2` or `test_user3` in databse.
  *   This test will create a user called `test_user1`, `test_user2` and `test_user3` in database.
  */
+//mocha -t 5000 test.service.chat.js
 
 /**
  * Module dependencies
@@ -167,7 +168,7 @@ describe('Chat', function() {
 	});
 
 	describe('#getMessages()', async function() {
-		it('should response OK and data is an empty array', async function() {
+		it('should response OK ', async function() {
 			this.timeout(50000);
 			const result = await chat_service.getMessages('test_user1', 'test_user2', new Date().getTime());
 			expect(result.status).to.eql(STATUS.OK);
@@ -244,20 +245,20 @@ describe('Chat', function() {
 
 		it('should response REJECT for no update', async function() {
 			this.timeout(50000);
-			const result = await chat_service.readMessage('test_user2', 'test_user1');
+			const result = await chat_service.readMessage('test_user1', 'test_user2');
 			expect(result.status).to.eql(STATUS.REJECT);
 			expect(result.reason).to.eql(REASON.SEND_READ_MESSAGE.NO_UPDATE);
 		});
 
 		it('should response OK', async function() {
 			this.timeout(50000);
-			const result = await chat_service.readMessage('test_user1', 'test_user2');
+			const result = await chat_service.readMessage('test_user2', 'test_user1');
 			expect(result.status).to.eql(STATUS.OK);
 		});
 
 		it('should response REJECT for no update', async function() {
 			this.timeout(50000);
-			const result = await chat_service.readMessage('test_user1', 'test_user2');
+			const result = await chat_service.readMessage('test_user2', 'test_user1');
 			expect(result.status).to.eql(STATUS.REJECT);
 			expect(result.reason).to.eql(REASON.SEND_READ_MESSAGE.NO_UPDATE);
 		});
