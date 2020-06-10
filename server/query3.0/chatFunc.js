@@ -118,7 +118,7 @@ const readChat = async function(info) {
  *   info.param 候选词：key按关键字正则搜索，date输出给定时间的前(20)条信息，
  *                     date1输出给定时间前后(三小时)的所有信息
  *                     room输出该房间所有的聊天信息
- *   info.param2 备选参数，仅对于date和date2起作用，在此输入getTime()时间
+ *   info.param2 备选参数，仅对于date和date1起作用，在此输入getTime()时间
  * 输出：
  * --401：没有查到记录
  * --[{host_id:"id", chat:"chat", data:"Date.getTime"}...]
@@ -132,12 +132,12 @@ const searchChat = async function(info) {
     {
         return 400;
     }
-    if (info.param != "key" || info.param != "room" 
-        || info.param != "date" || info.param != "date1")
+    if (info.param != "key" && info.param != "room" 
+        && info.param != "date" && info.param != "date1")
     {
         return 400;
     }
-    if ((info.param == "date" || info.param == "date2") && (!Number(info.param2)))
+    if ((info.param == "date" || info.param == "date1") && (!Number(info.param2)))
     {
         return 400;
     }
@@ -178,7 +178,6 @@ const searchChat = async function(info) {
 
     return status;
 }
-
 
 /**
  * 首页返回
