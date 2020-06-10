@@ -34,12 +34,12 @@ function Table() {
  */
 Table.prototype.createPrivateMessage = async function(message) {
 	await delay();
-	const { room, sender, text, time } = message;
+	const { room, sender, text, time, sentiment } = message;
 	if (!this._rooms.has(room)) {
 		this._rooms.set(room, []);
 	}
 	const _room = this._rooms.get(room);
-	const modify_message = { sender, text, time, is_read: false };
+	const modify_message = { sender, text, time, sentiment, is_read: false };
 	_room.push(modify_message);
 
 	return true;

@@ -69,7 +69,7 @@ Service.prototype.cloud = async function(username) {
 
 	await nlp.cloud();
 
-	const cloud_filename = path.join(__dirname, '../nlp/history.txt');
+	const cloud_filename = path.join(__dirname, '../nlp/cloud.png');
 
 	const result = await new Promise(resolve => fs.readFile(cloud_filename, 'base64', (err, data) => {
 		if (err) {
