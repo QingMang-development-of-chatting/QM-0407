@@ -3,7 +3,7 @@
     <div class="Home">
         <el-container id="container" >
             <el-aside id="aside">
-                <sidebar :avatar-url="currentUser.avatar" :get-new-friend="untreatedApplyNum>0" :unread-message-num="unreadMessageNum" :loading-avatar="loadingAvatar" @showInfo="showInfo" @showChat="showChat" @showFriend="showFriend" @logout="logout"></sidebar>
+                <sidebar :avatar-url="currentUser.avatar" :get-new-friend="untreatedApplyNum>0" :unread-message-num="unreadMessageNum" :loading-avatar="loadingAvatar" @showInfo="showInfo" @showChat="showChat" @showFriend="showFriend" @showWordCloud="showWordCloud" @logout="logout"></sidebar>
             </el-aside>
             <el-aside id="chat" v-show="isShowChat">
                 <chatbar :chatList="chatList" @toChat="toChat" :loading-chat-bar="loadingChatBar"></chatbar>
@@ -15,13 +15,15 @@
                 <div id="init" v-if="isInit">
                     <img class ="logo" :src="logo"  alt="logo">
                 </div>
-                <chat-area v-if="showChatArea" :friend-nickname="chattingFriendNickname" :friend-avatar="chattingFriendAvatar" :my-avatar="currentUser.avatar" :chatting-info="chatInfo[chattingFriendID]" :friendID="chattingFriendID" @sendMessage="sendMessage"></chat-area>
+                <div id="wordCloud" v-if="isShowWordCloud">
+                    <img class ="logo" :src="wordCloudSrc"  alt="wordCloud">
+                </div>
+                <chat-area ref="chatArea" v-if="showChatArea" :friend-nickname="chattingFriendNickname" :friend-avatar="chattingFriendAvatar" :my-avatar="currentUser.avatar" :chatting-info="chatInfo[chattingFriendID]" :friendID="chattingFriendID" :is-loading-history="loadingHistory" @sendMessage="sendMessage"></chat-area>
                 <friend-info v-if="showFriendInfo"></friend-info>
                 <add-friend v-if="showAddFriend" :loading="searchLoading" :apply-messages="applyMessages" :found-user="foundUser" :show-found="showFound" :showFoundRemind='showFoundRemind' @accept="acceptApply" @reject="rejectApply" @addFriend="sendAddFriend" @searchUser="searchUser"></add-friend>
             </el-main>
         </el-container>
         <setting-window v-if="showSetting" :id="currentUser.id" :nickname="currentUser.nickname" :avatar-url="currentUser.avatar"  :changing-password="changingPassword" @switchShow="switchShow" @closeInfo="closeSetting" @changeAvatar="editAvatar" @changeNickname="editNickname" @changePassword="changePassword"></setting-window>
-        <word-cloud v-if="showWordCloud" :imgSrc="showWordCloud"></word-cloud>
     </div>
 </template>
 
@@ -35,14 +37,12 @@
     import ChatArea from "../../components/chatArea/chatArea";
     import friendInfo from "../../components/friendInfo/friendInfo";
     import AddFriend from "../../components/addFriend/addFriend";
-    import WordCloud from "../../components/wordCloud/wordCloud";
     let Base64 = require('js-base64').Base64;
-    const duration_time = 1000;
+    const duration_time = 1500;
     export default {
         name: "home",
         components: {
-            WordCloud,
-            AddFriend,  //条件好友组件
+            AddFriend,  //添加好友组件
             sidebar,    //主侧边栏组件
             SettingWindow,  //个人资料设置组件
             Friendbar,  //好友资料侧边栏组件
@@ -63,6 +63,8 @@
                 loadingAvatar: true,
                 //是否正在加载聊天列表
                 loadingChatBar:true,
+                //是否正在加载聊天历史
+                loadingHistory: false,
                 //是否展示聊天侧边栏
                 isShowChat:true,
                 //是否展示好友资料侧边栏
@@ -76,7 +78,7 @@
                 //是否显示添加好友窗口
                 showAddFriend:false,
                 //是否显示词云
-                showWordCloud:false,
+                isShowWordCloud:false,
                 //是否正在查找
                 searchLoading:false,
                 //是否显示查找到的用户
@@ -260,13 +262,13 @@
                                     };
                                     recentChat.push(t);
                                 }
-                                // let test = {
-                                //     id:"test0",
-                                //     newInfo:true,
-                                //     unread_num:1,
-                                //     message:"哈哈哈哈哈哈",
-                                //     time:"昨天",
-                                // };
+                                let test = {
+                                    id:"test0",
+                                    newInfo:true,
+                                    unread_num:1,
+                                    message:"哈哈哈哈哈哈",
+                                    time:"昨天",
+                                };
                                 // let test1 = {
                                 //     id:"test2",
                                 //     newInfo:true,
@@ -281,9 +283,9 @@
                                 //     message:"哈哈哈哈哈哈",
                                 //     time:"昨天",
                                 // };
-                                // recentChat.push(test);
-                                // recentChat.push(test1);
-                                // recentChat.push(test2);
+                                recentChat.push(test);
+                                //recentChat.push(test1);
+                                //recentChat.push(test2);
                                 this.$store.commit('friendInfo/addRecent',recentChat);  //更新好友信息
                                 this.loadingChatBar = false;
                         })
@@ -336,7 +338,6 @@
                 this.isShowChat = true;
                 this.isShowFriend = false;
                 this.showSetting = false;
-                this.showWordCloud = false;
             },
             //切换用户资料及修改密码显示
             switchShow(){
@@ -345,14 +346,12 @@
             //显示个人资料
             showInfo(){
                 this.showSetting = true;
-                this.showWordCloud = false;
             },
             //显示好友信息
             showFriend(){
                 this.isShowChat = false;
                 this.isShowFriend = true;
                 this.showSetting = false;
-                this.showWordCloud = false;
             },
             //注销
             logout(){
@@ -444,12 +443,12 @@
 
             },
             //载入好友聊天对话框
-            async toChat(id,nickname,avatar){
+            toChat(id,nickname,avatar){
                 this.isInit = false;
                 this.showFriendInfo = false;
                 this.showAddFriend = false;
                 this.showChatArea = false;
-                this.showWordCloud = false;
+                this.isShowWordCloud = false;
                 this.showChatArea = true;
                 this.chattingFriendNickname = nickname;
                 this.chattingFriendAvatar = avatar;
@@ -457,8 +456,9 @@
                 //初次载入时，应调用接口向后台获取与该好友聊天记录,并将数据存入store，后续更新store即可
                 if(this.chatInfo[id]===undefined){
                     //获取聊天历史
+                    this.loadingHistory = true;
                     let now = new Date().getTime().toString()
-                    await this.$axios.get('/v1/chat/'+this.currentUser.id+'/history/'+id+'/'+now)
+                    this.$axios.get('/v1/chat/'+this.currentUser.id+'/history/'+id+'/'+now)
                         .then((result)=>{
                             console.log("获取聊天历史返回",result);
                             let temp = [];
@@ -471,7 +471,7 @@
                                 let t ={
                                     message:result.data[i].text,
                                     isFriend:isFriend,
-                                    isRead:result.data[i].isRead,
+                                    isRead:result.data[i].is_read,
                                     time:time,
                                     activeRate:result.data[i].Sentiment
                                 }
@@ -480,11 +480,13 @@
                             let chatHistory = {};
                             chatHistory[id] = temp;
                             this.$store.commit('chatInfo/addChatInfo',chatHistory);
+                            this.loadingHistory = false;
 
                     })
                         .catch((error)=>{
                             console.log("获取聊天历史失败",error);
                             this.$message({message:'获取聊天历史失败',type:'error',duration:duration_time});
+                            this.loadingHistory = false;
                     })
 
                 }
@@ -494,7 +496,7 @@
                     //去除好友新消息提醒
                     this.$store.commit('friendInfo/removeNew',id);
                     //将对方发送的未读信息修改为已读
-                    this.$store.commit('chatInfo/readFriendUpdate',id);
+                    //this.$store.commit('chatInfo/readFriendUpdate',id);
                     //向后台发送已读反馈
                     this.$socket.emit('messageReadSend',id,
                         (result)=> {
@@ -529,7 +531,7 @@
                 this.showFriendInfo = false;
                 this.showChatArea = false;
                 this.showAddFriend = true;
-                this.showWordCloud = false;
+                this.isShowWordCloud = false;
             },
             //接受好友添加请求
             acceptApply(applyId){
@@ -663,14 +665,28 @@
                 this.showAddFriend = false;
                 this.showChatArea = false;
                 this.showFriendInfo = true;
-                this.showWordCloud = false;
+                this.isShowWordCloud = false;
             },
             //发送消息
             sendMessage(message){
                 let time = new Date().getTime();
                 let time_show = this.getUtcTime(time);
                 let info =  {id:this.chattingFriendID,message:{message:message,isFriend:false,isRead:false,time:time_show}};
-                this.$store.commit('chatInfo/sendUpdate',info);
+                let receiver = this.chattingFriendID;
+                this.$socket.emit('messageSend',{receiver:receiver,text:message,time:time},
+                    (result)=>{
+                    console.log("发送聊天信息回执",result);
+                    console.log("发送聊天信息回执status",result.status);
+                    console.log("发送聊天信息回执reason",result.reason);
+                    if(result.status == 2){
+                        this.$message({message:"发送成功",type:"success",duration:800});
+                        this.$store.commit('chatInfo/sendUpdate',info);
+                        this.$refs.chatArea.scrollBottom();
+                    }
+                    else{
+                        this.$message({message:"发送失败,服务器响应错误",type:"error",duration:800});
+                    }
+                });
             },
             //将utc时间转化为年月日字符串
             getUtcTime(utc){
@@ -678,6 +694,32 @@
                 let timeString = time.getFullYear().toString()+"年 "+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日 "+time.getHours().toString()+":"+time.getMinutes().toString();
                 return timeString;
             },
+            //显示词云
+            showWordCloud(){
+                this.isInit = false;
+                this.showAddFriend = false;
+                this.showChatArea = false;
+                this.showFriendInfo = false;
+                this.isShowWordCloud = true;
+                //调用接口获取词云图
+                this.$axios.get('/v1/nlp/'+this.currentUser.id+'/cloud')
+                    .then((result)=>{
+                        this.wordCloudSrc = result.data;
+                    })
+                    .catch((error)=>{
+                        if(error.response.status === 400)
+                            this.$message({message:'请求参数错误,词云图获取失败',type:'error',duration:duration_time});
+                        else if(error.response.status === 409)
+                        {
+                            if(error.response.data ===0)
+                                this.$message({message:'信息过少,无法获取词云图',type:'info',duration:duration_time});
+                            else
+                                this.$message({message:'服务响应错误,词云图获取失败',type:'info',duration:duration_time});
+                        }
+                        else
+                            this.$message({message:'服务响应错误,词云图获取失败',type:'error',duration:duration_time})
+                    })
+            }
         },
         sockets: {
             //用户强制登出事件
@@ -754,7 +796,7 @@
     #main{
         padding: unset;
     }
-    #init{
+    #init,#wordCloud{
         height: inherit;
         background-color:#ffffffdb;
     }
