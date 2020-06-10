@@ -2,6 +2,7 @@
  * Module dependencies
  */
 const fs = require('fs');
+const path = require('path');
 const db = require('./db.singleton');
 const { SERVICE: { STATUS: STATUS }, REASON } = require('../constant');
 const nlp = require('../nlp/nlp.singleton');
@@ -55,15 +56,22 @@ Service.prototype.cloud = async function(username) {
 		str = str + message.text;
 	}
 
-	fs.writeFile('../nlp/history.txt', str, err => {
-		if (err) {
-			throw err;
-		}
+	const history_filename = path.join(__dirname, '../nlp/history.txt');
+
+	await new Promise(resolve => {
+		fs.writeFile(history_filename, str, err => {
+			if (err) {
+				throw err;
+			}
+			resolve();
+		});
 	});
 
 	await nlp.cloud();
 
-	const result = await new Promise(resolve => fs.readFile('../nlp/cloud.png', 'base64', (err, data) => {
+	const cloud_filename = path.join(__dirname, '../nlp/history.txt');
+
+	const result = await new Promise(resolve => fs.readFile(cloud_filename, 'base64', (err, data) => {
 		if (err) {
 			throw err;
 		}

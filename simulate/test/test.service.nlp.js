@@ -125,7 +125,7 @@ describe('Chat', function() {
 			this.timeout(120000);
 			const result = await nlp_service.cloud('test_user1');
 			expect(result.status).to.eql(STATUS.OK);
-			expect(result.data).to.be.a('string')
+			expect(result.data).to.be.a('string');
 		});
 	});
 });
