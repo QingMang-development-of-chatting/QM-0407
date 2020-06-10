@@ -10,7 +10,7 @@
                     <div class="myAvatar">
                         <el-avatar  shape="square" :size="60" fit="cover" :src="myAvatar" ></el-avatar>
                     </div>
-                    <div class="meSendTime" :style="showSendTime(index)">2015年 11月02日 3：04</div>
+                    <div class="meSendTime" :style="showSendTime(index)">{{piece.time}}</div>
                     <div class="myMessage">{{piece.message}}</div>
                     <div class="readMeTips" v-show="piece.isRead">已读</div>
                 </div>
@@ -18,7 +18,7 @@
                     <div class="friendAvatar">
                         <el-avatar  shape="square" :size="60" fit="cover" :src="friendAvatar" ></el-avatar>
                     </div>
-                    <div class="friendSendTime" :style="showSendTime(index)">2015年 11月02日 3：04</div>
+                    <div class="friendSendTime" :style="showSendTime(index)">{{piece.time}}</div>
                     <div class="friendMessage">{{piece.message}}</div>
                  </div>
             </div>
@@ -26,6 +26,7 @@
         <div class="chatAreaInput">
             <div class="inputMenu">
                 <img id="emojiIcon" :src="emoji" alt="emoji"/>
+                <img id="worldCloudIcon" :src="mangoIcon">
             </div>
             <div class="inputArea">
                 <label>
@@ -40,6 +41,7 @@
 
 <script>
     import emoji from'../../assets/emoji.png'
+    import mangoIcon from'../../assets/mango2.png'
     export default {
         props: {
             friendID:String,    //好友ID
@@ -55,7 +57,9 @@
                 //输入栏信息
                 messageInput: "",
                 //鼠标悬浮的消息序号
-                overIndex:-1
+                overIndex:-1,
+                //词云按钮图标
+                mangoIcon: mangoIcon,
             }
         },
         watch:{
@@ -202,10 +206,22 @@
     #emojiIcon:hover{
         cursor: pointer;
     }
-
+    #worldCloudIcon{
+        height: 25px;
+        width: 30px;
+        position: relative;
+        left: 40px;
+        top: 10px;
+    }
+    #worldCloudIcon:hover{
+        cursor: pointer;
+    }
     .myAvatar{
         float:right;
 
+    }
+    #emojiIcon:hover{
+        cursor: pointer;
     }
     .friendAvatar{
         float:left;

@@ -21,6 +21,7 @@
             </el-main>
         </el-container>
         <setting-window v-if="showSetting" :id="currentUser.id" :nickname="currentUser.nickname" :avatar-url="currentUser.avatar"  :changing-password="changingPassword" @switchShow="switchShow" @closeInfo="closeSetting" @changeAvatar="editAvatar" @changeNickname="editNickname" @changePassword="changePassword"></setting-window>
+        <word-cloud v-if="showWordCloud" :imgSrc="showWordCloud"></word-cloud>
     </div>
 </template>
 
@@ -34,11 +35,13 @@
     import ChatArea from "../../components/chatArea/chatArea";
     import friendInfo from "../../components/friendInfo/friendInfo";
     import AddFriend from "../../components/addFriend/addFriend";
+    import WordCloud from "../../components/wordCloud/wordCloud";
     let Base64 = require('js-base64').Base64;
     const duration_time = 1000;
     export default {
         name: "home",
         components: {
+            WordCloud,
             AddFriend,  //条件好友组件
             sidebar,    //主侧边栏组件
             SettingWindow,  //个人资料设置组件
@@ -72,6 +75,8 @@
                 showChatArea:false,
                 //是否显示添加好友窗口
                 showAddFriend:false,
+                //是否显示词云
+                showWordCloud:false,
                 //是否正在查找
                 searchLoading:false,
                 //是否显示查找到的用户
@@ -82,6 +87,8 @@
                 showFoundRemind:false,
                 //是否展示好友资料
                 showFriendInfo:false,
+                //词云图源
+                wordCloudSrc:"",
                 //聊天对话框好友ID
                 chattingFriendID:"",
                 //聊天对话框好友昵称
@@ -329,6 +336,7 @@
                 this.isShowChat = true;
                 this.isShowFriend = false;
                 this.showSetting = false;
+                this.showWordCloud = false;
             },
             //切换用户资料及修改密码显示
             switchShow(){
@@ -337,12 +345,14 @@
             //显示个人资料
             showInfo(){
                 this.showSetting = true;
+                this.showWordCloud = false;
             },
             //显示好友信息
             showFriend(){
                 this.isShowChat = false;
                 this.isShowFriend = true;
                 this.showSetting = false;
+                this.showWordCloud = false;
             },
             //注销
             logout(){
@@ -354,13 +364,15 @@
                         window.localStorage.removeItem('password');
                         this.$message({message:"已注销,即将跳转至登录页",type:"success",duration:duration_time});
                         setTimeout(()=>{
-                            this.$router.push("/Login");
+                            window.location.href="/Login";
+                            // this.$router.push("/Login");
                         },800);
                     }
                     else if(result.status === 1){
                         this.$message({message:"未登录",type:"warning",duration:duration_time});
                         setTimeout(()=>{
-                            this.$router.push("/Login");
+                            window.location.href="/Login";
+                            // this.$router.push("/Login");
                         },800);
                     }
                     else{
@@ -432,61 +444,24 @@
 
             },
             //载入好友聊天对话框
-            toChat(id,nickname,avatar){
+            async toChat(id,nickname,avatar){
                 this.isInit = false;
                 this.showFriendInfo = false;
                 this.showAddFriend = false;
                 this.showChatArea = false;
+                this.showWordCloud = false;
                 this.showChatArea = true;
                 this.chattingFriendNickname = nickname;
                 this.chattingFriendAvatar = avatar;
                 this.chattingFriendID = id;
                 //初次载入时，应调用接口向后台获取与该好友聊天记录,并将数据存入store，后续更新store即可
                 if(this.chatInfo[id]===undefined){
-                    // let temp ={
-                    //     "test0":[
-                    //         {message:"可达",isFriend:true,isRead:true,time:"5月1日"},
-                    //         {message:"可达可达",isFriend:true,isRead:true,time:"5月1日"},
-                    //         {message:"可达可达可达",isFriend:true,isRead:true,time:"5月1日"},
-                    //         {message:"可达可达可达可达",isFriend:true,isRead:true,time:"5月1日"},
-                    //         {message:"🦆\n🦆🦆\n🦆🦆🦆\n🦆🦆🦆🦆",isFriend:true,isRead:true,time:"5月1日"},
-                    //         {message:"？？？",isFriend:false,isRead:true,time:"5月1日"},
-                    //         {message:"可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？" +
-                    //                 "可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？" +
-                    //                 "可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？" +
-                    //                 "可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？" +
-                    //                 "可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？" +
-                    //                 "可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？",isFriend:true,isRead:false,time:"5月1日"},
-                    //     ],
-                    //     "test2":[
-                    //         {message:"Baby baby baby baby O baby baby o baby 是不是拥有以后 就会开始要失去 给你的越多 你却越想要躲 爱已无法回答所有的问题",isFriend:true,isRead:true,time:"19:48"},
-                    //         {message:"离开你是傻  是对是错  是看破是软弱  这结果是爱是恨  或者是什么",isFriend:false,isRead:true,time:"19:48"},
-                    //         {message:"最爱你的人是我  你怎么舍得我难过  对你付出了这么多  你却没有感动过",isFriend:true,isRead:true,time:"19:49"},
-                    //         {message:"爱我别走  如果你说你不爱我  不要听见你真的说出口  再给我一点温柔",isFriend:false,isRead:true,time:"19:48"},
-                    //         {message:"干啥呢？",isFriend:false,isRead:true,time:"19:48"},
-                    //         {message:"没干啥",isFriend:true,isRead:false,time:"19:49"},
-                    //     ],
-                    //     "test3":[
-                    //         {message:"在？",isFriend:true,isRead:true,time:"昨天"},
-                    //         {message:"既然你诚心诚意的发问了",isFriend:false,isRead:true,time:"昨天"},
-                    //         {message:"我们就大发慈悲的告诉你! ",isFriend:true,isRead:true,time:"昨天"},
-                    //         {message:"为了防止世界被破坏 ",isFriend:false,isRead:true,time:"昨天"},
-                    //         {message:"为了守护世界的和平",isFriend:true,isRead:true,time:"昨天"},
-                    //         {message:"贯彻爱与真实的邪恶",isFriend:false,isRead:true,time:"昨天"},
-                    //         {message:"可爱又迷人的反派角色~~",isFriend:true,isRead:true,time:"昨天"},
-                    //         {message:"武藏！",isFriend:false,isRead:true,time:"昨天"},
-                    //         {message:"小次郎！",isFriend:true,isRead:true,time:"昨天"},
-                    //         {message:"我们是穿梭在银河的火箭队！白洞，白色的明天在等着我们！！",isFriend:false,isRead:true,time:"昨天"},
-                    //         {message:"就是这样~喵~~~~",isFriend:true,isRead:false,time:"昨天"},
-                    //         {message:"就是这样~喵~~~~",isFriend:true,isRead:false,time:"昨天"}
-                    //     ],
-                    // };
                     //获取聊天历史
                     let now = new Date().getTime().toString()
-                    this.$axios.get('/v1/chat/'+this.currentUser.id+'/history/'+id+'/'+now)
+                    await this.$axios.get('/v1/chat/'+this.currentUser.id+'/history/'+id+'/'+now)
                         .then((result)=>{
                             console.log("获取聊天历史返回",result);
-                            let temp;
+                            let temp = [];
                             for(let i=0;i<result.data.length;i++)
                             {
                                 let isFriend = false;
@@ -504,7 +479,6 @@
                             }
                             let chatHistory = {};
                             chatHistory[id] = temp;
-                            // console.log(chatHistory);
                             this.$store.commit('chatInfo/addChatInfo',chatHistory);
 
                     })
@@ -531,11 +505,15 @@
                             if(result.reason === 0)
                                 console.log("已读反馈发送失败，用户未登录，后台拒绝服务");
                             else if(result.reason === 1)
+                                console.log("已读反馈发送失败，接收者非好友，后台拒绝服务");
+                            else if(result.reason === 2)
+                                console.log("已读反馈已发送，无更新");
+                            else if(result.reason === 3)
                                 console.log("已读反馈发送失败，不可发送给自己，后台拒绝服务");
                             else
-                                console.log("已读反馈发送失败，接收者非好友，后台拒绝服务")
+                                console.log("已读反馈发送失败，未知返回值:",result.reason);
                         }
-                        else if(result.status === 1)
+                        else if(result.status === 0)
                             console.log("已读反馈发送失败，参数错误");
                         else{
                             console.log("服务器响应错误");
@@ -551,6 +529,7 @@
                 this.showFriendInfo = false;
                 this.showChatArea = false;
                 this.showAddFriend = true;
+                this.showWordCloud = false;
             },
             //接受好友添加请求
             acceptApply(applyId){
@@ -684,13 +663,13 @@
                 this.showAddFriend = false;
                 this.showChatArea = false;
                 this.showFriendInfo = true;
-
+                this.showWordCloud = false;
             },
             //发送消息
             sendMessage(message){
-                let date = new Date();
-                let time = date.getFullYear()+'-'+(date.getMonth()+1).toString()+'-'+date.getDay().toString()+'-'+date.getHours().toString()+'-'+date.getMinutes();
-                let info =  {id:this.chattingFriendID,message:{message:message,isFriend:false,isRead:false,time:time}};
+                let time = new Date().getTime();
+                let time_show = this.getUtcTime(time);
+                let info =  {id:this.chattingFriendID,message:{message:message,isFriend:false,isRead:false,time:time_show}};
                 this.$store.commit('chatInfo/sendUpdate',info);
             },
             //将utc时间转化为年月日字符串
@@ -707,7 +686,8 @@
                 window.localStorage.removeItem("username");
                 window.localStorage.removeItem("password");
                 setTimeout(()=>{
-                    this.$router.push("/Login");
+                    window.location.href="/Login";
+                    // this.$router.push("/Login");
                 },2000);
             },
             //收到好友申请

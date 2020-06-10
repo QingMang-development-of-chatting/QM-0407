@@ -1,6 +1,6 @@
 //登录组件
 <template>
-    <div class="Login">
+    <div class="Login" >
         <h1>青芒</h1>
         <div class="input-div" @mouseover="showClIcon" @mouseleave="showClearIcon = false">
             <el-input placeholder="请输入账号" v-model="id" maxlength="15" prefix-icon="el-icon-user-solid" @input="showClIcon">
