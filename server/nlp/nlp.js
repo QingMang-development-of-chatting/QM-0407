@@ -2,6 +2,7 @@
  * Module dependencies
  */
 const { spawn } = require('child_process');
+const path = require('path');
 
 /**
  * `NLP` constructor
@@ -22,7 +23,7 @@ function NLP() {}
  * @api public
  */
 NLP.prototype.textfilter = async function(text) {
-	const textfilter = spawn('python', ['../nlp/textfilter.py', text]);
+	const textfilter = spawn('python', [path.join(__dirname, 'textfilter.py'), text]);
 
 	const result = await new Promise(resolve => {
 		textfilter.stdout.on('data', data => {
@@ -31,7 +32,7 @@ NLP.prototype.textfilter = async function(text) {
 		});
 
 		textfilter.stderr.on('data', data => {
-			console.log(`stderr: ${data}`);
+			throw new Error('Util textfilter');
 		});
 
 		textfilter.on('close', code => {
@@ -60,7 +61,7 @@ NLP.prototype.textfilter = async function(text) {
  * @api public
  */
 NLP.prototype.sentiment = async function(text) {
-	const sentiment = spawn('python', ['../nlp/sentiment.py', text]);
+	const sentiment = spawn('python', [path.join(__dirname, 'sentiment.py'), text]);
 
 	const result = await new Promise(resolve => {
 		sentiment.stdout.on('data', data => {
@@ -70,6 +71,7 @@ NLP.prototype.sentiment = async function(text) {
 		});
 
 		sentiment.stderr.on('data', data => {
+			console.log(`stderr ${data}`);
 			throw new Error('Util sentiment');
 		});
 
@@ -95,7 +97,7 @@ NLP.prototype.sentiment = async function(text) {
  * @api public
  */
 NLP.prototype.cloud = async function() {
-	const cloud = spawn('python', ['../nlp/cloud.py']);
+	const cloud = spawn('python', [path.join(__dirname, 'cloud.py')]);
 
 	const result = await new Promise(resolve => {
 		cloud.stdout.on('data', data => {
