@@ -705,7 +705,7 @@
             //发送消息
             sendMessage(message){
                 let time = new Date().getTime();
-                let time_show = this.getUtcTime(time);
+                let time_show = this.utcTimeToString(time);
                 let info =  {id:this.chattingFriendID,message:{message:message,isFriend:false,isRead:false,time:time_show}};
                 let receiver = this.chattingFriendID;
                 this.$socket.emit('messageSend',{receiver:receiver,text:message,time:time},
@@ -716,7 +716,7 @@
                     console.log("发送聊天信息回执result.reason",result.reason);
                     if(result.status == 2){
                         this.$message({message:"发送成功",type:"success",duration:800});
-                        let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show}};
+                        let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show,utcTime:time}};
                         this.$store.commit('chatInfo/sendUpdate',UpdateInfo);
                         this.$refs.chatArea.scrollBottom();
                     }
@@ -726,7 +726,7 @@
                 });
             },
             //将utc时间转化为年月日字符串
-            getUtcTime(utc){
+            utcTimeToString (utc){
                 let time = new Date(utc);
                 let timeString = time.getFullYear().toString()+"年 "+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日 "+time.getHours().toString()+":"+time.getMinutes().toString();
                 return timeString;
@@ -813,6 +813,7 @@
                 //将自己发送给该好友信息修改为已读
                 this.$store.commit('chatInfo/readMeUpdate',receiver);
             },
+            //接收消息反馈事件
             messageRece(response){
             //----------------response:sender,text,time,sentiment---------------
                 console.log("接收体",response);
@@ -827,8 +828,8 @@
                 let Text = response.text;
                 let time_show="";
                 let Time = new Date(response.time);
-                time_show = this.getUtcTime(response.time);
-                //console.log("收到新的信息Time:",Time)
+                time_show = this.utcTimeToString(response.time);
+                console.log("收到新的信息Time:",Time)
                 console.log("收到新的信息time_show:",time_show)
                 let ActiveRate = response.sentiment;
                 let Is_read = true;
@@ -849,21 +850,23 @@
                 }
 
 
-                let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,activeRate:ActiveRate}};
+                let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,utcTime:Time.getTime() ,activeRate:ActiveRate}};
 
                 //*****************
                 //********查看chatInfo有没有sender,没有则增加
                 //************
-                //if(this.chatInfo[Sender]===undefined)
-                    //{this.$store.commit('chatInfo/addChatInfo',info);}
+                if(this.chatInfo[Sender]===undefined)
+                    {
+                    console.log("新增sender的info",info);
+                    this.$store.commit('friendInfo/addRecent',info);
+                    }
 
                 //console.log("收到新的信息is_Friend:",Is_friend);
                 //console.log("收到新的信息Sender:",Sender);
-                //else
-                
-
+                else
+                {
                 this.$store.commit('chatInfo/sendUpdate',info);
-                
+                }
 
 
                 
@@ -873,7 +876,8 @@
                     id:Sender,
                     newInfo:Is_read,
                     unread_num:this.chatList[Sender].unread_num,
-                    time:time_show
+                    time:time_show,
+                    recentMessage:{message:Text,time:time_show}
                 }
                 let arrrayRecent = [];
                 arrrayRecent.push(recentChat);
@@ -881,6 +885,7 @@
                 this.$store.commit('friendInfo/addRecent',arrrayRecent);
                 //console.log("获取最近好友信息：",this.$store.state.friendInfoDic[Sender]);
                 */
+                
 
             },
             disconnect(){
