@@ -94,6 +94,8 @@
                 this.$emit('sendMessage',messageInput); //触发父组件sendMessage事件
                 this.messageInput = "";
                 this.scrollBottom();
+                this.faceShow = false;
+
             },
             //显示发送时间
             selectedItem(i){
