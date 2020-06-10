@@ -3,7 +3,7 @@
     <div class="Home">
         <el-container id="container" >
             <el-aside id="aside">
-                <sidebar :avatar-url="currentUser.avatar" :get-new-friend="untreatedApplyNum>0" :loading-avatar="loadingAvatar" @showInfo="showInfo" @showChat="showChat" @showFriend="showFriend" @logout="logout"></sidebar>
+                <sidebar :avatar-url="currentUser.avatar" :get-new-friend="untreatedApplyNum>0" :unread-message-num="unreadMessageNum" :loading-avatar="loadingAvatar" @showInfo="showInfo" @showChat="showChat" @showFriend="showFriend" @logout="logout"></sidebar>
             </el-aside>
             <el-aside id="chat" v-show="isShowChat">
                 <chatbar :chatList="chatList" @toChat="toChat" :loading-chat-bar="loadingChatBar"></chatbar>
@@ -88,7 +88,6 @@
                 chattingFriendNickname:"",
                 //聊天对话框好友头像
                 chattingFriendAvatar:"",
-
             }
         },
         computed:{
@@ -111,6 +110,10 @@
             //未处理申请数目
             untreatedApplyNum(){
                 return this.$store.getters['applyList/getUntreatedNum'];
+            },
+            //是否有新消息
+            unreadMessageNum(){
+                return this.$store.getters['friendInfo/getNewInfoNum'];
             },
         },
         methods:{
@@ -206,7 +209,7 @@
                                         unread_num:0,
                                         recentMessage:{}
                                     };
-                            })
+                                })
                                 .catch((error)=>{
                                     console.log("获取好友资料出错",error.response);
                                 });
@@ -222,7 +225,7 @@
                                     if (result2.data[i].sender !== id)
                                         newInfo = true;
                                     //处理消息内容
-                                    let recentInfo = result2.data[i].last_txt;
+                                    let recentInfo = result2.data[i].last_text;
                                     if(recentInfo.length > 18)  //消息内容过长省略部分内容
                                     {
                                         recentInfo = recentInfo.substr(0,18);
@@ -250,11 +253,35 @@
                                     };
                                     recentChat.push(t);
                                 }
+                                // let test = {
+                                //     id:"test0",
+                                //     newInfo:true,
+                                //     unread_num:1,
+                                //     message:"哈哈哈哈哈哈",
+                                //     time:"昨天",
+                                // };
+                                // let test1 = {
+                                //     id:"test2",
+                                //     newInfo:true,
+                                //     unread_num:1,
+                                //     message:"哈哈哈哈哈哈",
+                                //     time:"昨天",
+                                // };
+                                // let test2 = {
+                                //     id:"test3",
+                                //     newInfo:true,
+                                //     unread_num:2,
+                                //     message:"哈哈哈哈哈哈",
+                                //     time:"昨天",
+                                // };
+                                // recentChat.push(test);
+                                // recentChat.push(test1);
+                                // recentChat.push(test2);
                                 this.$store.commit('friendInfo/addRecent',recentChat);  //更新好友信息
                                 this.loadingChatBar = false;
                         })
                             .catch((error)=>{
-                                console.log("获取聊天列表出错",error.response);
+                                console.log("获取聊天列表出错",error);
                                 this.loadingChatBar = false;
                         });
                             this.loadingChatBar = false;
@@ -415,44 +442,106 @@
                 this.chattingFriendAvatar = avatar;
                 this.chattingFriendID = id;
                 //初次载入时，应调用接口向后台获取与该好友聊天记录,并将数据存入store，后续更新store即可
-                //console.log(this.chatInfo[id]);
                 if(this.chatInfo[id]===undefined){
-                    let temp ={
-                        "test0":[
-                            {message:"可达",isFriend:true,isRead:true,time:"5月1日"},
-                            {message:"可达可达",isFriend:true,isRead:true,time:"5月1日"},
-                            {message:"可达可达可达",isFriend:true,isRead:true,time:"5月1日"},
-                            {message:"可达可达可达可达",isFriend:true,isRead:true,time:"5月1日"},
-                            {message:"🦆\n🦆🦆\n🦆🦆🦆\n🦆🦆🦆🦆",isFriend:true,isRead:true,time:"5月1日"},
-                            {message:"？？？",isFriend:false,isRead:true,time:"5月1日"},
-                            {message:"可达可达？",isFriend:true,isRead:true,time:"5月1日"},
-                        ],
-                        "test2":[
-                            {message:"Baby baby baby baby O baby baby o baby 是不是拥有以后 就会开始要失去 给你的越多 你却越想要躲 爱已无法回答所有的问题",isFriend:true,isRead:true,time:"19:48"},
-                            {message:"离开你是傻  是对是错  是看破是软弱  这结果是爱是恨  或者是什么",isFriend:false,isRead:true,time:"19:48"},
-                            {message:"最爱你的人是我  你怎么舍得我难过  对你付出了这么多  你却没有感动过",isFriend:true,isRead:true,time:"19:49"},
-                            {message:"爱我别走  如果你说你不爱我  不要听见你真的说出口  再给我一点温柔",isFriend:false,isRead:true,time:"19:48"},
-                            {message:"干啥呢？",isFriend:false,isRead:true,time:"19:48"},
-                            {message:"没干啥",isFriend:true,isRead:true,time:"19:49"},
-                        ],
-                        "test3":[
-                            {message:"在？",isFriend:true,isRead:true,time:"昨天"},
-                            {message:"既然你诚心诚意的发问了",isFriend:false,isRead:true,time:"昨天"},
-                            {message:"我们就大发慈悲的告诉你! ",isFriend:true,isRead:true,time:"昨天"},
-                            {message:"为了防止世界被破坏 ",isFriend:false,isRead:true,time:"昨天"},
-                            {message:"为了守护世界的和平",isFriend:true,isRead:true,time:"昨天"},
-                            {message:"贯彻爱与真实的邪恶",isFriend:false,isRead:true,time:"昨天"},
-                            {message:"可爱又迷人的反派角色~~",isFriend:true,isRead:true,time:"昨天"},
-                            {message:"武藏！",isFriend:false,isRead:true,time:"昨天"},
-                            {message:"小次郎！",isFriend:true,isRead:true,time:"昨天"},
-                            {message:"我们是穿梭在银河的火箭队！白洞，白色的明天在等着我们！！",isFriend:false,isRead:true,time:"昨天"},
-                            {message:"就是这样~喵~~~~",isFriend:true,isRead:true,time:"昨天"},
-                        ],
-                    };
-                    let chatHistory = {};
-                    chatHistory[id] = temp[id];
-                    console.log(chatHistory);
-                    this.$store.commit('chatInfo/addChatInfo',chatHistory);
+                    // let temp ={
+                    //     "test0":[
+                    //         {message:"可达",isFriend:true,isRead:true,time:"5月1日"},
+                    //         {message:"可达可达",isFriend:true,isRead:true,time:"5月1日"},
+                    //         {message:"可达可达可达",isFriend:true,isRead:true,time:"5月1日"},
+                    //         {message:"可达可达可达可达",isFriend:true,isRead:true,time:"5月1日"},
+                    //         {message:"🦆\n🦆🦆\n🦆🦆🦆\n🦆🦆🦆🦆",isFriend:true,isRead:true,time:"5月1日"},
+                    //         {message:"？？？",isFriend:false,isRead:true,time:"5月1日"},
+                    //         {message:"可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？" +
+                    //                 "可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？" +
+                    //                 "可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？" +
+                    //                 "可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？" +
+                    //                 "可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？" +
+                    //                 "可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？可达可达？",isFriend:true,isRead:false,time:"5月1日"},
+                    //     ],
+                    //     "test2":[
+                    //         {message:"Baby baby baby baby O baby baby o baby 是不是拥有以后 就会开始要失去 给你的越多 你却越想要躲 爱已无法回答所有的问题",isFriend:true,isRead:true,time:"19:48"},
+                    //         {message:"离开你是傻  是对是错  是看破是软弱  这结果是爱是恨  或者是什么",isFriend:false,isRead:true,time:"19:48"},
+                    //         {message:"最爱你的人是我  你怎么舍得我难过  对你付出了这么多  你却没有感动过",isFriend:true,isRead:true,time:"19:49"},
+                    //         {message:"爱我别走  如果你说你不爱我  不要听见你真的说出口  再给我一点温柔",isFriend:false,isRead:true,time:"19:48"},
+                    //         {message:"干啥呢？",isFriend:false,isRead:true,time:"19:48"},
+                    //         {message:"没干啥",isFriend:true,isRead:false,time:"19:49"},
+                    //     ],
+                    //     "test3":[
+                    //         {message:"在？",isFriend:true,isRead:true,time:"昨天"},
+                    //         {message:"既然你诚心诚意的发问了",isFriend:false,isRead:true,time:"昨天"},
+                    //         {message:"我们就大发慈悲的告诉你! ",isFriend:true,isRead:true,time:"昨天"},
+                    //         {message:"为了防止世界被破坏 ",isFriend:false,isRead:true,time:"昨天"},
+                    //         {message:"为了守护世界的和平",isFriend:true,isRead:true,time:"昨天"},
+                    //         {message:"贯彻爱与真实的邪恶",isFriend:false,isRead:true,time:"昨天"},
+                    //         {message:"可爱又迷人的反派角色~~",isFriend:true,isRead:true,time:"昨天"},
+                    //         {message:"武藏！",isFriend:false,isRead:true,time:"昨天"},
+                    //         {message:"小次郎！",isFriend:true,isRead:true,time:"昨天"},
+                    //         {message:"我们是穿梭在银河的火箭队！白洞，白色的明天在等着我们！！",isFriend:false,isRead:true,time:"昨天"},
+                    //         {message:"就是这样~喵~~~~",isFriend:true,isRead:false,time:"昨天"},
+                    //         {message:"就是这样~喵~~~~",isFriend:true,isRead:false,time:"昨天"}
+                    //     ],
+                    // };
+                    //获取聊天历史
+                    let now = new Date().getTime().toString()
+                    this.$axios.get('/v1/chat/'+this.currentUser.id+'/history/'+id+'/'+now)
+                        .then((result)=>{
+                            console.log("获取聊天历史返回",result);
+                            let temp;
+                            for(let i=0;i<result.data.length;i++)
+                            {
+                                let isFriend = false;
+                                if(result.data[i].sender === id)
+                                    isFriend = true;
+                                let time = this.getUtcTime(result.data[i].time);
+                                let t ={
+                                    message:result.data[i].text,
+                                    isFriend:isFriend,
+                                    isRead:result.data[i].isRead,
+                                    time:time,
+                                    activeRate:result.data[i].Sentiment
+                                }
+                                temp.push(t);
+                            }
+                            let chatHistory = {};
+                            chatHistory[id] = temp;
+                            // console.log(chatHistory);
+                            this.$store.commit('chatInfo/addChatInfo',chatHistory);
+
+                    })
+                        .catch((error)=>{
+                            console.log("获取聊天历史失败",error);
+                            this.$message({message:'获取聊天历史失败',type:'error',duration:duration_time});
+                    })
+
+                }
+                //载入时判断是否有新信息，有则去除新消息提醒，将对方发送的未读信息修改为已读，并向后台发送已读反馈
+                if(this.chatList[id].newInfo === true && this.chatList[id].unread_num >0)
+                {
+                    //去除好友新消息提醒
+                    this.$store.commit('friendInfo/removeNew',id);
+                    //将对方发送的未读信息修改为已读
+                    this.$store.commit('chatInfo/readFriendUpdate',id);
+                    //向后台发送已读反馈
+                    this.$socket.emit('messageReadSend',id,
+                        (result)=> {
+                        if(result.status === 2){
+                            console.log("已读反馈发送成功");
+                        }
+                        else if(result.status === 1){
+                            if(result.reason === 0)
+                                console.log("已读反馈发送失败，用户未登录，后台拒绝服务");
+                            else if(result.reason === 1)
+                                console.log("已读反馈发送失败，不可发送给自己，后台拒绝服务");
+                            else
+                                console.log("已读反馈发送失败，接收者非好友，后台拒绝服务")
+                        }
+                        else if(result.status === 1)
+                            console.log("已读反馈发送失败，参数错误");
+                        else{
+                            console.log("服务器响应错误");
+                            this.$message({message:'服务器响应错误',type:'error',duration:duration_time});
+                        }
+                    });
                 }
                 // console.log(this.chatInfo[this.chattingFriendID]);
             },
@@ -501,7 +590,7 @@
                     })
                     .catch((error)=>{
                         console.log("拒绝申请返回出错,",error.response);
-                        if(error.response.status === 408)
+                        if(error.response.status === 409)
                             this.$message({message:"申请者不存在",type:"warning",duration:duration_time});
                         else if(error.response.status === 400)
                             this.$message({message:"请求参数错误",type:"error",duration:duration_time});
@@ -546,9 +635,6 @@
             },
             //发送添加好友请求
             sendAddFriend(id){
-                ///console.log(id);
-                //此处需要调用发送好友请求接口（提供添加者ID、昵称以及被添加者ID参数）
-                //console.log(this.$store.getters['friendInfo/getFriend'](id));
                 if(id === this.currentUser.id)
                     this.$message({message:'不可添加自己为好友',type:'warning',duration:duration_time});
                 else if(this.$store.getters['friendInfo/getFriend'](id) === undefined)
@@ -557,10 +643,37 @@
                         console.log("发送好友请求返回",result);
                         if (result.status === 2)
                             this.$message({message:"已发送",type:"success",duration:duration_time});
+                        else if(result.status === 1 && result.reason===0)
+                            this.$message({message:"用户未登录,服务器拒绝服务",type:"error",duration:duration_time});
+                        else if(result.status === 1 && result.reason===1)
+                            this.$message({message:"不可添加自己为好友,服务器拒绝服务",type:"error",duration:duration_time});
+                        else if(result.status === 1 && result.reason===2)
+                            this.$message({message:"该用户已在您的好友列表中",type:"warning",duration:duration_time});
                         else if(result.status === 1 && result.reason===3)
                             this.$message({message:"存在重复好友申请，请待对方处理",type:"warning",duration:duration_time});
+                        else if(result.status === 1 && result.reason===4) {
+                            this.$message({message:id+"通过了你的好友请求",type:"success",duration:duration_time});
+                            this.$store.commit('applyList/accept', id);
+                            let avatar,nickname;
+                            this.$axios.get('v1/userinfo/'+id)
+                                .then((result)=>{
+                                    console.log("好友资料返回",result);
+                                    avatar = result.data.photo;
+                                    nickname = result.data.nickname;
+                                    if (avatar === "")  //用户未设置过头像，采用默认头像
+                                        avatar = default_avatar;
+                                    // console.log(this.$store.state.currentUser.id);
+                                    let friend = {};
+                                    friend[id]={nickname:nickname,avatar:avatar,newInfo:false,unread_num:0,recentMessage:{}};
+                                    this.$store.commit('friendInfo/addFriendInfo',friend);  //更新好友列表
+                                })
+                                .catch((error)=>{
+                                    this.$message({message:'服务器响应错误',type:"warning",duration:duration_time});
+                                    console.log('处理申请反馈时，服务器响应错误:',error.response);
+                                });
+                        }
                         else
-                            this.$message({message:"发送失败,服务器响应错误",type:"error",duration:duration_time});
+                            this.$message({message:"服务器响应错误",type:"error",duration:duration_time});
                     });
                 else
                     this.$message({message:'该用户已在您的好友列表中',type:'warning',duration:duration_time});
@@ -575,13 +688,16 @@
             },
             //发送消息
             sendMessage(message){
-                // this.$socket.emit("v1.1/message",this.currentUser,  { sender: this.currentUserNickname, text: message});
-                // console.log("已发送");
                 let date = new Date();
                 let time = date.getFullYear()+'-'+(date.getMonth()+1).toString()+'-'+date.getDay().toString()+'-'+date.getHours().toString()+'-'+date.getMinutes();
-                // console.log(time);
                 let info =  {id:this.chattingFriendID,message:{message:message,isFriend:false,isRead:false,time:time}};
                 this.$store.commit('chatInfo/sendUpdate',info);
+            },
+            //将utc时间转化为年月日字符串
+            getUtcTime(utc){
+                let time = new Date(utc);
+                let timeString = time.getFullYear().toString()+"年 "+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日 "+time.getHours().toString()+":"+time.getMinutes().toString();
+                return timeString;
             },
         },
         sockets: {
@@ -631,6 +747,12 @@
                         this.$message({message:'服务器响应错误',type:"warning",duration:duration_time});
                         console.log('处理申请反馈时，服务器响应错误:',error.response);
                     });
+            },
+            //已读反馈事件
+            messageReadRece(receiver){
+                console.log("消息已读反馈",receiver);
+                //将自己发送给该好友信息修改为已读
+                this.$store.commit('chatInfo/readMeUpdate',receiver);
             },
             disconnect(){
                 this.$message({message:"服务器已断开连接",type:"error",duration:duration_time});

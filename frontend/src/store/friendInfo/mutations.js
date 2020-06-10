@@ -21,5 +21,10 @@ export default {
             Vue.set(state.friendInfoDic[info[i].id],'recentMessage' ,{message:info[i].message,time:info[i].time});
         }
     },
+    //去除新消息提醒
+    removeNew(state,id){
+        Vue.set(state.friendInfoDic[id],'newInfo',false);
+        Vue.set(state.friendInfoDic[id],'unread_num',0);
+    }
 
 };

@@ -4,7 +4,9 @@
         <el-input  class="searchBar" placeholder="输入好友昵称查找好友" v-model="searchInput" clearable prefix-icon="el-icon-search"></el-input>
         <el-menu class="chatbar-main" v-loading="loadingChatBar">
             <el-menu-item class="chatListClass" v-for="(message,key) in chatLists" :key="key" v-show="search(message.nickname)" @click="toChat(key,message.nickname,message.avatar)">
-                <el-avatar class="avatar" shape="square" :size="58" fit="cover" :src="message.avatar"></el-avatar>
+                <el-badge :value="message.unread_num" :hidden="!message.newInfo || message.unread_num<1">
+                    <el-avatar class="avatar" shape="square" :size="58" fit="cover" :src="message.avatar"></el-avatar>
+                </el-badge>
                 <span class="nickname">{{message.nickname}}</span>
                 <span class="time">{{message.recentMessage.time}}</span>
                 <span class="chatInfo">{{message.recentMessage.message}}</span>
@@ -29,7 +31,6 @@
         computed:{
             chatLists(){
                 let temp={};
-
                 for (let key in this.chatList)
                 {
                     if (this.chatList[key].recentMessage.message !== undefined)
@@ -95,7 +96,7 @@
         position: absolute;
         top: 30px;
         left: 90px;
-        color: #7e7878;
+        color: #7E7878;
     }
     .time{
         font-size: 13px;
@@ -118,6 +119,11 @@
     .chatbar-main{
         height:92%;
         overflow-y: auto;
+    }
+    .el-badge >>> .el-badge__content{
+        right: 18px;
+        top: 15px;
+        background-color: #f51601de;
     }
     .searchBar >>> .el-input__inner{
         padding-left: 45px !important;
