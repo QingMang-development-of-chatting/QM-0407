@@ -15,8 +15,8 @@
                 <div id="init" v-if="isInit">
                     <img class ="logo" :src="logo"  alt="logo">
                 </div>
-                <div id="wordCloud" v-if="isShowWordCloud">
-                    <img class ="logo" :src="wordCloudSrc"  alt="wordCloud">
+                <div id="wordCloud" v-if="isShowWordCloud" v-loading="loadingWordCloud">
+                    <img id="wordCloudImg" :src="wordCloudSrc"  alt="wordCloud">
                 </div>
                 <chat-area ref="chatArea" v-if="showChatArea" :friend-nickname="chattingFriendNickname" :friend-avatar="chattingFriendAvatar" :my-avatar="currentUser.avatar" :chatting-info="chatInfo[chattingFriendID]" :friendID="chattingFriendID" :is-loading-history="loadingHistory" @sendMessage="sendMessage"></chat-area>
                 <friend-info v-if="showFriendInfo"></friend-info>
@@ -65,6 +65,8 @@
                 loadingChatBar:true,
                 //是否正在加载聊天历史
                 loadingHistory: false,
+                //是否正在加载词云图
+                loadingWordCloud:false,
                 //是否展示聊天侧边栏
                 isShowChat:true,
                 //是否展示好友资料侧边栏
@@ -247,8 +249,12 @@
                                     let yesterday = new Date(now.getTime()-24*60*60*1000);
                                     if(time.getFullYear() !== now.getFullYear())
                                         time_show = time.getFullYear().toString()+"年"+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日";
-                                    else if(time.getMonth() === now.getMonth() && time.getDate() === now.getDate())
-                                        time_show = time.getHours().toString()+":"+time.getMinutes().toString();
+                                    else if(time.getMonth() === now.getMonth() && time.getDate() === now.getDate()){
+                                        if(time.getMinutes()>9)
+                                            time_show = time.getHours().toString()+":"+time.getMinutes().toString();
+                                        else
+                                            time_show = time.getHours().toString()+":0"+time.getMinutes().toString();
+                                    }
                                     else if(time.getMonth() === yesterday.getMonth() && time.getDate() === yesterday.getDate())
                                         time_show = "昨天";
                                     else
@@ -262,12 +268,12 @@
                                     };
                                     recentChat.push(t);
                                 }
-                                //let test = {
-                                //    id:"test0",
-                                //    newInfo:true,
-                                //    unread_num:1,
-                                //    message:"哈哈哈哈哈哈",
-                                //    time:"昨天",
+                                // let test = {
+                                //     id:"test0",
+                                //     newInfo:true,
+                                //     unread_num:1,
+                                //     message:"哈哈哈哈哈哈",
+                                //     time:"昨天",
                                 // };
                                 // let test1 = {
                                 //     id:"test2",
@@ -283,44 +289,9 @@
                                 //     message:"哈哈哈哈哈哈",
                                 //     time:"昨天",
                                 // };
-                                //recentChat.push(test);
+                                // recentChat.push(test);
                                 //recentChat.push(test1);
                                 //recentChat.push(test2);
-                                if(result2.data.length===0)
-                                {
-                                if(id === "test1"){
-                                        let te ={
-                                        id:"test2",
-                                        newInfo:false,
-                                        unread_num:0,
-                                        message:"123test",
-                                        time:"5月1日",
-                                    };
-                                        recentChat.push(te);
-                                    }
-                                if(id === "test2"){
-                                        let te ={
-                                        id:"test1",
-                                        newInfo:false,
-                                        unread_num:0,
-                                        message:"123test",
-                                        time:"5月1日",
-                                    };
-                                        recentChat.push(te);
-                                    }
-                                if(id === "test3"){
-                                        let te ={
-                                        id:"test1",
-                                        newInfo:false,
-                                        unread_num:0,
-                                        message:"123test",
-                                        time:"5月1日",
-                                    };
-                                        recentChat.push(te);
-                                    }
-                                
-                                }
-
                                 this.$store.commit('friendInfo/addRecent',recentChat);  //更新好友信息
                                 this.loadingChatBar = false;
                         })
@@ -482,7 +453,7 @@
                 this.isInit = false;
                 this.showFriendInfo = false;
                 this.showAddFriend = false;
-                this.showChatArea = false;
+                //this.showChatArea = false;
                 this.isShowWordCloud = false;
                 this.showChatArea = true;
                 this.chattingFriendNickname = nickname;
@@ -502,12 +473,13 @@
                                 let isFriend = false;
                                 if(result.data[i].sender === id)
                                     isFriend = true;
-                                let time = this.getUtcTime(result.data[i].time);
+                                let time = this.utcTimeToString(result.data[i].time);
                                 let t ={
                                     message:result.data[i].text,
                                     isFriend:isFriend,
                                     isRead:result.data[i].is_read,
                                     time:time,
+                                    utcTime:result.data[i].time,
                                     activeRate:result.data[i].Sentiment
                                 }
                                 temp.push(t);
@@ -516,12 +488,13 @@
                             chatHistory[id] = temp;
                             this.$store.commit('chatInfo/addChatInfo',chatHistory);
                             this.loadingHistory = false;
-
+                            this.$refs.chatArea.scrollBottom();
                     })
                         .catch((error)=>{
                             console.log("获取聊天历史失败",error);
                             this.$message({message:'获取聊天历史失败',type:'error',duration:duration_time});
                             this.loadingHistory = false;
+                            this.$refs.chatArea.scrollBottom();
                     })
 
                 }
@@ -558,7 +531,6 @@
                         }
                     });
                 }
-                // console.log(this.chatInfo[this.chattingFriendID]);
             },
             //载入添加好友窗口
             toAdd(){
@@ -706,14 +678,12 @@
             sendMessage(message){
                 let time = new Date().getTime();
                 let time_show = this.utcTimeToString(time);
-                let info =  {id:this.chattingFriendID,message:{message:message,isFriend:false,isRead:false,time:time_show}};
                 let receiver = this.chattingFriendID;
                 this.$socket.emit('messageSend',{receiver:receiver,text:message,time:time},
                     (result)=>{
-                    console.log("发送聊天信息回执result",result);
-                    console.log("发送聊天信息回执result.data",result.data);
-                    console.log("发送聊天信息回执result.status",result.status);
-                    console.log("发送聊天信息回执result.reason",result.reason);
+                    console.log("发送聊天信息回执",result);
+                    console.log("发送聊天信息回执status",result.status);
+                    console.log("发送聊天信息回执reason",result.reason);
                     if(result.status == 2){
                         this.$message({message:"发送成功",type:"success",duration:800});
                         let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show,utcTime:time}};
@@ -726,9 +696,13 @@
                 });
             },
             //将utc时间转化为年月日字符串
-            utcTimeToString (utc){
+            utcTimeToString(utc){
                 let time = new Date(utc);
-                let timeString = time.getFullYear().toString()+"年 "+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日 "+time.getHours().toString()+":"+time.getMinutes().toString();
+                let timeString = "";
+                if(time.getMinutes()>9)
+                    timeString = time.getFullYear().toString()+"年 "+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日 "+time.getHours().toString()+":"+time.getMinutes().toString();
+                else
+                    timeString = time.getFullYear().toString()+"年 "+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日 "+time.getHours().toString()+":0"+time.getMinutes().toString();
                 return timeString;
             },
             //显示词云
@@ -738,10 +712,12 @@
                 this.showChatArea = false;
                 this.showFriendInfo = false;
                 this.isShowWordCloud = true;
+                this.loadingWordCloud = true;
                 //调用接口获取词云图
                 this.$axios.get('/v1/nlp/'+this.currentUser.id+'/cloud')
                     .then((result)=>{
-                        this.wordCloudSrc = result.data;
+                        this.wordCloudSrc = 'data:image/jpeg;base64,'+result.data;
+                        this.loadingWordCloud = false;
                     })
                     .catch((error)=>{
                         if(error.response.status === 400)
@@ -754,7 +730,8 @@
                                 this.$message({message:'服务响应错误,词云图获取失败',type:'info',duration:duration_time});
                         }
                         else
-                            this.$message({message:'服务响应错误,词云图获取失败',type:'error',duration:duration_time})
+                            this.$message({message:'服务响应错误,词云图获取失败',type:'error',duration:duration_time});
+                        this.loadingWordCloud = false;
                     })
             }
         },
@@ -815,11 +792,10 @@
             },
             //接收消息反馈事件
             messageRece(response){
-            //----------------response:sender,text,time,sentiment---------------
+                //----------------response:sender,text,time,sentiment---------------
                 console.log("接收体",response);
                 console.log("接收好友",response.sender);
                 console.log("消息",response.text);
-                
 
                 //*************
                 //实时渲染
@@ -843,13 +819,11 @@
                     Is_read = false;
                 }
                 else{
-                //this.$store.commit('chatInfo/removeNew',id);
-                //this.toChat(Sender,this.$store.state.friendInfoDic[Sender].nickname,this.$store.state.friendInfoDic[Sender].avatar);
-                this.$socket.emit('messageReadSend',Sender);
-                this.$refs.chatArea.scrollBottom();
+                    //this.$store.commit('chatInfo/removeNew',id);
+                    //this.toChat(Sender,this.$store.state.friendInfoDic[Sender].nickname,this.$store.state.friendInfoDic[Sender].avatar);
+                    this.$socket.emit('messageReadSend',Sender);
+                    this.$refs.chatArea.scrollBottom();
                 }
-
-
                 let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,utcTime:Time.getTime() ,activeRate:ActiveRate}};
 
                 //*****************
@@ -867,9 +841,6 @@
                 {
                 this.$store.commit('chatInfo/sendUpdate',info);
                 }
-
-
-                
                 //修改最近聊天信息info:[{id:~,newInfo:~,unread_num:~,message:~,time:~},...]
                 /*
                 let recentChat = {
@@ -885,8 +856,6 @@
                 this.$store.commit('friendInfo/addRecent',arrrayRecent);
                 //console.log("获取最近好友信息：",this.$store.state.friendInfoDic[Sender]);
                 */
-                
-
             },
             disconnect(){
                 this.$message({message:"服务器已断开连接",type:"error",duration:duration_time});
@@ -924,6 +893,8 @@
         top:50%;
         margin-top: -125px;
     }
-
+    #wordCloudImg{
+        width: 500px;
+    }
 
 </style>

@@ -69,13 +69,13 @@
                 getBrowString: "",
             }
         },
+        mounted() {
+            this.scrollBottom();
+        },
         watch:{
             friendID(){
                 this.messageInput = "";
             }
-        },
-        mounted() {
-            this.scrollBottom();
         },
         methods:{
             //滚轮滚动到底部
