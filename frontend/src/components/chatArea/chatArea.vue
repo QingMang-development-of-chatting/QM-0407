@@ -5,17 +5,20 @@
             <span class="headText">{{friendNickname}}</span>
         </div>
         <div id="chatAreaInfo" >
-            <div class="messageItem" v-for="piece in chattingInfo" :key="piece.index" >
-                <div class="me" v-if="!piece.isFriend">
+            <div class="messageItem" v-for="(piece,index) in chattingInfo" :key="index" >
+                <div class="me" v-if="!piece.isFriend"  @mouseover="selectedItem(index)" @mouseleave="cancelSelect()">
                     <div class="myAvatar">
                         <el-avatar  shape="square" :size="60" fit="cover" :src="myAvatar" ></el-avatar>
                     </div>
+                    <div class="meSendTime" :style="showSendTime(index)">2015年 11月02日 3：04</div>
                     <div class="myMessage">{{piece.message}}</div>
+                    <div class="readMeTips" v-show="piece.isRead">已读</div>
                 </div>
-                <div class="friend" v-if="piece.isFriend">
+                <div class="friend" v-if="piece.isFriend" @mouseover="selectedItem(index)" @mouseleave="cancelSelect()">
                     <div class="friendAvatar">
                         <el-avatar  shape="square" :size="60" fit="cover" :src="friendAvatar" ></el-avatar>
                     </div>
+                    <div class="friendSendTime" :style="showSendTime(index)">2015年 11月02日 3：04</div>
                     <div class="friendMessage">{{piece.message}}</div>
                  </div>
             </div>
@@ -51,6 +54,8 @@
                 emoji: emoji,
                 //输入栏信息
                 messageInput: "",
+                //鼠标悬浮的消息序号
+                overIndex:-1
             }
         },
         watch:{
@@ -61,18 +66,33 @@
         mounted() {this.scrollBottom();
         },
         methods:{
-            //发送消息
+            //滚轮滚动到底部
             scrollBottom(){
                 let div = document.getElementById('chatAreaInfo');
                 setTimeout(()=>{
                 div.scrollTop = div.scrollHeight;},0);
             },
+            //发送消息
             sendMessage(messageInput)
             {
                 this.$emit('sendMessage',messageInput); //触发父组件sendMessage事件
                 this.messageInput = "";
                 this.scrollBottom();
             },
+            //显示发送时间
+            selectedItem(i){
+                this.overIndex = i;
+            },
+            //隐藏发送时间
+            cancelSelect(){
+                this.overIndex = -1;
+            },
+            showSendTime(index){
+                if(index === this.overIndex)
+                    return "visibility:visible";
+                else
+                    return "visibility:hidden";
+            }
 
         }
     };
@@ -97,29 +117,32 @@
         left:30px;
     }
     .me{
+        margin-top: 10px;
         float: right;
         clear: both;
         margin-right: 10px;
         height:auto;
-        margin-bottom: 15px;
+        margin-bottom: 30px;
     }
     .friend{
+        margin-top: 10px;
         float: left;
         clear: both;
         margin-left: 10px;
         height:auto;
-        margin-bottom: 15px;
+        margin-bottom: 30px;
     }
     .myMessage{
         position: relative;
-        top:8px;
+        top:20px;
         float: right;
+        left: 120px;
         background-color: rgba(34, 255, 0, 0.44);
         padding: 10px;
         margin-right: 8px;
         border-radius: 2px;
         text-align: left;
-        max-width:55rem;
+        max-width:50rem;
         width: fit-content;
         width: -moz-fit-content;
         word-wrap: break-word;
@@ -127,14 +150,15 @@
     }
     .friendMessage{
         position: relative;
-        top:8px;
+        top:20px;
+        right: 120px;
         float: left;
         background-color: white;
         padding: 10px;
         margin-left: 8px;
         border-radius: 2px;
         text-align: left;
-        max-width:55rem;
+        max-width:50rem;
         width: fit-content;
         width: -moz-fit-content;
         word-wrap: break-word;
@@ -160,6 +184,7 @@
     }
     #send{
         background-color: rgba(222, 222, 222, 0.82);
+        color:black;
         border: unset;
         position: relative;
         left:900px;
@@ -184,5 +209,29 @@
     }
     .friendAvatar{
         float:left;
+    }
+    .readMeTips{
+        position: relative;
+        color: #cbcbcb;
+        font-size: 14px;
+        right:10px;
+        top:30px;
+        float: right;
+    }
+    .meSendTime{
+        position: relative;
+        right:15px;
+        float:right;
+        font-size: 12px;
+        height: 15px;
+        color: #525252;
+    }
+    .friendSendTime{
+        position: relative;
+        left:15px;
+        float: left;
+        font-size: 12px;
+        height: 15px;
+        color: #525252;
     }
 </style>

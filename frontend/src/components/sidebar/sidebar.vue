@@ -3,7 +3,7 @@
     <div class="sidebar">
         <el-avatar id="avatar" title="修改资料" shape="square" :size="60" fit="cover" v-loading="loadingAvatar" :src="avatarUrl"  @click.native="showInfo" ></el-avatar>
         <br/>
-        <el-badge  is-dot>
+        <el-badge class="chatBadge" :value="unreadMessageNum" :hidden="unreadMessageNum<1">
             <el-link id="chat" v-bind:class="{selected:chatSelect}" title="聊天" :underline="false"  icon="el-icon-chat-line-round" @click="showChat"></el-link>
         </el-badge>
         <br/>
@@ -23,6 +23,7 @@
             avatarUrl:String,   //当前用户头像url
             loadingAvatar:Boolean,  //加载头像中
             getNewFriend:Boolean,   //是否有好友申请未处理
+            unreadMessageNum:Number,  //未读信息数
         },
         data(){
             return {
@@ -92,6 +93,10 @@
         background-color: #f51500;
         height: 12px;
         width: 12px;
+    }
+    .chatBadge >>>  .el-badge__content{
+        height: unset;
+        width: unset;
     }
 
 </style>

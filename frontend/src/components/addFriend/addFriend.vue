@@ -21,9 +21,9 @@
                 <el-button  id="addFriendButton" icon="el-icon-circle-plus" @click="addFriend(foundUser.id)">添加好友</el-button>
             </div>
         </div>
-        <div class="addMessages">
+        <div class="addMessages" >
             <div class="applyHead">好友申请</div>
-            <div class="applyList">
+            <div class="applyList" id="addDiv">
                 <div class="applyItem" v-for="applyMessage in applyMessages" :key="applyMessage.index">
                     <el-avatar class="applyAvatar" shape="square" :size="60" fit="cover" :src="applyMessage.avatar"></el-avatar>
                     <span class="applyNickname">{{applyMessage.nickname}}</span>
@@ -87,8 +87,17 @@
             searchUser(id){
                 this.$emit('searchUser',id);
             },
+            //滚轮滚动到顶部
+            scrollTop(){
+                let div = document.getElementById('addDiv');
+                setTimeout(()=>{
+                    div.scrollTop = 0;},0);
+            },
         },
         watch:{
+            applyMessages(){
+                this.scrollTop();
+            }
         }
     };
 </script>
