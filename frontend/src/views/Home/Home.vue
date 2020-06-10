@@ -286,6 +286,41 @@
                                 //recentChat.push(test);
                                 //recentChat.push(test1);
                                 //recentChat.push(test2);
+                                if(result2.data.length===0)
+                                {
+                                if(id === "test1"){
+                                        let te ={
+                                        id:"test2",
+                                        newInfo:false,
+                                        unread_num:0,
+                                        message:"123test",
+                                        time:"5月1日",
+                                    };
+                                        recentChat.push(te);
+                                    }
+                                if(id === "test2"){
+                                        let te ={
+                                        id:"test1",
+                                        newInfo:false,
+                                        unread_num:0,
+                                        message:"123test",
+                                        time:"5月1日",
+                                    };
+                                        recentChat.push(te);
+                                    }
+                                if(id === "test3"){
+                                        let te ={
+                                        id:"test1",
+                                        newInfo:false,
+                                        unread_num:0,
+                                        message:"123test",
+                                        time:"5月1日",
+                                    };
+                                        recentChat.push(te);
+                                    }
+                                
+                                }
+
                                 this.$store.commit('friendInfo/addRecent',recentChat);  //更新好友信息
                                 this.loadingChatBar = false;
                         })
@@ -675,9 +710,10 @@
                 let receiver = this.chattingFriendID;
                 this.$socket.emit('messageSend',{receiver:receiver,text:message,time:time},
                     (result)=>{
-                    console.log("发送聊天信息回执",result);
-                    console.log("发送聊天信息回执status",result.status);
-                    console.log("发送聊天信息回执reason",result.reason);
+                    console.log("发送聊天信息回执result",result);
+                    console.log("发送聊天信息回执result.data",result.data);
+                    console.log("发送聊天信息回执result.status",result.status);
+                    console.log("发送聊天信息回执result.reason",result.reason);
                     if(result.status == 2){
                         this.$message({message:"发送成功",type:"success",duration:800});
                         this.$store.commit('chatInfo/sendUpdate',info);
@@ -775,6 +811,76 @@
                 console.log("消息已读反馈",receiver);
                 //将自己发送给该好友信息修改为已读
                 this.$store.commit('chatInfo/readMeUpdate',receiver);
+            },
+            messageRece(response){
+            //----------------response:sender,text,time,sentiment---------------
+                console.log("接收体",response);
+                console.log("接收好友",response.sender);
+                console.log("消息",response.text);
+                
+
+                //*************
+                //实时渲染
+                //**************
+                let Sender = response.sender;
+                let Text = response.text;
+                let time_show="";
+                let Time = new Date(response.time);
+                time_show = this.getUtcTime(response.time);
+                //console.log("收到新的信息Time:",Time)
+                console.log("收到新的信息time_show:",time_show)
+                let ActiveRate = response.sentiment;
+                let Is_read = true;
+                let Is_friend = true;
+                //***************
+                //处理未读消息
+                //****************
+                if(Sender!=this.chattingFriendID)
+                {
+                    this.chatList[Sender].unread_num=this.chatList[Sender].unread_num+1;
+                    Is_read = false;
+                }
+                else{
+                //this.$store.commit('chatInfo/removeNew',id);
+                //this.toChat(Sender,this.$store.state.friendInfoDic[Sender].nickname,this.$store.state.friendInfoDic[Sender].avatar);
+                this.$socket.emit('messageReadSend',Sender);
+                this.$refs.chatArea.scrollBottom();
+                }
+
+
+                let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,activeRate:ActiveRate}};
+
+                //*****************
+                //********查看chatInfo有没有sender,没有则增加
+                //************
+                //if(this.chatInfo[Sender]===undefined)
+                    //{this.$store.commit('chatInfo/addChatInfo',info);}
+
+                //console.log("收到新的信息is_Friend:",Is_friend);
+                //console.log("收到新的信息Sender:",Sender);
+                //else
+                
+
+                this.$store.commit('chatInfo/sendUpdate',info);
+                
+
+
+                
+                //修改最近聊天信息info:[{id:~,newInfo:~,unread_num:~,message:~,time:~},...]
+                /*
+                let recentChat = {
+                    id:Sender,
+                    newInfo:Is_read,
+                    unread_num:this.chatList[Sender].unread_num,
+                    time:time_show
+                }
+                let arrrayRecent = [];
+                arrrayRecent.push(recentChat);
+                console.log("待存储info：",arrrayRecent);
+                this.$store.commit('friendInfo/addRecent',arrrayRecent);
+                //console.log("获取最近好友信息：",this.$store.state.friendInfoDic[Sender]);
+                */
+
             },
             disconnect(){
                 this.$message({message:"服务器已断开连接",type:"error",duration:duration_time});
