@@ -11,6 +11,7 @@
             <el-link id="friend" v-bind:class="{selected:friendSelect}" title="通讯录" :underline="false"  icon="el-icon-user-solid" @click="showFriend"></el-link>
         </el-badge>
         <br/>
+        <el-link id="wordCloud" v-bind:class="{selected:wordCloudSelect}" title="词云" :underline="false"  icon="el-icon-cloudy" @click="showWordCloud"></el-link>
         <el-link id="logout" title="退出" :underline="false" class="el-icon-switch-button"  @click="logout"></el-link>
 
     </div>
@@ -29,31 +30,42 @@
             return {
                 chatSelect: true,   //是否选中聊天图标
                 friendSelect: false,    //是否选中好友图标
+                wordCloudSelect:false,  //是否选中词云图标
             }
         },
         methods:{
             //展示聊天侧边栏
             showChat(){
-                this.chatSelect = true;
                 this.friendSelect = false;
+                this.wordCloudSelect = false;
+                this.chatSelect = true;
                 this.$emit('showChat'); //触发父组件showChat事件
             },
             //展示好友资料侧边栏
             showFriend(){
                 this.chatSelect = false;
+                this.wordCloudSelect = false;
                 this.friendSelect = true;
                 this.$emit('showFriend');   //触发父组件showFriend事件
             },
             //展示个人资料设置
             showInfo(){
+                // this.chatSelect = false;
+                // this.friendSelect = false;
+                this.$emit('showInfo'); //触发父组件showInfo事件
+            },
+            //显示词云图
+            showWordCloud(){
                 this.chatSelect = false;
                 this.friendSelect = false;
-                this.$emit('showInfo'); //触发父组件showInfo事件
+                this.wordCloudSelect = true;
+                this.$emit('showWordCloud');    //触发父组件showWordCloud事件
             },
             //注销
             logout(){
-                this.$emit('logout');                //触发父组件logout事件
-            }
+                this.$emit('logout');   //触发父组件logout事件
+            },
+
         },
     };
 </script>
@@ -62,11 +74,11 @@
         background-color:#6b95554a ;
         height: inherit;
     }
-    #chat,#friend,#logout{
+    #chat,#friend,#logout,#wordCloud{
         font-size: 48px;
         font-weight: bold;
     }
-    #chat:hover,#friend:hover{
+    #chat:hover,#friend:hover,#wordCloud:hover{
         color: #606266;
      }
     .selected{
@@ -81,11 +93,11 @@
         cursor: pointer;
     }
 
-    #chat,#friend{
+    #chat,#friend,#wordCloud{
         margin-top: 30px ;
     }
     #logout{
-        margin-top: 400px ;
+        margin-top: 300px ;
     }
     .el-badge >>>  .el-badge__content{
         right: 15px;

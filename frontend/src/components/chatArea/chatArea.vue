@@ -1,10 +1,10 @@
 //聊天对话框组件
 <template>
-    <div class="chatArea">
+    <div class="chatArea" >
         <div class="chatAreaHead">
             <span class="headText">{{friendNickname}}</span>
         </div>
-        <div id="chatAreaInfo" >
+        <div id="chatAreaInfo" v-loading="isLoadingHistory">
             <div class="messageItem" v-for="(piece,index) in chattingInfo" :key="index" >
                 <div class="me" v-if="!piece.isFriend"  @mouseover="selectedItem(index)" @mouseleave="cancelSelect()">
                     <div class="myAvatar">
@@ -22,19 +22,16 @@
                     <div class="friendMessage">{{piece.message}}</div>
                  </div>
             </div>
-
-            <!-- 表情区域 -->
-            <div class="browBox" v-if="faceShow">
-                <ul>
-                    <li v-for="(item,index) in faceList" :key="index" @click="getBrow(index)">{{item}}</li>
-                </ul>
-            </div>
-
+        </div>
+        <!-- 表情区域 -->
+        <div class="browBox" v-if="faceShow">
+            <ul>
+                <li v-for="(item,index) in faceList" :key="index" @click="getBrow(index)">{{item}}</li>
+            </ul>
         </div>
         <div class="chatAreaInput">
             <div class="inputMenu">
                 <img id="emojiIcon" :src="emoji" alt="emoji" @click="faceContent"/>
-                <img id="worldCloudIcon" :src="mangoIcon">
             </div>
             <div class="inputArea">
                 <label>
@@ -49,7 +46,6 @@
 
 <script>
     import emoji from'../../assets/emoji.png'
-    import mangoIcon from'../../assets/mango2.png'
     const appData = require("@/assets/emojis.json");
     export default {
         props: {
@@ -58,6 +54,7 @@
             friendAvatar:String,    //好友头像
             myAvatar:String,    //我的头像
             chattingInfo: Array,    //聊天记录
+            isLoadingHistory:Boolean,
         },
         data(){
             return {
@@ -67,8 +64,6 @@
                 messageInput: "",
                 //鼠标悬浮的消息序号
                 overIndex:-1,
-                //词云按钮图标
-                mangoIcon: mangoIcon,
                 faceList: [],
                 faceShow: false,
                 getBrowString: "",
@@ -79,7 +74,8 @@
                 this.messageInput = "";
             }
         },
-        mounted() {this.scrollBottom();
+        mounted() {
+            this.scrollBottom();
         },
         methods:{
             //滚轮滚动到底部
@@ -89,13 +85,11 @@
                 div.scrollTop = div.scrollHeight;},0);
             },
             //发送消息
-            sendMessage(messageInput)
+             sendMessage(messageInput)
             {
                 this.$emit('sendMessage',messageInput); //触发父组件sendMessage事件
                 this.messageInput = "";
-                this.scrollBottom();
                 this.faceShow = false;
-
             },
             //显示发送时间
             selectedItem(i){
@@ -105,21 +99,21 @@
             cancelSelect(){
                 this.overIndex = -1;
             },
+            //控制发送时间显示
             showSendTime(index){
                 if(index === this.overIndex)
                     return "visibility:visible";
                 else
                     return "visibility:hidden";
             },
-
             faceContent() {
                 this.faceShow = !this.faceShow;
                 if (this.faceShow == true) {
                     for (let i in appData) {
-                    this.faceList.push(appData[i].char);
+                        this.faceList.push(appData[i].char);
                     }
                 } else {
-                this.faceList = [];
+                    this.faceList = [];
                 }
             },
             // 获取用户点击之后的标签 ，存放到输入框内
@@ -128,11 +122,9 @@
                     if (index == i) {
                         this.getBrowString = this.faceList[index];
                         this.messageInput += this.getBrowString;
-                     }
+                    }
                 }
             },
-
-
         }
     };
 </script>
@@ -175,7 +167,7 @@
         position: relative;
         top:20px;
         float: right;
-        left: 120px;
+        left: 110px;
         background-color: rgba(34, 255, 0, 0.44);
         padding: 10px;
         margin-right: 8px;
@@ -190,7 +182,7 @@
     .friendMessage{
         position: relative;
         top:20px;
-        right: 120px;
+        right: 110px;
         float: left;
         background-color: white;
         padding: 10px;
@@ -241,16 +233,6 @@
     #emojiIcon:hover{
         cursor: pointer;
     }
-    #worldCloudIcon{
-        height: 25px;
-        width: 30px;
-        position: relative;
-        left: 40px;
-        top: 10px;
-    }
-    #worldCloudIcon:hover{
-        cursor: pointer;
-    }
     .myAvatar{
         float:right;
 
@@ -265,7 +247,7 @@
         position: relative;
         color: #cbcbcb;
         font-size: 14px;
-        right:10px;
+        left:100px;
         top:30px;
         float: right;
     }
@@ -285,25 +267,22 @@
         height: 15px;
         color: #525252;
     }
-
     #chatAreaInfo{
         position:relative;
     }
     .browBox{
         position:absolute;
-        bottom:0px;
-        left:5px;
+        bottom:180px;
+        left:450px;
         height:200px;
         width:400px;
         overflow-y: scroll;
         /*text-align: left;*/
         padding-left: 0px;
-
         /*overflow: scroll;*/
         background: #ffffff;
         border-radius:15px 15px 15px 15px;
 
-        
     }
     .browBox ul {
         display: flex;
@@ -312,7 +291,7 @@
         padding: 5px;
         margin: 10px;
         /*background:#6625aa;*/
-            
+
     }
     .browBox ul li {
         /*border: 1px solid;*/
@@ -320,5 +299,5 @@
         font-size: 20px;
         list-style: none;
         text-align: center;
-     }
+    }
 </style>
