@@ -1,5 +1,0 @@
-curl -v 127.0.0.1:3000/register -b cookies.txt -c cookies.txt -H "Content-Type: application/json" -d @test.json
-
-curl -v 127.0.0.1:3000/login -b cookies.txt -c cookies.txt -H "Content-Type: application/json" -d @test.json
-
-curl -v 127.0.0.1:3000/logout -c cookies.txt
