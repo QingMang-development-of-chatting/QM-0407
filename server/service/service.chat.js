@@ -17,7 +17,6 @@ const { SERVICE: { STATUS: STATUS }, REASON } = require('../constant');
 function Service() {}
 
 /**
- * TODO 可能要改
  * 获取聊天的列表。
  * Examples:
  *
@@ -28,6 +27,7 @@ function Service() {}
  * @api public
  */
 Service.prototype.getRecentChatList = async function(username) {
+	var res = await chatFunc.unreadRoom({"user_id":username})
 	//获取user的所有好友	
 	var friends = await friendService.prototype.getFriends(username);
 	friends = friends.data;
@@ -129,7 +129,7 @@ Service.prototype.getMessages = async function(username1, username2, time) {
 
     //尝试获取消息记录
     var result = await chatFunc.searchChat({"room":room_id,"param":"room","param2":time,"n":20});
-    var msgs = [];	//格式适配：[{sender(String), text(String), time(Number), is_read(Boolean)}](Array)
+    var msgs = [];	//格式适配：[{sender(String), text(String), time(Number), is_read(Boolean),sentiment(Number)}](Array)
 	for(i=0;i<result.length;i++){	//time递增
 		if(msgs.length>=20){
 			console.log("已获取20条msg，break");
@@ -143,6 +143,7 @@ Service.prototype.getMessages = async function(username1, username2, time) {
         temp.text = msg.chat;
 		temp.time = msg.date;
 		temp.sender = msg.host_id;
+		temp.sentiment = msg.sentiment;
 		//判断receiver是否已读（sender的反面）
 		var receiver = username1;
 		if(receiver===temp.sender){
@@ -245,7 +246,7 @@ function sortbytime(msg1,msg2){
  */
 module.exports = Service;
 
-//Service.prototype.getRecentChatList('1234');
+//Service.prototype.getRecentChatList('test_user1');
 //Service.prototype.getMessages('test_user1', 'test_user2', new Date().getTime());
 //Service.prototype.readMessage('test_user2', 'test_user1');
 //Service.prototype.addMessage({sender:"1234",receiver:"0001",text:"69",time:new Date().getTime()});
