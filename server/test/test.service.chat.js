@@ -4,7 +4,6 @@
  *   This test requires there is no user called `test_user1`, `test_user2` or `test_user3` in databse.
  *   This test will create a user called `test_user1`, `test_user2` and `test_user3` in database.
  */
-//mocha -t 5000 test.service.chat.js
 
 /**
  * Module dependencies
@@ -125,13 +124,20 @@ describe('Chat', function() {
 			const message = {
 				sender: 'test_user1',
 				receiver: 'test_user2',
-				text: 'Hi, user2.',
+				text: '色情',
 				time: new Date().getTime()
 			};
-			g_user1_user2.last_message = message;
-			g_user1_user2.history.push(message);
+			g_user1_user2.last_message = {
+				sender: 'test_user1',
+				receiver: 'test_user2',
+				text: '*情',
+				time: new Date().getTime()
+			};
+			g_user1_user2.history.push(g_user1_user2.last_message);
 			const result = await chat_service.addMessage(message);
 			expect(result.status).to.eql(STATUS.OK);
+			expect(result.data.text).to.eql('*情');
+			expect(result.data.sentiment).to.be.a('number');
 		});
 	});
 
@@ -168,11 +174,15 @@ describe('Chat', function() {
 	});
 
 	describe('#getMessages()', async function() {
-		it('should response OK ', async function() {
+		it('should response OK and data is an array', async function() {
 			this.timeout(50000);
 			const result = await chat_service.getMessages('test_user1', 'test_user2', new Date().getTime());
 			expect(result.status).to.eql(STATUS.OK);
-			expect(result.data).to.eql([
+			expect(result.data[0].sentiment).to.be.a('number');
+			expect(result.data.map(message => {
+				const {sender, text, time, is_read} = message;
+				return {sender, text, time, is_read};
+			})).to.eql([
 				{
 					sender: g_user1_user2.last_message.sender,
 					text: g_user1_user2.last_message.text,
@@ -217,11 +227,14 @@ describe('Chat', function() {
 	});
 
 	describe('#getMessages()', async function() {
-		it('should response OK and data is an empty array', async function() {
+		it('should response OK and data is an array', async function() {
 			this.timeout(50000);
 			const result = await chat_service.getMessages('test_user1', 'test_user2', new Date().getTime());
 			expect(result.status).to.eql(STATUS.OK);
-			expect(result.data).to.eql(g_user1_user2.history.map(function(message) {
+			expect(result.data.map(message => {
+				const {sender, text, time, is_read} = message;
+				return {sender, text, time, is_read};
+			})).to.eql(g_user1_user2.history.map(function(message) {
 				const {sender, text, time} = message;
 				return {sender, text, time, is_read:false} 
 			}));
@@ -245,31 +258,34 @@ describe('Chat', function() {
 
 		it('should response REJECT for no update', async function() {
 			this.timeout(50000);
-			const result = await chat_service.readMessage('test_user1', 'test_user2');
+			const result = await chat_service.readMessage('test_user2', 'test_user1');
 			expect(result.status).to.eql(STATUS.REJECT);
 			expect(result.reason).to.eql(REASON.SEND_READ_MESSAGE.NO_UPDATE);
 		});
 
 		it('should response OK', async function() {
 			this.timeout(50000);
-			const result = await chat_service.readMessage('test_user2', 'test_user1');
+			const result = await chat_service.readMessage('test_user1', 'test_user2');
 			expect(result.status).to.eql(STATUS.OK);
 		});
 
 		it('should response REJECT for no update', async function() {
 			this.timeout(50000);
-			const result = await chat_service.readMessage('test_user2', 'test_user1');
+			const result = await chat_service.readMessage('test_user1', 'test_user2');
 			expect(result.status).to.eql(STATUS.REJECT);
 			expect(result.reason).to.eql(REASON.SEND_READ_MESSAGE.NO_UPDATE);
 		});
 	});
 
 	describe('#getMessages()', async function() {
-		it('should response OK and data is an empty array', async function() {
+		it('should response OK and data is an array', async function() {
 			this.timeout(50000);
 			const result = await chat_service.getMessages('test_user1', 'test_user2', new Date().getTime());
 			expect(result.status).to.eql(STATUS.OK);
-			expect(result.data).to.eql(g_user1_user2.history.map(function(message) {
+			expect(result.data.map(message => {
+				const {sender, text, time, is_read} = message;
+				return {sender, text, time, is_read};
+			})).to.eql(g_user1_user2.history.map(function(message) {
 				const {sender, text, time} = message;
 				return {sender, text, time, is_read:true} 
 			}));
@@ -335,7 +351,7 @@ describe('Chat', function() {
 
 	describe('#multiple_messages', async function() {
 		it('should response OK', async function() {
-			this.timeout(50000);
+			this.timeout(120000);
 			let i = 0;
 			while (i < 20) {
 				const message = {
@@ -350,6 +366,9 @@ describe('Chat', function() {
 				const result = await chat_service.addMessage(message);
 				expect(result.status).to.eql(STATUS.OK);
 			}
+		});
+
+		it('should response OK and data', async function() {
 			const result_chatlist = await chat_service.getRecentChatList('test_user1');
 			expect(result_chatlist.status).to.eql(STATUS.OK);
 			expect(result_chatlist.data).to.eql([
@@ -372,7 +391,6 @@ describe('Chat', function() {
 			expect(result_getmessages.status).to.eql(STATUS.OK);
 			expect(result_getmessages.data.length).to.eql(20);
 		});
-
 
 	});
 

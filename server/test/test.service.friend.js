@@ -3,9 +3,9 @@
  * 
  *   This test requires there is no user called `test_user1`, `test_user2` or `test_user3` in databse.
  *   This test will create a user called `test_user1`, `test_user2` and `test_user3` in database.
- *	 db: friend_answer、room_info、user_info、friend_info
+ * mocha -t 5000 test.service.friend.js
  * /
-// mocha -t 5000 test.service.friend.js
+
 /**
  * Module dependencies
  */
@@ -151,6 +151,15 @@ describe('Friend', function() {
 		});
 	});
 
+	describe('#applyUserToBeFriend()', function() {
+		it('should response REJECT for already friends', async function() {
+			this.timeout(50000);
+			const result = await friend_service.applyUserToBeFriend('test_user1', 'test_user2');
+			expect(result.status).to.eql(STATUS.REJECT);
+			expect(result.reason).to.eql(REASON.FRIEND.SEND_APPLY.ALREADY_FRIENDS);
+		});
+	});
+
 	describe('#deleteFriend()', function() {
 		it('should response REJECT for the same user', async function() {
 			this.timeout(50000);
@@ -211,6 +220,65 @@ describe('Friend', function() {
 			const result = await friend_service.rejectUserToBeFriend('test_user1', 'test_user2');
 			expect(result.status).to.eql(STATUS.REJECT);
 			expect(result.reason).to.eql(REASON.FRIEND.REJECT.NO_SUCH_APLLICANT);
+		});
+	});
+
+	describe('#applyUserToBeFriend()', function() {
+		it('should response OK', async function() {
+			this.timeout(50000);
+			const result = await friend_service.applyUserToBeFriend('test_user2', 'test_user1');
+			expect(result.status).to.eql(STATUS.OK);
+		});
+	});
+
+	describe('#getNotification()', function() {
+		it('should response OK and data is packed with one notification', async function() {
+			this.timeout(50000);
+			const result = await friend_service.getNotification('test_user1');
+			expect(result.status).to.eql(STATUS.OK);
+			expect(result.data).to.eql([{sender: 'test_user2', type: NOTIFICATION.TYPE.APPLY}]);
+		});
+	});
+
+	describe('#applyUserToBeFriend()', function() {
+		it('should response REJECT fr multiplt roles', async function() {
+			this.timeout(50000);
+			const result = await friend_service.applyUserToBeFriend('test_user1', 'test_user2');
+			expect(result.status).to.eql(STATUS.REJECT);
+			expect(result.reason).to.eql(REASON.FRIEND.SEND_APPLY.MULT_ROLES);
+		});
+	});
+
+	describe('#getNotification()', function() {
+		it('should response OK and data is packed with one notification', async function() {
+			this.timeout(50000);
+			const result = await friend_service.getNotification('test_user1');
+			expect(result.status).to.eql(STATUS.OK);
+			expect(result.data).to.eql([{sender: 'test_user2', type: NOTIFICATION.TYPE.ACCESS}]);
+		});
+	});
+
+	describe('#getFriends()', function() {
+		it('should response OK and data is an array', async function() {
+			this.timeout(50000);
+			const result = await friend_service.getFriends('test_user1');
+			expect(result.status).to.eql(STATUS.OK);
+			expect(result.data).to.eql(['test_user2']);
+		});
+
+		it('should response OK and data is an array', async function() {
+			this.timeout(50000);
+			const result = await friend_service.getFriends('test_user2');
+			expect(result.status).to.eql(STATUS.OK);
+			expect(result.data).to.eql(['test_user1']);
+		});
+	});
+
+	describe('#deleteFriend()', function() {
+		it('should response OK', async function() {
+			this.timeout(50000);
+			const result = await friend_service.deleteFriend('test_user1', 'test_user2');
+			expect(result.status).to.eql(STATUS.OK);
 		});
 	});
 
