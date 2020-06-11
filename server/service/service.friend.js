@@ -82,8 +82,7 @@ Service.prototype.getNotification = async function(username) {
 };
 
 /**
- * 发送好友申请
- * TODO？不含检测responser存在性的功能
+ * 发送好友申请(双向发送好友申请时、会直接加为好友)
  * Examples:
  *
  *   service.applyUserToBeFriend('Steve Jobs', 'Tim Cook');
@@ -119,7 +118,6 @@ Service.prototype.applyUserToBeFriend = async function(requester, responser) {
 
 /**
  * 接受好友申请，并添加好友
- * TODO? 无用户不存在的检测
  * Examples:
  *
  *   service.accessUserToBeFriend('Steve Jobs', 'Tim Cook');
@@ -150,7 +148,6 @@ Service.prototype.accessUserToBeFriend = async function(responser, requester) {
 
 /**
  * 拒绝好友申请
- * TODO? 无用户不存在的检测
  * Examples:
  *
  *   service.accessUserToBeFriend('Steve Jobs', 'Tim Cook');
@@ -174,7 +171,7 @@ Service.prototype.rejectUserToBeFriend = async function(responser, requester) {
 };
 
 /**
- * 删除好友。仅修改friend_info表。
+ * 删除好友。
  *
  * Examples:
  *

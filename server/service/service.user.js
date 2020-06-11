@@ -81,7 +81,7 @@ Service.prototype.isValid = async function(username, password) {
 };
 
 /**
- * 获取用户info，精确搜索username
+ * 根据username、获取用户info
  *
  * Examples:
  *
