@@ -18,7 +18,7 @@
                 <div id="wordCloud" v-if="isShowWordCloud" v-loading="loadingWordCloud">
                     <img id="wordCloudImg" :src="wordCloudSrc"  alt="wordCloud">
                 </div>
-                <chat-area ref="chatArea" v-if="showChatArea" :friend-nickname="chattingFriendNickname" :friend-avatar="chattingFriendAvatar" :my-avatar="currentUser.avatar" :chatting-info="chatInfo[chattingFriendID]" :friendID="chattingFriendID" :is-loading-history="loadingHistory" @sendMessage="sendMessage"></chat-area>
+                <chat-area ref="chatArea" v-if="showChatArea" :friend-nickname="chattingFriendNickname" :friend-avatar="chattingFriendAvatar" :my-avatar="currentUser.avatar" :chatting-info="chatInfo[chattingFriendID]" :friendID="chattingFriendID" :is-loading-history="loadingHistory" :is-loading-more="loadingMore" :has-more-history="moreHistory" @getMoreHistory="getMoreHistory" @sendMessage="sendMessage"></chat-area>
                 <friend-info v-if="showFriendInfo" :friendId="selectFriendId" :friendNickname="selectFriendNickname" :friendAvatar="selectFriendAvatar" @toChat="toChat" @deleteFriend="deleteFriend"></friend-info>
                 <add-friend v-if="showAddFriend" :loading="searchLoading" :apply-messages="applyMessages" :found-user="foundUser" :show-found="showFound" :showFoundRemind='showFoundRemind' @accept="acceptApply" @reject="rejectApply" @addFriend="sendAddFriend" @searchUser="searchUser"></add-friend>
             </el-main>
@@ -65,6 +65,10 @@
                 loadingChatBar:true,
                 //是否正在加载聊天历史
                 loadingHistory: false,
+                //是否正在加载更多聊天记录
+                loadingMore:false,
+                //有无更多聊天记录
+                moreHistory:true,
                 //是否正在加载词云图
                 loadingWordCloud:false,
                 //是否展示聊天侧边栏
@@ -258,32 +262,22 @@
                                     };
                                     recentChat.push(t);
                                 }
-                                //let test0 = {
-                                //    id:"test0",
-                                //    newInfo:true,
-                                //    unread_num:1,
-                                //    message:"哈哈哈哈哈哈",
-                                //    time:"昨天",
-                                //};
-                                //let test1 = {
-                                //    id:"test1",
-                                //    newInfo:true,
-                                //    unread_num:1,
-                                //    message:"哈哈哈哈哈哈",
-                                //    time:"昨天",
-                                //};
-                                // let test2 = {
-                                //     id:"test3",
+                                // let test0 = {
+                                //     id:"test0",
                                 //     newInfo:true,
-                                //     unread_num:2,
+                                //     unread_num:1,
                                 //     message:"哈哈哈哈哈哈",
                                 //     time:"昨天",
                                 // };
-
-                                //recentChat.push(test0);
-                                //recentChat.push(test1);
-                                // recentChat.push(test2);
-
+                                // recentChat.push(test0);
+                                // let test1 = {
+                                //     id:"test1",
+                                //     newInfo:true,
+                                //     unread_num:1,
+                                //     message:"哈哈哈哈哈哈",
+                                //     time:"昨天",
+                                // };
+                                // recentChat.push(test1);
                                 this.$store.commit('friendInfo/addRecent',recentChat);  //更新好友信息
                                 this.loadingChatBar = false;
                             })
@@ -445,17 +439,18 @@
                 this.isInit = false;
                 this.showFriendInfo = false;
                 this.showAddFriend = false;
-                //this.showChatArea = false;
                 this.isShowWordCloud = false;
                 this.showChatArea = true;
                 this.chattingFriendNickname = nickname;
                 this.chattingFriendAvatar = avatar;
                 this.chattingFriendID = id;
+                this.loadingMore = false;
+                this.moreHistory = true;
                 //初次载入时，应调用接口向后台获取与该好友聊天记录,并将数据存入store，后续更新store即可
                 if(this.chatInfo[id]===undefined){
                     //获取聊天历史
                     this.loadingHistory = true;
-                    let now = new Date().getTime().toString()
+                    let now = new Date().getTime().toString();
                     this.$axios.get('/v1/chat/'+this.currentUser.id+'/history/'+id+'/'+now)
                         .then((result)=>{
                             console.log("获取聊天历史返回",result);
@@ -473,7 +468,7 @@
                                     time:time,
                                     utcTime:result.data[i].time,
                                     activeRate:result.data[i].sentiment
-                                }
+                                };
                                 temp.push(t);
                             }
                             let chatHistory = {};
@@ -523,6 +518,17 @@
                             }
                         });
                 }
+                //判断块是否有滚动条
+                setTimeout(()=>{
+                    if(this.$refs.chatArea.canScroll())
+                    {
+                        this.moreHistory = true;
+                        //this.$refs.chatArea.scrollBottom();//滚动到底部
+                    }
+                    else
+                        this.moreHistory = false;
+                },500);
+
             },
             //载入添加好友窗口
             toAdd(){
@@ -679,15 +685,21 @@
                         console.log("发送聊天信息回执",result);
                         console.log("发送聊天信息回执status",result.status);
                         console.log("发送聊天信息回执reason",result.reason);
-                        if(result.status == 2){
+                        if(result.status === 2){
                             this.$message({message:"发送成功",type:"success",duration:800});
                             let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show,utcTime:time,activeRate:result.data.sentiment}};
                             this.$store.commit('chatInfo/sendUpdate',UpdateInfo);
                             this.$refs.chatArea.scrollBottom();
                             //更新侧边栏
                             let info = [];
+                            let message_show = message;
+                            if(message.length > 18)  //消息内容过长省略部分内容
+                            {
+                                message_show = message.substr(0,18);
+                                message_show +="...";
+                            }
                             let chatBarTime = this.getChatBarTime(time);
-                            info.push({id:receiver,newInfo:true,unread_num:0,message:message,time:chatBarTime})
+                            info.push({id:receiver,newInfo:true,unread_num:0,message:message_show,time:chatBarTime});
                             this.$store.commit('friendInfo/addRecent',info);
                         }
                         else{
@@ -707,7 +719,7 @@
             },
             //将utc时间转化为聊天栏显示时间字符串
             getChatBarTime(utc){
-                let timeString = ""
+                let timeString = "";
                 let time = new Date(utc);
                 let now = new Date();
                 let yesterday = new Date(now.getTime()-24*60*60*1000);
@@ -752,6 +764,65 @@
                         else
                             this.$message({message:'服务响应错误,词云图获取失败',type:'error',duration:duration_time});
                         this.loadingWordCloud = false;
+                    })
+            },
+            //获取更多聊天历史
+            getMoreHistory(friendID,time){
+                this.loadingMore = true;
+                let start_height = this.$refs.chatArea.getScrollHeight();
+                // console.log(friendID);
+                // console.log(new Date(time));
+                this.$axios.get('/v1/chat/'+this.currentUser.id+'/history/'+friendID+'/'+time)
+                    .then((result)=>{
+                        console.log("获取聊天历史:",result);
+                        let temp = [];
+                        for(let i=0;i<result.data.length;i++)
+                        {
+                            let isFriend = false;
+                            if(result.data[i].sender === friendID)
+                                isFriend = true;
+                            let time = this.utcTimeToString(result.data[i].time);
+                            let t ={
+                                message:result.data[i].text,
+                                isFriend:isFriend,
+                                isRead:result.data[i].is_read,
+                                time:time,
+                                utcTime:result.data[i].time,
+                                activeRate:result.data[i].sentiment
+                            };
+                            temp.push(t);
+                        }
+                        if(temp.length> 0){
+                            let info = {id:friendID,history:temp};
+                            this.$store.commit('chatInfo/getMoreChatInfo',info);
+                            setTimeout(()=>{
+                                let end_height = this.$refs.chatArea.getScrollHeight();
+                                console.log("滚动高度0",start_height);
+                                console.log("滚动高度1",end_height);
+                                this.$refs.chatArea.scrollWhere(end_height-start_height-64);
+                            },1);
+                        }
+                        else{
+                            this.moreHistory = false;
+                        }
+                        this.loadingMore = false;
+                    })
+                    .catch((error)=>{
+                        if(error.response.status === 400)
+                            this.$message({message:'请求参数错误',type:"error",duration:duration_time});
+                        else if(error.response.status === 409)
+                        {
+                            if(error.response.data === 0)
+                                this.$message({message:'不可获取自己与自己的聊天记录',type:"error",duration:duration_time});
+                            else if(error.response.data === 1)
+                                this.$message({message:'该用户非好友，获取聊天记录失败',type:"error",duration:duration_time});
+                            else
+                                this.$message({message:'服务器响应错误',type:"error",duration:duration_time});
+                        }
+                        else{
+                            this.$message({message:'服务器响应错误',type:"error",duration:duration_time});
+                        }
+                        this.loadingMore = false;
                     })
             }
         },
@@ -813,7 +884,7 @@
             //接收消息反馈事件
             messageRece(response){
                 //----------------response:sender,text,time,sentiment---------------
-                console.log("接收体",response);
+                 console.log("接收体",response);
                 // console.log("接收好友",response.sender);
                 // console.log("消息",response.text);
                 //*************
@@ -828,6 +899,12 @@
                 let ActiveRate = response.sentiment;
                 let Is_read = true;
                 let Is_friend = true;
+                let Text_show = Text;
+                if(Text.length > 18)  //消息内容过长省略部分内容
+                {
+                    Text_show = Text.substr(0,18);
+                    Text_show +="...";
+                }
                 //***************
                 //处理未读消息
                 //****************
@@ -838,7 +915,7 @@
                     //修改新消息相关数据
                     let info = [];
                     let chatBarTime = this.getChatBarTime(response.time);
-                    info.push({id:Sender,newInfo:true,unread_num:this.chatList[Sender].unread_num+1,message:Text,time:chatBarTime})
+                    info.push({id:Sender,newInfo:true,unread_num:this.chatList[Sender].unread_num+1,message:Text_show,time:chatBarTime});
                     this.$store.commit('friendInfo/addRecent',info);
                     Is_read = false;
                 }
@@ -849,16 +926,15 @@
                     //更新侧边栏
                     let info = [];
                     let chatBarTime = this.getChatBarTime(response.time);
-                    info.push({id:Sender,newInfo:true,unread_num:this.chatList[Sender].unread_num,message:Text,time:chatBarTime})
+                    info.push({id:Sender,newInfo:false,unread_num:0,message:Text_show,time:chatBarTime});
                     this.$store.commit('friendInfo/addRecent',info);
                     //发送消息已读
                     this.$socket.emit('messageReadSend',Sender);
                     //滚动到底部
-
+                    this.$refs.chatArea.scrollBottom();
                 }
                 //更新聊天历史
                 let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,utcTime:response.time ,activeRate:ActiveRate}};
-                //console.log("要插进去信息记录的info",info);
 
                 //*****************
                 //********查看chatInfo有没有sender,没有则增加

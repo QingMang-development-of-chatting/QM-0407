@@ -4,7 +4,11 @@
         <div class="chatAreaHead">
             <span class="headText">{{friendNickname}}</span>
         </div>
-        <div id="chatAreaInfo" v-loading="isLoadingHistory">
+        <div id="chatAreaInfo" v-loading="isLoadingHistory" @scroll="scrollToTop">
+            <div class="moreTip" v-loading="isLoadingMore"
+                 element-loading-spinner="el-icon-loading"
+                 element-loading-background="rgba(0, 0, 0, 0)" >{{moreTipText}}
+            </div>
             <div class="messageItem" v-for="(piece,index) in chattingInfo" :key="index" >
                 <div class="me" v-if="!piece.isFriend"  @mouseover="selectedItem(index)" @mouseleave="cancelSelect()">
                     <div class="myAvatar">
@@ -12,7 +16,6 @@
                     </div>
                     <div class="meSendTime" :style="showSendTime(index)">{{piece.time}}</div>
                     <div class="myMessage" :class="{positiveStyle:piece.activeRate>=0.6,normalStlye:piece.activeRate<0.6&&piece.activeRate>=0.5,negativeStyle:piece.activeRate<0.5}">{{piece.message}}</div>
-
                     <div class="readMeTips" v-show="piece.isRead">已读</div>
                 </div>
                 <div class="friend" v-if="piece.isFriend" @mouseover="selectedItem(index)" @mouseleave="cancelSelect()">
@@ -55,7 +58,9 @@
             friendAvatar:String,    //好友头像
             myAvatar:String,    //我的头像
             chattingInfo: Array,    //聊天记录
-            isLoadingHistory:Boolean,
+            hasMoreHistory:Boolean, //是否有更多聊天记录
+            isLoadingHistory:Boolean,   //是否正在加载聊天历史
+            isLoadingMore:Boolean,  //是否正在加载更多聊天历史
         },
         data(){
             return {
@@ -71,9 +76,19 @@
                 messageColor:"",
             }
         },
-        
+
         mounted() {
             this.scrollBottom();
+        },
+        computed:{
+            //顶端文本
+            moreTipText(){
+                if(this.hasMoreHistory)
+                    return "上拉查看更多消息";
+                else
+                    return "没有更多消息";
+            },
+
         },
         watch:{
             friendID(){
@@ -87,10 +102,32 @@
                 setTimeout(()=>{
                 div.scrollTop = div.scrollHeight;},0);
             },
+            //判断块是否可以滚动
+            canScroll(){
+                let div = document.getElementById('chatAreaInfo');
+                if(div.scrollHeight > div.clientHeight)
+                    return true;
+                else
+                    return false;
+            },
+            //获取块的滚动高度
+            getScrollHeight(){
+                let div = document.getElementById('chatAreaInfo');
+                return div.scrollHeight;
+            },
+            //滚轮滚动到指定高度
+            scrollWhere(height){
+                let div = document.getElementById('chatAreaInfo');
+                setTimeout(()=>{
+                    div.scrollTop = height;},0);
+            },
             //发送消息
              sendMessage(messageInput)
             {
-                this.$emit('sendMessage',messageInput); //触发父组件sendMessage事件
+                if(this.messageInput === "")
+                    this.$message({message:"不能发送空白消息",type:'warning',duration:1500});
+                else
+                    this.$emit('sendMessage',messageInput); //触发父组件sendMessage事件
                 this.messageInput = "";
                 this.faceShow = false;
             },
@@ -128,6 +165,15 @@
                     }
                 }
             },
+            //滚轮滚动到顶部
+            scrollToTop(e){
+                setTimeout(()=>{
+                    if(e.target.scrollTop === 0 && this.isLoadingMore === false && this.hasMoreHistory===true)
+                        if(this.chattingInfo[0] !== undefined)
+                            this.$emit('getMoreHistory',this.friendID,this.chattingInfo[0].utcTime);
+                },1)
+
+            }
         }
     };
 </script>
@@ -182,16 +228,6 @@
         word-wrap: break-word;
         white-space: pre-wrap;
     }
-    .positiveStyle{
-        color:#FF6600;
-    }
-    .normalStyle{
-        color:#000000;
-    }
-    .negativeStyle{
-        color:#009999;
-        /*color:#888888;*/
-    }
     .friendMessage{
         position: relative;
         top:20px;
@@ -231,8 +267,6 @@
         color:black;
         border: unset;
         position: relative;
-        
-
         left:900px;
     }
     #send:hover{
@@ -314,5 +348,18 @@
         font-size: 20px;
         list-style: none;
         text-align: center;
+    }
+    .moreTip{
+        color: #25a4ffed;
+    }
+    .positiveStyle{
+        color:#FF6600;
+    }
+    .normalStyle{
+        color:#000000;
+    }
+    .negativeStyle{
+        color:#009999;
+        /*color:#888888;*/
     }
 </style>
