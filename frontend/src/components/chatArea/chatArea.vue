@@ -11,7 +11,8 @@
                         <el-avatar  shape="square" :size="60" fit="cover" :src="myAvatar" ></el-avatar>
                     </div>
                     <div class="meSendTime" :style="showSendTime(index)">{{piece.time}}</div>
-                    <div class="myMessage">{{piece.message}}</div>
+                    <div class="myMessage" :class="{positiveStyle:piece.activeRate>=0.6,normalStlye:piece.activeRate<0.6&&piece.activeRate>=0.5,negativeStyle:piece.activeRate<0.5}">{{piece.message}}</div>
+
                     <div class="readMeTips" v-show="piece.isRead">已读</div>
                 </div>
                 <div class="friend" v-if="piece.isFriend" @mouseover="selectedItem(index)" @mouseleave="cancelSelect()">
@@ -19,7 +20,7 @@
                         <el-avatar  shape="square" :size="60" fit="cover" :src="friendAvatar" ></el-avatar>
                     </div>
                     <div class="friendSendTime" :style="showSendTime(index)">{{piece.time}}</div>
-                    <div class="friendMessage">{{piece.message}}</div>
+                    <div class="friendMessage" :class="{positiveStyle:piece.activeRate>=0.6,normalStlye:piece.activeRate<0.6&&piece.activeRate>=0.5,negativeStyle:piece.activeRate<0.5}">{{piece.message}}</div>
                  </div>
             </div>
         </div>
@@ -67,8 +68,10 @@
                 faceList: [],
                 faceShow: false,
                 getBrowString: "",
+                messageColor:"",
             }
         },
+        
         mounted() {
             this.scrollBottom();
         },
@@ -179,6 +182,16 @@
         word-wrap: break-word;
         white-space: pre-wrap;
     }
+    .positiveStyle{
+        color:#FF6600;
+    }
+    .normalStyle{
+        color:#000000;
+    }
+    .negativeStyle{
+        color:#009999;
+        /*color:#888888;*/
+    }
     .friendMessage{
         position: relative;
         top:20px;
@@ -218,6 +231,8 @@
         color:black;
         border: unset;
         position: relative;
+        
+
         left:900px;
     }
     #send:hover{
