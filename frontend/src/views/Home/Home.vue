@@ -51,7 +51,7 @@
             friendInfo, //好友资料组件
         },
         created() {
-             this.init();
+            this.init();
         },
         data(){
             return{
@@ -145,41 +145,41 @@
                     password = decode_password.substr(4);
                     await this.$socket.emit('userLogin',id,password,
                         (result)=>{
-                        console.log("登录接口返回:",result);
-                        if(result.status === 2)
-                        {
-                            console.log("登录成功");
-                        }
-                        else if(result.status === 1)
-                        {
-                            if(result.reason === 0 || result.reason === 1){
-                                this.$message({message:"登录信息已过期",type:"warning",duration:duration_time});
+                            console.log("登录接口返回:",result);
+                            if(result.status === 2)
+                            {
+                                console.log("登录成功");
+                            }
+                            else if(result.status === 1)
+                            {
+                                if(result.reason === 0 || result.reason === 1){
+                                    this.$message({message:"登录信息已过期",type:"warning",duration:duration_time});
+                                    window.localStorage.removeItem("username");
+                                    window.localStorage.removeItem("password");
+                                    setTimeout(()=>{
+                                        this.$router.push("/Login");
+                                    },duration_time);
+                                }
+                                else
+                                    console.log("重复登录");
+                            }
+                            else if(result.status === 0)
+                            {
+                                this.$message({message:"请求参数错误",type:"error",duration:duration_time});
+                                setTimeout(()=>{
+                                    this.$router.push("/Login");
+                                },duration_time);
+                            }
+                            else
+                            {
+                                this.$message({message:"服务器无响应",type:"warning",duration:duration_time});
                                 window.localStorage.removeItem("username");
                                 window.localStorage.removeItem("password");
                                 setTimeout(()=>{
                                     this.$router.push("/Login");
                                 },duration_time);
                             }
-                            else
-                                console.log("重复登录");
-                        }
-                        else if(result.status === 0)
-                        {
-                            this.$message({message:"请求参数错误",type:"error",duration:duration_time});
-                            setTimeout(()=>{
-                                this.$router.push("/Login");
-                                },duration_time);
-                        }
-                        else
-                        {
-                            this.$message({message:"服务器无响应",type:"warning",duration:duration_time});
-                            window.localStorage.removeItem("username");
-                            window.localStorage.removeItem("password");
-                            setTimeout(()=>{
-                                this.$router.push("/Login");
-                                },duration_time);
-                        }
-                    });
+                        });
                 }
                 //初始化
                 //此处调用接口获取当前用户资料
@@ -244,21 +244,7 @@
                                     }
                                     //处理时间显示
                                     let time_show = "";     //侧边栏显示的时间
-                                    let time = new Date(result2.data[i].last_time);
-                                    let now = new Date();
-                                    let yesterday = new Date(now.getTime()-24*60*60*1000);
-                                    if(time.getFullYear() !== now.getFullYear())
-                                        time_show = time.getFullYear().toString()+"年"+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日";
-                                    else if(time.getMonth() === now.getMonth() && time.getDate() === now.getDate()){
-                                        if(time.getMinutes()>9)
-                                            time_show = time.getHours().toString()+":"+time.getMinutes().toString();
-                                        else
-                                            time_show = time.getHours().toString()+":0"+time.getMinutes().toString();
-                                    }
-                                    else if(time.getMonth() === yesterday.getMonth() && time.getDate() === yesterday.getDate())
-                                        time_show = "昨天";
-                                    else
-                                        time_show = (time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日";
+                                    time_show = this.getChatBarTime(result2.data[i].last_time);
                                     let t ={
                                         id:result2.data[i].friend,
                                         newInfo:newInfo,
@@ -268,20 +254,20 @@
                                     };
                                     recentChat.push(t);
                                 }
-                                // let test = {
-                                //     id:"test0",
-                                //     newInfo:true,
-                                //     unread_num:1,
-                                //     message:"哈哈哈哈哈哈",
-                                //     time:"昨天",
-                                // };
-                                // let test1 = {
-                                //     id:"test2",
-                                //     newInfo:true,
-                                //     unread_num:1,
-                                //     message:"哈哈哈哈哈哈",
-                                //     time:"昨天",
-                                // };
+                                let test0 = {
+                                    id:"test0",
+                                    newInfo:true,
+                                    unread_num:1,
+                                    message:"哈哈哈哈哈哈",
+                                    time:"昨天",
+                                };
+                                let test1 = {
+                                    id:"test2",
+                                    newInfo:true,
+                                    unread_num:1,
+                                    message:"哈哈哈哈哈哈",
+                                    time:"昨天",
+                                };
                                 // let test2 = {
                                 //     id:"test3",
                                 //     newInfo:true,
@@ -289,17 +275,17 @@
                                 //     message:"哈哈哈哈哈哈",
                                 //     time:"昨天",
                                 // };
-                                // recentChat.push(test);
-                                //recentChat.push(test1);
-                                //recentChat.push(test2);
+                                recentChat.push(test0);
+                                recentChat.push(test1);
+                                // recentChat.push(test2);
                                 this.$store.commit('friendInfo/addRecent',recentChat);  //更新好友信息
                                 this.loadingChatBar = false;
-                        })
+                            })
                             .catch((error)=>{
                                 console.log("获取聊天列表出错",error);
                                 this.loadingChatBar = false;
-                        });
-                            this.loadingChatBar = false;
+                            });
+                        this.loadingChatBar = false;
                     })
                     .catch((error)=>{
                         console.log("获取好友列表时，服务器响应错误:",error);
@@ -337,7 +323,7 @@
                     })
                     .catch((error)=>{
                         console.log("获取好友申请表时出错",error.response);
-                })
+                    })
             },
             //显示聊天界面
             showChat(){
@@ -363,27 +349,27 @@
             logout(){
                 this.$socket.emit('userLogout',
                     (result)=>{
-                    console.log("注销返回:",result);
-                    if(result.status === 2){
-                        window.localStorage.removeItem("username");
-                        window.localStorage.removeItem('password');
-                        this.$message({message:"已注销,即将跳转至登录页",type:"success",duration:duration_time});
-                        setTimeout(()=>{
-                            window.location.href="/Login";
-                            // this.$router.push("/Login");
-                        },800);
-                    }
-                    else if(result.status === 1){
-                        this.$message({message:"未登录",type:"warning",duration:duration_time});
-                        setTimeout(()=>{
-                            window.location.href="/Login";
-                            // this.$router.push("/Login");
-                        },800);
-                    }
-                    else{
-                        this.$message({message:"服务器未响应",type:"warning",duration:duration_time});
-                    }
-                });
+                        console.log("注销返回:",result);
+                        if(result.status === 2){
+                            window.localStorage.removeItem("username");
+                            window.localStorage.removeItem('password');
+                            this.$message({message:"已注销,即将跳转至登录页",type:"success",duration:duration_time});
+                            setTimeout(()=>{
+                                window.location.href="/Login";
+                                // this.$router.push("/Login");
+                            },800);
+                        }
+                        else if(result.status === 1){
+                            this.$message({message:"未登录",type:"warning",duration:duration_time});
+                            setTimeout(()=>{
+                                window.location.href="/Login";
+                                // this.$router.push("/Login");
+                            },800);
+                        }
+                        else{
+                            this.$message({message:"服务器未响应",type:"warning",duration:duration_time});
+                        }
+                    });
             },
             //隐藏个人资料
             closeSetting(){
@@ -420,13 +406,13 @@
                     nickname:nickname
                 })
                     .then(()=> {
-                    this.$store.commit('currentUser/setNickname', nickname);
-                    this.$message({message:'修改成功',type:'success',duration:duration_time});
-                })
+                        this.$store.commit('currentUser/setNickname', nickname);
+                        this.$message({message:'修改成功',type:'success',duration:duration_time});
+                    })
                     .catch((error)=> {
-                    console.log("修改昵称返回错误:",error);
-                    this.$message({message:'修改失败,服务器响应错误',type:'warning',duration:duration_time});
-                })
+                        console.log("修改昵称返回错误:",error);
+                        this.$message({message:'修改失败,服务器响应错误',type:'warning',duration:duration_time});
+                    })
             },
             //修改密码
             changePassword(newPassword){
@@ -441,11 +427,11 @@
                         window.localStorage.setItem('password',encode_password);
                         this.$message({message:'密码修改成功',type:'success',duration:duration_time});
 
-                })
+                    })
                     .catch((error)=>{
                         console.log("修改密码失败返回:",error);
                         this.$message({message:'密码修改失败',type:'error',duration:duration_time});
-                })
+                    })
 
             },
             //载入好友聊天对话框
@@ -489,13 +475,13 @@
                             this.$store.commit('chatInfo/addChatInfo',chatHistory);
                             this.loadingHistory = false;
                             this.$refs.chatArea.scrollBottom();
-                    })
+                        })
                         .catch((error)=>{
                             console.log("获取聊天历史失败",error);
                             this.$message({message:'获取聊天历史失败',type:'error',duration:duration_time});
                             this.loadingHistory = false;
                             this.$refs.chatArea.scrollBottom();
-                    })
+                        })
 
                 }
                 //载入时判断是否有新信息，有则去除新消息提醒，将对方发送的未读信息修改为已读，并向后台发送已读反馈
@@ -508,28 +494,28 @@
                     //向后台发送已读反馈
                     this.$socket.emit('messageReadSend',id,
                         (result)=> {
-                        if(result.status === 2){
-                            console.log("已读反馈发送成功");
-                        }
-                        else if(result.status === 1){
-                            if(result.reason === 0)
-                                console.log("已读反馈发送失败，用户未登录，后台拒绝服务");
-                            else if(result.reason === 1)
-                                console.log("已读反馈发送失败，接收者非好友，后台拒绝服务");
-                            else if(result.reason === 2)
-                                console.log("已读反馈已发送，无更新");
-                            else if(result.reason === 3)
-                                console.log("已读反馈发送失败，不可发送给自己，后台拒绝服务");
-                            else
-                                console.log("已读反馈发送失败，未知返回值:",result.reason);
-                        }
-                        else if(result.status === 0)
-                            console.log("已读反馈发送失败，参数错误");
-                        else{
-                            console.log("服务器响应错误");
-                            this.$message({message:'服务器响应错误',type:'error',duration:duration_time});
-                        }
-                    });
+                            if(result.status === 2){
+                                console.log("已读反馈发送成功");
+                            }
+                            else if(result.status === 1){
+                                if(result.reason === 0)
+                                    console.log("已读反馈发送失败，用户未登录，后台拒绝服务");
+                                else if(result.reason === 1)
+                                    console.log("已读反馈发送失败，接收者非好友，后台拒绝服务");
+                                else if(result.reason === 2)
+                                    console.log("已读反馈已发送，无更新");
+                                else if(result.reason === 3)
+                                    console.log("已读反馈发送失败，不可发送给自己，后台拒绝服务");
+                                else
+                                    console.log("已读反馈发送失败，未知返回值:",result.reason);
+                            }
+                            else if(result.status === 0)
+                                console.log("已读反馈发送失败，参数错误");
+                            else{
+                                console.log("服务器响应错误");
+                                this.$message({message:'服务器响应错误',type:'error',duration:duration_time});
+                            }
+                        });
                 }
             },
             //载入添加好友窗口
@@ -545,27 +531,27 @@
                 //此处需要调用接受好友请求接口（参数提供添加者ID，被添加者ID ）
                 this.$socket.emit('friendAccessSend',applyId,
                     (result)=>{
-                    console.log("接受好友申请返回",result);
-                    if(result.status === 2){
-                        this.$store.commit('applyList/accept',applyId); //更新申请列表
-                        let friendInfo = this.$store.getters['applyList/getApplyUser'](applyId);
-                        let friend = {};
-                        friend[applyId]={nickname:friendInfo.nickname,avatar:friendInfo.avatar,newInfo:false,unread_num:0,recentMessage:{}};
-                        this.$store.commit('friendInfo/addFriendInfo',friend);  //更新好友列表
-                    }
-                    else if(result.status === 1){
-                        if(result.reason === 0)
-                            this.$message({message:"服务器拒绝服务:未登录",type:"warning",duration:duration_time});
-                        else if(result.reason === 1)
-                            this.$message({message:"服务器拒绝服务:申请者为自身",type:"warning",duration:duration_time});
-                        else if(result.reason === 2)
-                            this.$message({message:"服务器拒绝服务:申请者不存在",type:"warning",duration:duration_time});
-                        else if(result.reason === 3)
-                            this.$message({message:"服务器拒绝服务:申请者已是您的好友",type:"warning",duration:duration_time});
-                    }
-                    else
-                        this.$message({message:"请求参数错误",type:"error",duration:duration_time});
-                });
+                        console.log("接受好友申请返回",result);
+                        if(result.status === 2){
+                            this.$store.commit('applyList/accept',applyId); //更新申请列表
+                            let friendInfo = this.$store.getters['applyList/getApplyUser'](applyId);
+                            let friend = {};
+                            friend[applyId]={nickname:friendInfo.nickname,avatar:friendInfo.avatar,newInfo:false,unread_num:0,recentMessage:{}};
+                            this.$store.commit('friendInfo/addFriendInfo',friend);  //更新好友列表
+                        }
+                        else if(result.status === 1){
+                            if(result.reason === 0)
+                                this.$message({message:"服务器拒绝服务:未登录",type:"warning",duration:duration_time});
+                            else if(result.reason === 1)
+                                this.$message({message:"服务器拒绝服务:申请者为自身",type:"warning",duration:duration_time});
+                            else if(result.reason === 2)
+                                this.$message({message:"服务器拒绝服务:申请者不存在",type:"warning",duration:duration_time});
+                            else if(result.reason === 3)
+                                this.$message({message:"服务器拒绝服务:申请者已是您的好友",type:"warning",duration:duration_time});
+                        }
+                        else
+                            this.$message({message:"请求参数错误",type:"error",duration:duration_time});
+                    });
             },
             //拒绝好友添加请求
             rejectApply(applyId){
@@ -628,41 +614,41 @@
                 else if(this.$store.getters['friendInfo/getFriend'](id) === undefined)
                     this.$socket.emit('friendApplySend',id,
                         (result)=>{
-                        console.log("发送好友请求返回",result);
-                        if (result.status === 2)
-                            this.$message({message:"已发送",type:"success",duration:duration_time});
-                        else if(result.status === 1 && result.reason===0)
-                            this.$message({message:"用户未登录,服务器拒绝服务",type:"error",duration:duration_time});
-                        else if(result.status === 1 && result.reason===1)
-                            this.$message({message:"不可添加自己为好友,服务器拒绝服务",type:"error",duration:duration_time});
-                        else if(result.status === 1 && result.reason===2)
-                            this.$message({message:"该用户已在您的好友列表中",type:"warning",duration:duration_time});
-                        else if(result.status === 1 && result.reason===3)
-                            this.$message({message:"存在重复好友申请，请待对方处理",type:"warning",duration:duration_time});
-                        else if(result.status === 1 && result.reason===4) {
-                            this.$message({message:id+"通过了你的好友请求",type:"success",duration:duration_time});
-                            this.$store.commit('applyList/accept', id);
-                            let avatar,nickname;
-                            this.$axios.get('v1/userinfo/'+id)
-                                .then((result)=>{
-                                    console.log("好友资料返回",result);
-                                    avatar = result.data.photo;
-                                    nickname = result.data.nickname;
-                                    if (avatar === "")  //用户未设置过头像，采用默认头像
-                                        avatar = default_avatar;
-                                    // console.log(this.$store.state.currentUser.id);
-                                    let friend = {};
-                                    friend[id]={nickname:nickname,avatar:avatar,newInfo:false,unread_num:0,recentMessage:{}};
-                                    this.$store.commit('friendInfo/addFriendInfo',friend);  //更新好友列表
-                                })
-                                .catch((error)=>{
-                                    this.$message({message:'服务器响应错误',type:"warning",duration:duration_time});
-                                    console.log('处理申请反馈时，服务器响应错误:',error.response);
-                                });
-                        }
-                        else
-                            this.$message({message:"服务器响应错误",type:"error",duration:duration_time});
-                    });
+                            console.log("发送好友请求返回",result);
+                            if (result.status === 2)
+                                this.$message({message:"已发送",type:"success",duration:duration_time});
+                            else if(result.status === 1 && result.reason===0)
+                                this.$message({message:"用户未登录,服务器拒绝服务",type:"error",duration:duration_time});
+                            else if(result.status === 1 && result.reason===1)
+                                this.$message({message:"不可添加自己为好友,服务器拒绝服务",type:"error",duration:duration_time});
+                            else if(result.status === 1 && result.reason===2)
+                                this.$message({message:"该用户已在您的好友列表中",type:"warning",duration:duration_time});
+                            else if(result.status === 1 && result.reason===3)
+                                this.$message({message:"存在重复好友申请，请待对方处理",type:"warning",duration:duration_time});
+                            else if(result.status === 1 && result.reason===4) {
+                                this.$message({message:id+"通过了你的好友请求",type:"success",duration:duration_time});
+                                this.$store.commit('applyList/accept', id);
+                                let avatar,nickname;
+                                this.$axios.get('v1/userinfo/'+id)
+                                    .then((result)=>{
+                                        console.log("好友资料返回",result);
+                                        avatar = result.data.photo;
+                                        nickname = result.data.nickname;
+                                        if (avatar === "")  //用户未设置过头像，采用默认头像
+                                            avatar = default_avatar;
+                                        // console.log(this.$store.state.currentUser.id);
+                                        let friend = {};
+                                        friend[id]={nickname:nickname,avatar:avatar,newInfo:false,unread_num:0,recentMessage:{}};
+                                        this.$store.commit('friendInfo/addFriendInfo',friend);  //更新好友列表
+                                    })
+                                    .catch((error)=>{
+                                        this.$message({message:'服务器响应错误',type:"warning",duration:duration_time});
+                                        console.log('处理申请反馈时，服务器响应错误:',error.response);
+                                    });
+                            }
+                            else
+                                this.$message({message:"服务器响应错误",type:"error",duration:duration_time});
+                        });
                 else
                     this.$message({message:'该用户已在您的好友列表中',type:'warning',duration:duration_time});
             },
@@ -681,19 +667,19 @@
                 let receiver = this.chattingFriendID;
                 this.$socket.emit('messageSend',{receiver:receiver,text:message,time:time},
                     (result)=>{
-                    console.log("发送聊天信息回执",result);
-                    console.log("发送聊天信息回执status",result.status);
-                    console.log("发送聊天信息回执reason",result.reason);
-                    if(result.status == 2){
-                        this.$message({message:"发送成功",type:"success",duration:800});
-                        let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show,utcTime:time}};
-                        this.$store.commit('chatInfo/sendUpdate',UpdateInfo);
-                        this.$refs.chatArea.scrollBottom();
-                    }
-                    else{
-                        this.$message({message:"发送失败,服务器响应错误",type:"error",duration:800});
-                    }
-                });
+                        console.log("发送聊天信息回执",result);
+                        console.log("发送聊天信息回执status",result.status);
+                        console.log("发送聊天信息回执reason",result.reason);
+                        if(result.status == 2){
+                            this.$message({message:"发送成功",type:"success",duration:800});
+                            let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show,utcTime:time}};
+                            this.$store.commit('chatInfo/sendUpdate',UpdateInfo);
+                            this.$refs.chatArea.scrollBottom();
+                        }
+                        else{
+                            this.$message({message:"发送失败,服务器响应错误",type:"error",duration:800});
+                        }
+                    });
             },
             //将utc时间转化为年月日字符串
             utcTimeToString(utc){
@@ -703,6 +689,26 @@
                     timeString = time.getFullYear().toString()+"年 "+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日 "+time.getHours().toString()+":"+time.getMinutes().toString();
                 else
                     timeString = time.getFullYear().toString()+"年 "+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日 "+time.getHours().toString()+":0"+time.getMinutes().toString();
+                return timeString;
+            },
+            //将utc时间转化为聊天栏显示时间字符串
+            getChatBarTime(utc){
+                let timeString = ""
+                let time = new Date(utc);
+                let now = new Date();
+                let yesterday = new Date(now.getTime()-24*60*60*1000);
+                if(time.getFullYear() !== now.getFullYear())
+                    timeString = time.getFullYear().toString()+"年"+(time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日";
+                else if(time.getMonth() === now.getMonth() && time.getDate() === now.getDate()){
+                    if(time.getMinutes()>9)
+                        timeString = time.getHours().toString()+":"+time.getMinutes().toString();
+                    else
+                        timeString = time.getHours().toString()+":0"+time.getMinutes().toString();
+                }
+                else if(time.getMonth() === yesterday.getMonth() && time.getDate() === yesterday.getDate())
+                    timeString = "昨天";
+                else
+                    timeString = (time.getMonth()+1).toString()+"月"+time.getDate().toString()+"日";
                 return timeString;
             },
             //显示词云
@@ -758,7 +764,7 @@
                             avatar = default_avatar;
                         let newApply ={id:id,nickname:nickname,avatar:avatar,dispose:0};
                         this.$store.commit('applyList/add',newApply);
-                }).catch((error)=>{
+                    }).catch((error)=>{
                     console.log("获取申请者资料更新申请表时出错,",error);
                 })
             },
@@ -793,54 +799,61 @@
             //接收消息反馈事件
             messageRece(response){
                 //----------------response:sender,text,time,sentiment---------------
-                console.log("接收体",response);
-                console.log("接收好友",response.sender);
-                console.log("消息",response.text);
-
+                // console.log("接收体",response);
+                // console.log("接收好友",response.sender);
+                // console.log("消息",response.text);
                 //*************
                 //实时渲染
                 //**************
                 let Sender = response.sender;
                 let Text = response.text;
                 let time_show="";
-                let Time = new Date(response.time);
                 time_show = this.utcTimeToString(response.time);
-                console.log("收到新的信息Time:",Time)
-                console.log("收到新的信息time_show:",time_show)
+                // console.log("收到新的信息Time:",Time)
+                // console.log("收到新的信息time_show:",time_show)
                 let ActiveRate = response.sentiment;
                 let Is_read = true;
                 let Is_friend = true;
                 //***************
                 //处理未读消息
                 //****************
-                if(Sender!=this.chattingFriendID)
+                //用户未处于发送者聊天对话框
+                if(Sender!==this.chattingFriendID || this.showChatArea=== false)
                 {
-                    this.chatList[Sender].unread_num=this.chatList[Sender].unread_num+1;
+                    //this.chatList[Sender].unread_num=this.chatList[Sender].unread_num+1;
+                    //修改新消息相关数据
+                    let info = [];
+                    let chatBarTime = this.getChatBarTime(response.time);
+                    info.push({id:Sender,newInfo:true,unread_num:this.chatList[Sender].unread_num+1,message:Text,time:chatBarTime})
+                    this.$store.commit('friendInfo/addRecent',info);
                     Is_read = false;
                 }
+                //用户处于发送者聊天对话框
                 else{
                     //this.$store.commit('chatInfo/removeNew',id);
                     //this.toChat(Sender,this.$store.state.friendInfoDic[Sender].nickname,this.$store.state.friendInfoDic[Sender].avatar);
+                    //发送消息已读
                     this.$socket.emit('messageReadSend',Sender);
-                    this.$refs.chatArea.scrollBottom();
+                    //滚动到底部
+
                 }
-                let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,utcTime:Time.getTime() ,activeRate:ActiveRate}};
+                //更新聊天历史
+                let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,utcTime:response.time ,activeRate:ActiveRate}};
 
                 //*****************
                 //********查看chatInfo有没有sender,没有则增加
                 //************
-                if(this.chatInfo[Sender]===undefined)
-                    {
-                    console.log("新增sender的info",info);
-                    this.$store.commit('friendInfo/addRecent',info);
-                    }
-
+                // if(this.chatInfo[Sender]===undefined)
+                // {
+                //     console.log("新增sender的info",info);
+                //     this.$store.commit('friendInfo/addRecent',info);
+                // }
                 //console.log("收到新的信息is_Friend:",Is_friend);
                 //console.log("收到新的信息Sender:",Sender);
-                else
-                {
+                //else
+                //{
                 this.$store.commit('chatInfo/sendUpdate',info);
-                }
+                //}
                 //修改最近聊天信息info:[{id:~,newInfo:~,unread_num:~,message:~,time:~},...]
                 /*
                 let recentChat = {
@@ -856,6 +869,7 @@
                 this.$store.commit('friendInfo/addRecent',arrrayRecent);
                 //console.log("获取最近好友信息：",this.$store.state.friendInfoDic[Sender]);
                 */
+                this.$refs.chatArea.scrollBottom();
             },
             disconnect(){
                 this.$message({message:"服务器已断开连接",type:"error",duration:duration_time});
