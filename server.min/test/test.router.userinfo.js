@@ -131,7 +131,7 @@ describe('UserInfo', function() {
 		it('should response 200', async function() {
 			this.timeout(50000);
 			// case: perform well when new user
-			await userinfo_requester.setNickname('test_user', 'new nickname')
+			await userinfo_requester.setNickname('test_user', 'nickname')
 			.then(response => {
 				expect(response.status).to.eql(200);
 			});
@@ -139,14 +139,14 @@ describe('UserInfo', function() {
 			await userinfo_requester.getInfo('test_user')
 			.then(response => {
 				expect(response.status).to.eql(200);
-				expect(response.data).to.eql({ username: 'test_user', nickname: 'new nickname', photo: '' });
+				expect(response.data).to.eql({ username: 'test_user', nickname: 'nickname', photo: '' });
 			});
 		});
 
 		it('should response 404', async function() {
 			this.timeout(50000);
 			// case: user duplicate
-			await userinfo_requester.setNickname('no_such_user', 'new nickname')
+			await userinfo_requester.setNickname('no_such_user', 'nickname')
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(404);
@@ -190,7 +190,7 @@ describe('UserInfo', function() {
 			await userinfo_requester.getInfo('test_user')
 			.then(response => {
 				expect(response.status).to.eql(200);
-				expect(response.data).to.eql({ username: 'test_user', nickname: 'new nickname', photo: 'default photo' });
+				expect(response.data).to.eql({ username: 'test_user', nickname: 'nickname', photo: 'default photo' });
 			});
 		});
 
