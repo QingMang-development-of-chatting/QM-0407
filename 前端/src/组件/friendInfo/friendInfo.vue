@@ -11,7 +11,7 @@
             <div id="friendId">
                 账号：{{friendId}}
             </div>
-            <el-button id="sendmessage" @click="toChat()">发送消息</el-button>
+            <el-button id="send" @click="toChat()">发送消息</el-button>
             <el-button id="delete" @click="deleteFriend()">删除好友</el-button>
         </div>
     </div>
@@ -76,15 +76,28 @@
         top:60px;
         left:140px;
     }
-    #sendmessage{
+    #send{
         position:relative;
         top:80px;
         left:120px;
+        background-color: rgb(62, 204, 58);
+        color:white;
+    }
+    #send:hover{
+        background-color:  rgb(30, 122, 30);
+        color:white;
     }
     #delete{
         position:relative;
         top:80px;
-        left:160px;
+        left:170px;
+        background-color: rgb(241, 48, 48);
+        color:white;
     }
+    #delete:hover{
+        background-color:  rgb(189, 19, 19);
+        color:white;
+    }
+    
     
 </style>
