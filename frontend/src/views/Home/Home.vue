@@ -279,7 +279,7 @@
                                 //recentChat.push(test0);
                                 //recentChat.push(test1);
                                 // recentChat.push(test2);
-                                
+
                                 this.$store.commit('friendInfo/addRecent',recentChat);  //更新好友信息
                                 this.loadingChatBar = false;
                             })
@@ -677,6 +677,11 @@
                             let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show,utcTime:time,activeRate:result.data.sentiment}};
                             this.$store.commit('chatInfo/sendUpdate',UpdateInfo);
                             this.$refs.chatArea.scrollBottom();
+                            //更新侧边栏
+                            let info = [];
+                            let chatBarTime = this.getChatBarTime(time);
+                            info.push({id:receiver,newInfo:true,unread_num:0,message:message,time:chatBarTime})
+                            this.$store.commit('friendInfo/addRecent',info);
                         }
                         else{
                             this.$message({message:"发送失败,服务器响应错误",type:"error",duration:800});
@@ -834,6 +839,11 @@
                 else{
                     //this.$store.commit('chatInfo/removeNew',id);
                     //this.toChat(Sender,this.$store.state.friendInfoDic[Sender].nickname,this.$store.state.friendInfoDic[Sender].avatar);
+                    //更新侧边栏
+                    let info = [];
+                    let chatBarTime = this.getChatBarTime(response.time);
+                    info.push({id:Sender,newInfo:true,unread_num:this.chatList[Sender].unread_num,message:Text,time:chatBarTime})
+                    this.$store.commit('friendInfo/addRecent',info);
                     //发送消息已读
                     this.$socket.emit('messageReadSend',Sender);
                     //滚动到底部
