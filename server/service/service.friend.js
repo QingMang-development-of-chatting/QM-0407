@@ -58,7 +58,7 @@ Service.prototype.getNotification = async function(username) {
         console.log("无申请者");
         return { status: STATUS.OK,data:[] };
 	}
-	//格式[{sender(String), type(see below)}](Array)
+	//格式[{sender(String), type(Number)}](Array)
     var friend_request_array = [];
     for(i = 0;i<result.length;i++){ //调整格式
 		var rqs = {};
