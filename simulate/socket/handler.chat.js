@@ -93,7 +93,7 @@ EventHandler.prototype.onSendMessage = function() {
 		if (result.status === SERVICE.STATUS.OK) {
 			modify_message = { text: result.data.text, time, sentiment: result.data.sentiment };
 			this._transmitPrivateMessage(sender, receiver, modify_message);
-			callback({status: SOCKET.STATUS.OK});
+			callback({status: SOCKET.STATUS.OK, data: {text: result.data.text, sentiment: result.data.sentiment}});
 		}
 		else if (result.status === SERVICE.STATUS.REJECT) {
 			callback({status: SOCKET.STATUS.REJECT, reason: result.reason});
