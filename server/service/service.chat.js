@@ -27,52 +27,23 @@ function Service() {}
  * @api public
  */
 Service.prototype.getRecentChatList = async function(username) {
+	//直接query
 	var res = await chatFunc.unreadRoom({"user_id":username})
-	//获取user的所有好友	
-	var friends = await friendService.prototype.getFriends(username);
-	friends = friends.data;
-	//对每个获取room
-	var rooms = [];
-    for(i = 0;i<friends.length;i++){
-        var res = await chatFunc.searchRoom({"user_id":[username,friends[i]]});
-		if(res==401||res==310){  //一般是不会出现这个情况的
-			rooms.push(null);
-            continue;
-        }
-        var room_id = res[0].room_id;
-        rooms.push(room_id);
-	}
 	//获取每个room的最新一条chat，格式：[{ friend(String), last_text(String), last_time(Number), unread_cnt(Number), sender(String) }](Array)
     var data = [];
-    for(i = 0;i<rooms.length;i++){
-		if(rooms[i]==null){	//room不存在的情况。一般不会出现。
+    for(i = 0;i<res.length;i++){
+		var lastmsg = res[i];
+		if(lastmsg.chat==0){	//这个房间没有消息
 			continue;
 		}
-		// 获取房间的所有消息 TODO 提升效率
-		var result = await chatFunc.searchChat({"room":rooms[i],"param":"room"});
-		if(result==401){	//没聊过天
-			continue;
-		}
-		if(result==400){
-			console.log("query调用错误");
-		}
-		var lastmsg = result[result.length-1];
 		var temp = {};
 		//最后一条信息相关
-		temp.friend = friends[i];
+		temp.friend = lastmsg.friend;
         temp.last_text = lastmsg.chat;
 		temp.last_time = lastmsg.date;
 		temp.sender = lastmsg.host_id;
 		//这个房间，未读信息的数量
-		temp.unread_cnt = 0;	
-		for(ri=result.length-1;ri>=0;ri--){
-			var readlist = result[ri].user_read;
-			if(readlist.length==2){	//找到读了，表示更早的也都读了。所以直接break
-				break;
-			}else{
-				temp.unread_cnt+=1;
-			}
-		}
+		temp.unread_cnt = lastmsg.f_num+lastmsg.num;		//自己的未读+对方的未读
         data.push(temp);
 	}
 	//返回结果
@@ -249,4 +220,4 @@ module.exports = Service;
 //Service.prototype.getRecentChatList('test_user1');
 //Service.prototype.getMessages('test_user1', 'test_user2', new Date().getTime());
 //Service.prototype.readMessage('test_user2', 'test_user1');
-//Service.prototype.addMessage({sender:"1234",receiver:"0001",text:"69",time:new Date().getTime()});
+//Service.prototype.addMessage({sender:"test_user1",receiver:"test_user3",text:"114",time:new Date().getTime()});
