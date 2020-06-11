@@ -4,6 +4,7 @@
 //query
 const chatFunc = require('../query3.0/chatFunc.js');
 const friendService = require('../service/service.friend.js');	
+const nlp = require('../nlp/nlp.singleton.js');	
 //constant
 const { SERVICE: { STATUS: STATUS }, REASON } = require('../constant');
 
@@ -17,7 +18,6 @@ function Service() {}
 
 /**
  * 获取聊天的列表。
- *TOTEST
  * Examples:
  *
  *   service.getRecentChatList('...');
@@ -47,6 +47,7 @@ Service.prototype.getRecentChatList = async function(username) {
 		if(rooms[i]==null){	//room不存在的情况。一般不会出现。
 			continue;
 		}
+		// 获取房间的所有消息 TODO 提升效率
 		var result = await chatFunc.searchChat({"room":rooms[i],"param":"room"});
 		if(result==401){	//没聊过天
 			continue;
@@ -61,7 +62,7 @@ Service.prototype.getRecentChatList = async function(username) {
         temp.last_text = lastmsg.chat;
 		temp.last_time = lastmsg.date;
 		temp.sender = lastmsg.host_id;
-		//这个房间，username用户未读信息的数量
+		//这个房间，未读信息的数量
 		temp.unread_cnt = 0;	
 		for(ri=result.length-1;ri>=0;ri--){
 			var readlist = result[ri].user_read;
@@ -85,8 +86,8 @@ Service.prototype.getRecentChatList = async function(username) {
 
 
 /**
- * TODO 根据u1、u2，获取指定时间之前的msgs
- * msgs的数量不超过20, is_read判断的是u1是否已读
+ * 根据u1、u2，获取指定时间之前的20条msgs
+ * is_read判断消息的receiver是否已读
  *
  * Examples:
  *
@@ -126,7 +127,7 @@ Service.prototype.getMessages = async function(username1, username2, time) {
     var room_id = res[0].room_id;
 
     //尝试获取消息记录
-    var result = await chatFunc.searchChat({"room":room_id,"param":"room","param2":"date"});
+    var result = await chatFunc.searchChat({"room":room_id,"param":"room","param2":time,"n":20});
     var msgs = [];	//格式适配：[{sender(String), text(String), time(Number), is_read(Boolean)}](Array)
 	for(i=0;i<result.length;i++){	//time递增
 		if(msgs.length>=20){
@@ -160,17 +161,14 @@ Service.prototype.getMessages = async function(username1, username2, time) {
 };
 
 /**
- * 插入msg，一条
+ * 
+ * 插入一条msg
  *
  * Examples:
  *
  *   service.addMessage('...');
  *
- * @param {Object} message
- * @param {String} message.sender
- * @param {String} message.receiver
- * @param {String} message.text
- * @param {Number} message.time
+ * @param {Object} message{sender(String)、receiver(String)、text(String)、time(Number)}
  * @return {Object{status, reason}} for result
  * @api public
  */
@@ -187,9 +185,13 @@ Service.prototype.addMessage = async function(message) {
         return { status: STATUS.REJECT, reason: REASON.SEND_MESSAGE.NOT_FRIENDS };
 	}
 	var room_id = res[0].room_id;
-	var status = await chatFunc.insertChat({"host_id":sender,"room":room_id,"chat":[text],"date":[time]});
-	if(status==200){		// case：OK
-		return { status: STATUS.OK };
+	//感情分析、文本敏感词过滤
+	var senti = await nlp.sentiment(text);
+	var ftext = await nlp.textfilter(text);
+	//插入chat
+	var status = await chatFunc.insertChat({"host_id":sender,"room":room_id,"chat":[ftext],"date":[time],"sentiment":[senti]});
+	if(status==200){		// case：OK 携带一个data为{过滤后的text（string）和sentiment（Number）}
+		return { status: STATUS.OK,data:{text:ftext,sentiment:senti} };
 	}else{
 		return { status: STATUS.REJECT, reason: REASON.SEND_MESSAGE.NOT_FRIENDS };
 	}
@@ -242,7 +244,7 @@ function sortbytime(msg1,msg2){
  */
 module.exports = Service;
 
-//Service.prototype.getRecentChatList('test_user1');
+//Service.prototype.getRecentChatList('1234');
 //Service.prototype.getMessages('test_user1', 'test_user2', new Date().getTime());
 //Service.prototype.readMessage('test_user2', 'test_user1');
-//Service.prototype.addMessage({sender:"1234",receiver:"0001",text:"666",time:114514});
+//Service.prototype.addMessage({sender:"1234",receiver:"0001",text:"69",time:new Date().getTime()});
