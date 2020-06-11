@@ -9,7 +9,7 @@
             <span class="addText">新的朋友</span>
         </div>
         <el-menu class="friendbar-main">
-            <el-menu-item class="friendList" v-for="(friend,key) in friendList" v-show="search(friend.nickname)" :key="key" @click="showFriend()">
+            <el-menu-item class="friendList" v-for="(friend,key) in friendList" v-show="search(friend.nickname)" :key="key" @click="showFriend(key,friend.nickname,friend.avatar)">
                 <el-avatar class="avatar" shape="square" :size="58" fit="cover" :src="friend.avatar"></el-avatar>
                 <span class="nickname">{{friend.nickname}}</span>
             </el-menu-item>
@@ -34,8 +34,9 @@
             showAdd(){
                 this.$emit('showAdd');
             },
-            showFriend(){
-                this.$emit('showFriend');
+            showFriend(id,nickname,avatar){
+                this.$emit('showFriend',id,nickname,avatar);
+                console.log("好友：",id,nickname,avatar);
             },
             //搜索框筛选匹配
             search(nickname){
