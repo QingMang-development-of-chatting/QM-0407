@@ -8,7 +8,7 @@ export default {
     // setChatInfo(state, info) {
     //     state.chatMessages = info;
     // },
-    //增加聊天信息
+    //增加多个用户聊天信息
     addChatInfo(state,info){
         for (let key in info){
             // state.chatMessages[key] = info[key];
@@ -33,4 +33,12 @@ export default {
                 Vue.set(state.chatMessages[id][i],"isRead",true);
         }
     },
+    //获取单个用户更多聊天历史 info{id:~,history:[]}
+    getMoreChatInfo(state,info){
+        let a = info.history;
+        let b = a.concat(state.chatMessages[info.id]);
+        Vue.set(state.chatMessages,info.id,b);
+        //state.chatMessages[info.id].unshift(info.history);
+    }
+
 };

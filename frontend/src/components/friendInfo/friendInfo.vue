@@ -22,7 +22,7 @@
         props: {
             friendId:String,    //好友ID
             friendNickname:String,  //好友昵称
-            friendAvatar:String,    //好友头像   
+            friendAvatar:String,    //好友头像
         },
         data(){
             return{
@@ -35,7 +35,7 @@
             deletefriend(){
                 this.$emit('deleteFriend',this.friendId);
             }
-            
+
         }
     };
 </script>
@@ -86,5 +86,5 @@
         top:80px;
         left:160px;
     }
-    
+
 </style>
