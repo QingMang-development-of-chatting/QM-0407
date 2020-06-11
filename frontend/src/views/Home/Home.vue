@@ -254,20 +254,20 @@
                                     };
                                     recentChat.push(t);
                                 }
-                                let test0 = {
-                                    id:"test0",
-                                    newInfo:true,
-                                    unread_num:1,
-                                    message:"哈哈哈哈哈哈",
-                                    time:"昨天",
-                                };
-                                let test1 = {
-                                    id:"test2",
-                                    newInfo:true,
-                                    unread_num:1,
-                                    message:"哈哈哈哈哈哈",
-                                    time:"昨天",
-                                };
+                                //let test0 = {
+                                //    id:"test0",
+                                //    newInfo:true,
+                                //    unread_num:1,
+                                //    message:"哈哈哈哈哈哈",
+                                //    time:"昨天",
+                                //};
+                                //let test1 = {
+                                //    id:"test1",
+                                //    newInfo:true,
+                                //    unread_num:1,
+                                //    message:"哈哈哈哈哈哈",
+                                //    time:"昨天",
+                                //};
                                 // let test2 = {
                                 //     id:"test3",
                                 //     newInfo:true,
@@ -275,9 +275,11 @@
                                 //     message:"哈哈哈哈哈哈",
                                 //     time:"昨天",
                                 // };
-                                recentChat.push(test0);
-                                recentChat.push(test1);
+
+                                //recentChat.push(test0);
+                                //recentChat.push(test1);
                                 // recentChat.push(test2);
+                                
                                 this.$store.commit('friendInfo/addRecent',recentChat);  //更新好友信息
                                 this.loadingChatBar = false;
                             })
@@ -466,7 +468,7 @@
                                     isRead:result.data[i].is_read,
                                     time:time,
                                     utcTime:result.data[i].time,
-                                    activeRate:result.data[i].Sentiment
+                                    activeRate:result.data[i].sentiment
                                 }
                                 temp.push(t);
                             }
@@ -672,7 +674,7 @@
                         console.log("发送聊天信息回执reason",result.reason);
                         if(result.status == 2){
                             this.$message({message:"发送成功",type:"success",duration:800});
-                            let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show,utcTime:time}};
+                            let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show,utcTime:time,activeRate:result.data.sentiment}};
                             this.$store.commit('chatInfo/sendUpdate',UpdateInfo);
                             this.$refs.chatArea.scrollBottom();
                         }
@@ -799,7 +801,7 @@
             //接收消息反馈事件
             messageRece(response){
                 //----------------response:sender,text,time,sentiment---------------
-                // console.log("接收体",response);
+                console.log("接收体",response);
                 // console.log("接收好友",response.sender);
                 // console.log("消息",response.text);
                 //*************
@@ -839,6 +841,7 @@
                 }
                 //更新聊天历史
                 let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,utcTime:response.time ,activeRate:ActiveRate}};
+                //console.log("要插进去信息记录的info",info);
 
                 //*****************
                 //********查看chatInfo有没有sender,没有则增加
@@ -861,13 +864,14 @@
                     newInfo:Is_read,
                     unread_num:this.chatList[Sender].unread_num,
                     time:time_show,
-                    recentMessage:{message:Text,time:time_show}
+                    //recentMessage:{message:Text,time:time_show}
+                    message:Text
                 }
                 let arrrayRecent = [];
                 arrrayRecent.push(recentChat);
                 console.log("待存储info：",arrrayRecent);
                 this.$store.commit('friendInfo/addRecent',arrrayRecent);
-                //console.log("获取最近好友信息：",this.$store.state.friendInfoDic[Sender]);
+                console.log("获取最近好友信息：",this.$store.state.friendInfoDic[Sender]);
                 */
                 this.$refs.chatArea.scrollBottom();
             },
