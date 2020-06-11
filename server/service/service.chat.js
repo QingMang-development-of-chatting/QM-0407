@@ -17,6 +17,7 @@ const { SERVICE: { STATUS: STATUS }, REASON } = require('../constant');
 function Service() {}
 
 /**
+ * TODO 可能要改
  * 获取聊天的列表。
  * Examples:
  *
@@ -169,7 +170,7 @@ Service.prototype.getMessages = async function(username1, username2, time) {
  *   service.addMessage('...');
  *
  * @param {Object} message{sender(String)、receiver(String)、text(String)、time(Number)}
- * @return {Object{status, reason}} for result
+ * @return {Object{status, reason|data}} for result
  * @api public
  */
 Service.prototype.addMessage = async function(message) {
@@ -185,7 +186,7 @@ Service.prototype.addMessage = async function(message) {
         return { status: STATUS.REJECT, reason: REASON.SEND_MESSAGE.NOT_FRIENDS };
 	}
 	var room_id = res[0].room_id;
-	//感情分析、文本敏感词过滤
+	//情感分析、文本敏感词过滤
 	var senti = await nlp.sentiment(text);
 	var ftext = await nlp.textfilter(text);
 	//插入chat
@@ -222,7 +223,7 @@ Service.prototype.readMessage = async function(sender, receiver) {
         return { status: STATUS.REJECT, reason: REASON.SEND_READ_MESSAGE.NOT_FRIENDS};
     }
     var room_id = res1[0].room_id;
-	var res2 = await chatFunc.readChat({user_id:sender,room_id:room_id});
+	var res2 = await chatFunc.readChat({user_id:receiver,room_id:room_id});
 	if(res2==401){	//case: 过去已经都已读了
 		console.log("no msgs upd");
 		return { status: STATUS.REJECT, reason: REASON.SEND_READ_MESSAGE.NO_UPDATE};
