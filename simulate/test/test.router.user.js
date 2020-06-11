@@ -31,14 +31,14 @@ describe('User', function() {
 			});
 
 			// case: type error
-			await user_requester.register(1, 'default password', 'default nickname')
+			await user_requester.register(1, 'default password', 'nickname')
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(400);
 			});
 
 			// case: type error
-			await user_requester.register('test_user', 1, 'default nickname')
+			await user_requester.register('test_user', 1, 'nickname')
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(400);
@@ -55,7 +55,7 @@ describe('User', function() {
 		it('should response 201', async function() {
 			this.timeout(50000);
 			// case: perform well when new user
-			await user_requester.register('test_user', 'default password', 'default nickname')
+			await user_requester.register('test_user', 'default password', 'nickname')
 			.then(response => {
 				expect(response.status).to.eql(201);
 			});
@@ -64,7 +64,7 @@ describe('User', function() {
 		it('should response 409', async function() {
 			this.timeout(50000);
 			// case: user duplicate
-			await user_requester.register('test_user', 'default password', 'default nickname')
+			await user_requester.register('test_user', 'default password', 'nickname')
 			.then(response => { throw new Error('should not succeed'); })
 			.catch(error => {
 				expect(error.response.status).to.eql(409);

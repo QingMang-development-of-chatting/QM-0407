@@ -58,12 +58,12 @@ describe('NLP', function() {
 		it('should response 201', async function() {
 			this.timeout(50000);
 			// case: perform well when new user
-			await user_requester.register('test_user1', 'default password', 'default nickname')
+			await user_requester.register('test_user1', 'default password', 'nickname')
 			.then(response => {
 				expect(response.status).to.eql(201);
 			});
 			// case: perform well when new user
-			await user_requester.register('test_user2', 'default password', 'default nickname')
+			await user_requester.register('test_user2', 'default password', 'nickname')
 			.then(response => {
 				expect(response.status).to.eql(201);
 			});
@@ -167,6 +167,7 @@ describe('NLP', function() {
 			this.timeout(50000);
 			await nlp_requester.cloud('test_user1')
 			.then(response => {
+				expect(response.headers['content-type']).to.eql('image/png');
 				expect(response.data).to.be.a('string');
 			});
 		});

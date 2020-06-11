@@ -60,12 +60,12 @@ describe('Friend', function() {
 		it('should response 201', async function() {
 			this.timeout(50000);
 			// case: perform well when new user
-			await user_requester.register('test_user1', 'default password', 'default nickname')
+			await user_requester.register('test_user1', 'default password', 'nickname')
 			.then(response => {
 				expect(response.status).to.eql(201);
 			});
 			// case: perform well when new user
-			await user_requester.register('test_user2', 'default password', 'default nickname')
+			await user_requester.register('test_user2', 'default password', 'nickname')
 			.then(response => {
 				expect(response.status).to.eql(201);
 			});

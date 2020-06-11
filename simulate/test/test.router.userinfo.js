@@ -23,7 +23,7 @@ user_requester.bindAxios(axios);
 userinfo_requester.bindAxios(axios);
 
 // registers a test_user before tests
-user_requester.register('test_user', 'default password', 'default nickname');
+user_requester.register('test_user', 'default password', 'nickname');
 
 describe('UserInfo', function() {
 	describe('#getInfo()', function() {
@@ -43,7 +43,7 @@ describe('UserInfo', function() {
 			await userinfo_requester.getInfo('test_user')
 			.then(response => {
 				expect(response.status).to.eql(200);
-				expect(response.data).to.eql({ username: 'test_user', nickname: 'default nickname', photo: '' });
+				expect(response.data).to.eql({ username: 'test_user', nickname: 'nickname', photo: '' });
 			});
 		});
 

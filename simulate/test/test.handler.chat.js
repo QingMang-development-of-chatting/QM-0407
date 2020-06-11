@@ -65,12 +65,12 @@ describe('Friend', function() {
 		it('should response 201', async function() {
 			this.timeout(50000);
 			// case: perform well when new user
-			await user_requester.register('test_user1', 'default password', 'default nickname')
+			await user_requester.register('test_user1', 'default password', 'nickname')
 			.then(response => {
 				expect(response.status).to.eql(201);
 			});
 			// case: perform well when new user
-			await user_requester.register('test_user2', 'default password', 'default nickname')
+			await user_requester.register('test_user2', 'default password', 'nickname')
 			.then(response => {
 				expect(response.status).to.eql(201);
 			});
@@ -177,8 +177,10 @@ describe('Friend', function() {
 				time: new Date().getTime()
 			};
 			g_send_message = message;
-			await chat_emitter1.sendMessage(message, function({status}, resolve) {
+			await chat_emitter1.sendMessage(message, function({status, data}, resolve) {
 				expect(status).to.eql(SOCKET.STATUS.OK);
+				expect(data.text).to.eql('尼玛， **');
+				expect(data.sentiment).to.be.a('number');
 				resolve();
 			});
 		});
