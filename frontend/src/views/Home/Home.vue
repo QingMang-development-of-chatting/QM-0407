@@ -883,7 +883,7 @@
                 this.$store.commit('friendInfo/addRecent',arrrayRecent);
                 console.log("获取最近好友信息：",this.$store.state.friendInfoDic[Sender]);
                 */
-                this.$refs.chatArea.scrollBottom();
+                //this.$refs.chatArea.scrollBottom();
             },
             disconnect(){
                 this.$message({message:"服务器已断开连接",type:"error",duration:duration_time});
