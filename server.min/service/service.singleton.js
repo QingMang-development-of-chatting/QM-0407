@@ -1,10 +1,10 @@
 /**
  * Module dependencies
  */
-const UserService = require('./service/service.user');
-const FriendService = require('./service/service.friend');
-const ChatService = require('./service/service.chat');
-const NLPService = require('./service/service.nlp');
+const UserService = require('./service.user');
+const FriendService = require('./service.friend');
+const ChatService = require('./service.chat');
+const NLPService = require('./service.nlp');
 
 // builds a user service
 const user_service = new UserService();
