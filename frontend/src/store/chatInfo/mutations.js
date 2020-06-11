@@ -15,7 +15,7 @@ export default {
             Vue.set(state.chatMessages,key,info[key]);
         }
     },
-    //发送消息后更新
+    //发送消息后更新info{id:~,message:{{message:~, isFriend:~, isRead:~, time:~,utcTime:~,activeRate:~}}}
     sendUpdate(state,info){
         state.chatMessages[info.id].push(info.message);
     },
@@ -32,5 +32,5 @@ export default {
             if(state.chatMessages[id][i].isFriend === false)
                 Vue.set(state.chatMessages[id][i],"isRead",true);
         }
-    }
+    },
 };

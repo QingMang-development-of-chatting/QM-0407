@@ -25,6 +25,5 @@ export default {
     removeNew(state,id){
         Vue.set(state.friendInfoDic[id],'newInfo',false);
         Vue.set(state.friendInfoDic[id],'unread_num',0);
-    }
-
+    },
 };
