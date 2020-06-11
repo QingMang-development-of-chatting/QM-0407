@@ -19,7 +19,7 @@
                     <img id="wordCloudImg" :src="wordCloudSrc"  alt="wordCloud">
                 </div>
                 <chat-area ref="chatArea" v-if="showChatArea" :friend-nickname="chattingFriendNickname" :friend-avatar="chattingFriendAvatar" :my-avatar="currentUser.avatar" :chatting-info="chatInfo[chattingFriendID]" :friendID="chattingFriendID" :is-loading-history="loadingHistory" @sendMessage="sendMessage"></chat-area>
-                <friend-info v-if="showFriendInfo"></friend-info>
+                <friend-info v-if="showFriendInfo" :friendId="selectFriendId" :friendNickname="selectFriendNickname" :friendAvatar="selectFriendAvatar" @toChat="toChat" @deleteFriend="deleteFriend"></friend-info>
                 <add-friend v-if="showAddFriend" :loading="searchLoading" :apply-messages="applyMessages" :found-user="foundUser" :show-found="showFound" :showFoundRemind='showFoundRemind' @accept="acceptApply" @reject="rejectApply" @addFriend="sendAddFriend" @searchUser="searchUser"></add-friend>
             </el-main>
         </el-container>
@@ -99,6 +99,10 @@
                 chattingFriendNickname:"",
                 //聊天对话框好友头像
                 chattingFriendAvatar:"",
+                //点击获取好友的id，nickname，avatar
+                selectFriendId:"",
+                selectFriendNickname:"",
+                selectFriendAvatar:"",
             }
         },
         computed:{
@@ -655,7 +659,10 @@
                     this.$message({message:'该用户已在您的好友列表中',type:'warning',duration:duration_time});
             },
             //载入好友资料
-            toFriend(){
+            toFriend(id,nickname,avatar){
+                this.selectFriendId = id;
+                this.selectFriendNickname = nickname;
+                this.selectFriendAvatar = avatar;
                 this.isInit = false;
                 this.showAddFriend = false;
                 this.showChatArea = false;
