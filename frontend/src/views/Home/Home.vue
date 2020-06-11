@@ -929,7 +929,30 @@
                     info.push({id:Sender,newInfo:false,unread_num:0,message:Text_show,time:chatBarTime});
                     this.$store.commit('friendInfo/addRecent',info);
                     //发送消息已读
-                    this.$socket.emit('messageReadSend',Sender);
+                    this.$socket.emit('messageReadSend',Sender,
+                        (result)=> {
+                        if(result.status === 2){
+                            console.log("已读反馈发送成功");
+                        }
+                        else if(result.status === 1){
+                            if(result.reason === 0)
+                                console.log("已读反馈发送失败，用户未登录，后台拒绝服务");
+                            else if(result.reason === 1)
+                                console.log("已读反馈发送失败，接收者非好友，后台拒绝服务");
+                            else if(result.reason === 2)
+                                console.log("已读反馈已发送，无更新");
+                            else if(result.reason === 3)
+                                console.log("已读反馈发送失败，不可发送给自己，后台拒绝服务");
+                            else
+                                console.log("已读反馈发送失败，未知返回值:",result.reason);
+                        }
+                        else if(result.status === 0)
+                            console.log("已读反馈发送失败，参数错误");
+                        else{
+                            console.log("服务器响应错误");
+                            this.$message({message:'服务器响应错误',type:'error',duration:duration_time});
+                        }
+                    });
                     //滚动到底部
                     this.$refs.chatArea.scrollBottom();
                 }
