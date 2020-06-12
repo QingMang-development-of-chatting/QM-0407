@@ -126,6 +126,9 @@ Service.prototype.getMessages = async function(username1, username2, time) {
         }
         msgs.push(temp);
     }
+    msgs = msgs.sort((message1, message2) => {
+    	return message1.time - message2.time;
+    });
     return { status: STATUS.OK, data: msgs };
 };
 
