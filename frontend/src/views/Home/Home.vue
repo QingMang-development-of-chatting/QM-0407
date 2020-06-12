@@ -527,7 +527,7 @@
                     }
                     else
                         this.moreHistory = false;
-                },500);
+                },1500);
 
             },
             //载入添加好友窗口
