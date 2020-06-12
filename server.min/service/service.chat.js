@@ -96,7 +96,7 @@ Service.prototype.getMessages = async function(username1, username2, time) {
     var room_id = res[0].room_id;
 
     //尝试获取消息记录
-    var result = await chatFunc.searchChat({"room":room_id,"param":"room","param2":time,"n":20});
+    var result = await chatFunc.searchChat({"room":room_id,"param":"date","param2":time,"n":20});
     var msgs = [];	//格式适配：[{sender(String), text(String), time(Number), is_read(Boolean),sentiment(Number)}](Array)
 	for(i=0;i<result.length;i++){	//time递增
 		if(msgs.length>=20){
