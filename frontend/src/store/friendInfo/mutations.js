@@ -26,4 +26,8 @@ export default {
         Vue.set(state.friendInfoDic[id],'newInfo',false);
         Vue.set(state.friendInfoDic[id],'unread_num',0);
     },
+    //删除好友信息
+    deleteFriendInfo(state,id){
+        Vue.delete(state.friendInfoDic,id);
+    }
 };
