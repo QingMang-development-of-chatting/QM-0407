@@ -3,7 +3,7 @@
     <div class="Home">
         <el-container id="container" >
             <el-aside id="aside">
-                <sidebar :avatar-url="currentUser.avatar" :get-new-friend="untreatedApplyNum>0" :unread-message-num="unreadMessageNum" :loading-avatar="loadingAvatar" @showInfo="showInfo" @showChat="showChat" @showFriend="showFriend" @showWordCloud="showWordCloud" @logout="logout"></sidebar>
+                <sidebar :avatar-url="currentUser.avatar" :get-new-friend="untreatedApplyNum>0" :unread-message-num="unreadMessageNum"  :loading-avatar="loadingAvatar" @showInfo="showInfo" @showChat="showChat" @showFriend="showFriend" @showWordCloud="showWordCloud" @logout="logout"></sidebar>
             </el-aside>
             <el-aside id="chat" v-show="isShowChat">
                 <chatbar :chatList="chatList" @toChat="toChat" :loading-chat-bar="loadingChatBar"></chatbar>
@@ -330,6 +330,8 @@
                 this.isShowChat = true;
                 this.isShowFriend = false;
                 this.showSetting = false;
+                this.isInit = true;
+                this.showFriendInfo = false;
             },
             //切换用户资料及修改密码显示
             switchShow(){
@@ -439,6 +441,8 @@
                 this.isInit = false;
                 this.showFriendInfo = false;
                 this.showAddFriend = false;
+                this.isShowChat = true;
+                this.isShowFriend = false;
                 this.isShowWordCloud = false;
                 this.showChatArea = true;
                 this.chattingFriendNickname = nickname;
@@ -446,6 +450,7 @@
                 this.chattingFriendID = id;
                 this.loadingMore = false;
                 this.moreHistory = true;
+
                 //初次载入时，应调用接口向后台获取与该好友聊天记录,并将数据存入store，后续更新store即可
                 if(this.chatInfo[id]===undefined){
                     //获取聊天历史
@@ -674,6 +679,7 @@
                 this.showChatArea = false;
                 this.showFriendInfo = true;
                 this.isShowWordCloud = false;
+            
             },
             //发送消息
             sendMessage(message){
@@ -824,7 +830,27 @@
                         }
                         this.loadingMore = false;
                     })
-            }
+            },
+            //删除好友
+            deleteFriend(id){
+                this.showFriendInfo = false;
+                this.isInit = true;
+                this.$socket.emit('friendDeleteSend',id,
+                        (result)=>{
+                            console.log("删除好友返回",result);
+                            console.log("删除好友返回status",result.status);
+
+                            if(result.status == 2){
+                                this.$message({message:id+"好友删除成功",type:"success",duration:800});
+                                this.$store.commit('friendInfo/deleteFriendInfo',id);
+                                this.$store.commit('chatInfo/deleteChatInfo',id);
+                            }
+                            else{
+                                this.$message({message:"发送失败,服务器响应错误",type:"error",duration:800});
+                            }
+                        });           
+            } 
+                
         },
         sockets: {
             //用户强制登出事件
@@ -994,6 +1020,13 @@
             disconnect(){
                 this.$message({message:"服务器已断开连接",type:"error",duration:duration_time});
             },
+            //删除好友反馈事件
+            friendDeletedRece(friend){
+                console.log("删除好友反馈",friend);
+                this.$message({message:friend+"好友删除成功",type:"info",duration:duration_time});
+                this.$store.commit('friendInfo/deleteFriendInfo',friend);
+                this.$store.commit('chatInfo/deleteChatInfo',friend);
+            }
         },
 
     };
