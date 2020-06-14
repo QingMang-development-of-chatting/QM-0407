@@ -39,6 +39,10 @@ export default {
         let b = a.concat(state.chatMessages[info.id]);
         Vue.set(state.chatMessages,info.id,b);
         //state.chatMessages[info.id].unshift(info.history);
+    },
+    //删除聊天消息
+    deleteChatInfo(state,id){
+        Vue.delete(state.chatMessages,id);
     }
 
 };
