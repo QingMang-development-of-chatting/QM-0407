@@ -32,7 +32,7 @@
             toChat(){
                 this.$emit('toChat',this.friendId,this.friendNickname,this.friendAvatar);
             },
-            deletefriend(){
+            deleteFriend(){
                 this.$emit('deleteFriend',this.friendId);
             }
 
