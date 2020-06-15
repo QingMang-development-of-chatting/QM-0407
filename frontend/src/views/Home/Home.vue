@@ -3,7 +3,7 @@
     <div class="Home">
         <el-container id="container" >
             <el-aside id="aside">
-                <sidebar :avatar-url="currentUser.avatar" :get-new-friend="untreatedApplyNum>0" :unread-message-num="unreadMessageNum"  :loading-avatar="loadingAvatar" @showInfo="showInfo" @showChat="showChat" @showFriend="showFriend" @showWordCloud="showWordCloud" @logout="logout"></sidebar>
+                <sidebar :tochatselect="tochatselect" :avatar-url="currentUser.avatar" :get-new-friend="untreatedApplyNum>0" :unread-message-num="unreadMessageNum"  :loading-avatar="loadingAvatar" @showInfo="showInfo" @showChat="showChat" @showFriend="showFriend" @showWordCloud="showWordCloud" @logout="logout"></sidebar>
             </el-aside>
             <el-aside id="chat" v-show="isShowChat">
                 <chatbar :chatList="chatList" @toChat="toChat" :loading-chat-bar="loadingChatBar"></chatbar>
@@ -107,6 +107,8 @@
                 selectFriendId:"",
                 selectFriendNickname:"",
                 selectFriendAvatar:"",
+                //sidebar样式切换
+                tochatselect:false,
             }
         },
         computed:{
@@ -346,6 +348,9 @@
                 this.isShowChat = false;
                 this.isShowFriend = true;
                 this.showSetting = false;
+                this.showChatArea = false;
+                this.isInit = true;
+                this.tochatselect = false;
             },
             //注销
             logout(){
@@ -450,6 +455,7 @@
                 this.chattingFriendID = id;
                 this.loadingMore = false;
                 this.moreHistory = true;
+                this.tochatselect = true;
 
                 //初次载入时，应调用接口向后台获取与该好友聊天记录,并将数据存入store，后续更新store即可
                 if(this.chatInfo[id]===undefined){
@@ -678,8 +684,7 @@
                 this.showAddFriend = false;
                 this.showChatArea = false;
                 this.showFriendInfo = true;
-                this.isShowWordCloud = false;
-            
+                this.isShowWordCloud = false;           
             },
             //发送消息
             sendMessage(message){
@@ -834,7 +839,7 @@
             //删除好友
             deleteFriend(id){
                 this.showFriendInfo = false;
-                this.isInit = true;
+                this.isInit = true;            
                 this.$socket.emit('friendDeleteSend',id,
                         (result)=>{
                             console.log("删除好友返回",result);
@@ -843,7 +848,7 @@
                             if(result.status == 2){
                                 this.$message({message:id+"好友删除成功",type:"success",duration:800});
                                 this.$store.commit('friendInfo/deleteFriendInfo',id);
-                                this.$store.commit('chatInfo/deleteChatInfo',id);
+                                this.$store.commit('chatInfo/deleteChatInfo',id);                
                             }
                             else{
                                 this.$message({message:"发送失败,服务器响应错误",type:"error",duration:800});
