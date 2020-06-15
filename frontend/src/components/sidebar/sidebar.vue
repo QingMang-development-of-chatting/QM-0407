@@ -25,6 +25,7 @@
             loadingAvatar:Boolean,  //加载头像中
             getNewFriend:Boolean,   //是否有好友申请未处理
             unreadMessageNum:Number,  //未读信息数
+            tochatselect:Boolean,     //是否进行样式切换
         },
         data(){
             return {
@@ -67,6 +68,12 @@
             },
 
         },
+        watch:{
+            tochatselect(newname,oldname){
+                this.chatSelect = newname;
+                this.friendSelect = oldname;
+            }
+        }
     };
 </script>
 <style  lang="css" scoped>
