@@ -796,22 +796,33 @@
             },
             //删除好友
             deleteFriend(id){
-                this.showFriendInfo = false;
-                this.isInit = true;
-                this.$socket.emit('friendDeleteSend',id,
+                this.$confirm('确定删除该好友吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    confirmButtonClass:'confirmButton',
+                    cancelButtonClass:'cancelButton',
+                    type: 'info',
+                    center: true
+                })
+                .then(() => {
+                    this.showFriendInfo = false;
+                    this.isInit = true;            
+                    this.$socket.emit('friendDeleteSend',id,
                     (result)=>{
                         console.log("删除好友返回",result);
                         console.log("删除好友返回status",result.status);
+
                         if(result.status == 2){
                             this.$message({message:id+"好友删除成功",type:"success",duration:800});
                             this.$store.commit('friendInfo/deleteFriendInfo',id);
-                            this.$store.commit('chatInfo/deleteChatInfo',id);
+                            this.$store.commit('chatInfo/deleteChatInfo',id);                
                         }
                         else{
                             this.$message({message:"发送失败,服务器响应错误",type:"error",duration:800});
                         }
-                    });
-            }
+                    });    
+                });     
+            }               
         },
         sockets: {
             //用户强制登出事件
