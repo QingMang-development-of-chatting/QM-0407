@@ -9,10 +9,6 @@ export default {
         state.nickname = user.nickname;
         state.avatar = user.avatar;
     },
-    //设置当期用户ID
-    setID(state,id){
-        state.id = id;
-    },
     //设置当期用户昵称
     setNickname(state,nickname){
         state.nickname = nickname;

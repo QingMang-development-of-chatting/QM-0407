@@ -3,7 +3,7 @@
     <div class="Home">
         <el-container id="container" >
             <el-aside id="aside">
-                <sidebar :tochatselect="tochatselect" :avatar-url="currentUser.avatar" :get-new-friend="untreatedApplyNum>0" :unread-message-num="unreadMessageNum"  :loading-avatar="loadingAvatar" @showInfo="showInfo" @showChat="showChat" @showFriend="showFriend" @showWordCloud="showWordCloud" @logout="logout"></sidebar>
+                <sidebar :tochatselect="tochatselect" :avatar-url="currentUser.avatar" :get-new-friend="untreatedApplyNum>0" :unread-message-num="unreadMessageNum" :loading-avatar="loadingAvatar" @showInfo="showInfo" @showChat="showChat" @showFriend="showFriend" @showWordCloud="showWordCloud" @logout="logout"></sidebar>
             </el-aside>
             <el-aside id="chat" v-show="isShowChat">
                 <chatbar :chatList="chatList" @toChat="toChat" :loading-chat-bar="loadingChatBar"></chatbar>
@@ -197,7 +197,6 @@
                 let avatar;
                 await this.$axios.get('v1/userinfo/'+id)
                     .then((result)=>{
-                        console.log("用户资料返回",result);
                         avatar = result.data.photo;
                         nickname = result.data.nickname;
                         if (avatar === "")  //用户未设置过头像，采用默认头像
@@ -207,7 +206,7 @@
                     })
                     .catch((error)=>{
                         this.$message({message:'获取用户资料时，服务器响应错误',type:"warning",duration:duration_time});
-                        console.log('获取用户资料时，服务器响应错误:',error.response);
+                        console.log('获取用户资料时，服务器响应错误:',error);
                         this.loadingAvatar = false;
                     });
                 //获取好友列表
@@ -219,7 +218,6 @@
                         for(let i =0;i<result.data.length;i++)
                             await this.$axios.get('v1/userinfo/'+result.data[i])
                                 .then((response)=>{
-                                    console.log("好友资料返回",i,response);
                                     let avatar = response.data.photo;
                                     if(avatar === "")
                                         avatar = default_avatar;
@@ -232,12 +230,11 @@
                                     };
                                 })
                                 .catch((error)=>{
-                                    console.log("获取好友资料出错",error.response);
+                                    console.log("获取好友资料出错",error);
                                 });
                         this.$store.commit('friendInfo/addFriendInfo',friendInfo);  //保存好友信息
                         await this.$axios.get('/v1/chat/'+id+"/chatlist")
                             .then((result2)=>{
-                                console.log("聊天列表返回",result2);
                                 let recentChat = [];
                                 for(let i=0; i<result2.data.length;i++)
                                 {
@@ -264,22 +261,6 @@
                                     };
                                     recentChat.push(t);
                                 }
-                                // let test0 = {
-                                //     id:"test0",
-                                //     newInfo:true,
-                                //     unread_num:1,
-                                //     message:"哈哈哈哈哈哈",
-                                //     time:"昨天",
-                                // };
-                                // recentChat.push(test0);
-                                // let test1 = {
-                                //     id:"test1",
-                                //     newInfo:true,
-                                //     unread_num:1,
-                                //     message:"哈哈哈哈哈哈",
-                                //     time:"昨天",
-                                // };
-                                // recentChat.push(test1);
                                 this.$store.commit('friendInfo/addRecent',recentChat);  //更新好友信息
                                 this.loadingChatBar = false;
                             })
@@ -296,13 +277,11 @@
                 //此处调用接口获取好友申请表
                 this.$axios.get('/v1/friend/'+id+'/applicants')
                     .then(async (result)=>{
-                        console.log("好友申请返回",result);
                         let applyInfo = [];
                         for(let i = 0;i < result.data.length;i++){
                             if(result.data[i].type === 0||result.data[i].type ===1 || result.data[i].type ===2) {
                                 await this.$axios.get('v1/userinfo/' + result.data[i].sender)
                                     .then((result2) => {
-                                        console.log("申请者资料返回", result2);
                                         let id = result2.data.username;
                                         let nickname = result2.data.nickname;
                                         let avatar = result2.data.photo;
@@ -356,21 +335,18 @@
             logout(){
                 this.$socket.emit('userLogout',
                     (result)=>{
-                        console.log("注销返回:",result);
                         if(result.status === 2){
                             window.localStorage.removeItem("username");
                             window.localStorage.removeItem('password');
                             this.$message({message:"已注销,即将跳转至登录页",type:"success",duration:duration_time});
                             setTimeout(()=>{
                                 window.location.href="/Login";
-                                // this.$router.push("/Login");
                             },800);
                         }
                         else if(result.status === 1){
                             this.$message({message:"未登录",type:"warning",duration:duration_time});
                             setTimeout(()=>{
                                 window.location.href="/Login";
-                                // this.$router.push("/Login");
                             },800);
                         }
                         else{
@@ -427,8 +403,7 @@
                 this.$axios.put('/v1/userinfo/'+this.currentUser.id+'/password',{
                     password:newPassword
                 })
-                    .then((result)=> {
-                        console.log("修改密码成功返回:",result);
+                    .then(()=> {
                         let encode_password = 'q1m4'+newPassword;
                         encode_password = Base64.encode(encode_password);
                         window.localStorage.setItem('password',encode_password);
@@ -456,7 +431,6 @@
                 this.loadingMore = false;
                 this.moreHistory = true;
                 this.tochatselect = true;
-
                 //初次载入时，应调用接口向后台获取与该好友聊天记录,并将数据存入store，后续更新store即可
                 if(this.chatInfo[id]===undefined){
                     //获取聊天历史
@@ -464,7 +438,6 @@
                     let now = new Date().getTime().toString();
                     this.$axios.get('/v1/chat/'+this.currentUser.id+'/history/'+id+'/'+now)
                         .then((result)=>{
-                            console.log("获取聊天历史返回",result);
                             let temp = [];
                             for(let i=0;i<result.data.length;i++)
                             {
@@ -502,7 +475,6 @@
                     //去除好友新消息提醒
                     this.$store.commit('friendInfo/removeNew',id);
                     //将对方发送的未读信息修改为已读
-                    //this.$store.commit('chatInfo/readFriendUpdate',id);
                     //向后台发送已读反馈
                     this.$socket.emit('messageReadSend',id,
                         (result)=> {
@@ -534,7 +506,6 @@
                     if(this.$refs.chatArea.canScroll())
                     {
                         this.moreHistory = true;
-                        //this.$refs.chatArea.scrollBottom();//滚动到底部
                     }
                     else
                         this.moreHistory = false;
@@ -554,7 +525,6 @@
                 //此处需要调用接受好友请求接口（参数提供添加者ID，被添加者ID ）
                 this.$socket.emit('friendAccessSend',applyId,
                     (result)=>{
-                        console.log("接受好友申请返回",result);
                         if(result.status === 2){
                             this.$store.commit('applyList/accept',applyId); //更新申请列表
                             let friendInfo = this.$store.getters['applyList/getApplyUser'](applyId);
@@ -580,13 +550,11 @@
             rejectApply(applyId){
                 //此处需要调用拒绝好友请求接口（参数提供添加者ID，被添加者ID ）
                 this.$axios.put('/v1/friend/'+this.currentUser.id+'/applicants/reject/'+applyId)
-                    .then((result)=>{
-                        console.log("拒绝好友申请返回",result);
+                    .then(()=>{
                         this.$message({message:"已拒绝",type:"success",duration:duration_time});
                         this.$store.commit('applyList/reject',applyId); //更新申请列表
                     })
                     .catch((error)=>{
-                        console.log("拒绝申请返回出错,",error.response);
                         if(error.response.status === 409)
                             this.$message({message:"申请者不存在",type:"warning",duration:duration_time});
                         else if(error.response.status === 400)
@@ -654,12 +622,10 @@
                                 let avatar,nickname;
                                 this.$axios.get('v1/userinfo/'+id)
                                     .then((result)=>{
-                                        console.log("好友资料返回",result);
                                         avatar = result.data.photo;
                                         nickname = result.data.nickname;
                                         if (avatar === "")  //用户未设置过头像，采用默认头像
                                             avatar = default_avatar;
-                                        // console.log(this.$store.state.currentUser.id);
                                         let friend = {};
                                         friend[id]={nickname:nickname,avatar:avatar,newInfo:false,unread_num:0,recentMessage:{}};
                                         this.$store.commit('friendInfo/addFriendInfo',friend);  //更新好友列表
@@ -684,7 +650,7 @@
                 this.showAddFriend = false;
                 this.showChatArea = false;
                 this.showFriendInfo = true;
-                this.isShowWordCloud = false;           
+                this.isShowWordCloud = false;
             },
             //发送消息
             sendMessage(message){
@@ -693,9 +659,6 @@
                 let receiver = this.chattingFriendID;
                 this.$socket.emit('messageSend',{receiver:receiver,text:message,time:time},
                     (result)=>{
-                        console.log("发送聊天信息回执",result);
-                        console.log("发送聊天信息回执status",result.status);
-                        console.log("发送聊天信息回执reason",result.reason);
                         if(result.status === 2){
                             this.$message({message:"发送成功",type:"success",duration:800});
                             let UpdateInfo = {id:this.chattingFriendID,message:{message:result.data.text,isFriend:false,isRead:false,time:time_show,utcTime:time,activeRate:result.data.sentiment}};
@@ -781,11 +744,8 @@
             getMoreHistory(friendID,time){
                 this.loadingMore = true;
                 let start_height = this.$refs.chatArea.getScrollHeight();
-                // console.log(friendID);
-                // console.log(new Date(time));
                 this.$axios.get('/v1/chat/'+this.currentUser.id+'/history/'+friendID+'/'+time)
                     .then((result)=>{
-                        console.log("获取聊天历史:",result);
                         let temp = [];
                         for(let i=0;i<result.data.length;i++)
                         {
@@ -808,8 +768,6 @@
                             this.$store.commit('chatInfo/getMoreChatInfo',info);
                             setTimeout(()=>{
                                 let end_height = this.$refs.chatArea.getScrollHeight();
-                                console.log("滚动高度0",start_height);
-                                console.log("滚动高度1",end_height);
                                 this.$refs.chatArea.scrollWhere(end_height-start_height-64);
                             },1);
                         }
@@ -839,23 +797,21 @@
             //删除好友
             deleteFriend(id){
                 this.showFriendInfo = false;
-                this.isInit = true;            
+                this.isInit = true;
                 this.$socket.emit('friendDeleteSend',id,
-                        (result)=>{
-                            console.log("删除好友返回",result);
-                            console.log("删除好友返回status",result.status);
-
-                            if(result.status == 2){
-                                this.$message({message:id+"好友删除成功",type:"success",duration:800});
-                                this.$store.commit('friendInfo/deleteFriendInfo',id);
-                                this.$store.commit('chatInfo/deleteChatInfo',id);                
-                            }
-                            else{
-                                this.$message({message:"发送失败,服务器响应错误",type:"error",duration:800});
-                            }
-                        });           
-            } 
-                
+                    (result)=>{
+                        console.log("删除好友返回",result);
+                        console.log("删除好友返回status",result.status);
+                        if(result.status == 2){
+                            this.$message({message:id+"好友删除成功",type:"success",duration:800});
+                            this.$store.commit('friendInfo/deleteFriendInfo',id);
+                            this.$store.commit('chatInfo/deleteChatInfo',id);
+                        }
+                        else{
+                            this.$message({message:"发送失败,服务器响应错误",type:"error",duration:800});
+                        }
+                    });
+            }
         },
         sockets: {
             //用户强制登出事件
@@ -865,7 +821,6 @@
                 window.localStorage.removeItem("password");
                 setTimeout(()=>{
                     window.location.href="/Login";
-                    // this.$router.push("/Login");
                 },2000);
             },
             //收到好友申请
@@ -886,17 +841,14 @@
             },
             //好友申请反馈事件
             friendAccessdRece(response){
-                console.log("好友申请反馈",response);
                 this.$message({message:response+"通过了你的好友请求",type:"info",duration:duration_time});
                 let avatar,nickname;
                 this.$axios.get('v1/userinfo/'+response)
                     .then((result)=>{
-                        console.log("好友资料返回",result);
                         avatar = result.data.photo;
                         nickname = result.data.nickname;
                         if (avatar === "")  //用户未设置过头像，采用默认头像
                             avatar = default_avatar;
-                        // console.log(this.$store.state.currentUser.id);
                         let friend = {};
                         friend[response]={nickname:nickname,avatar:avatar,newInfo:false,unread_num:0,recentMessage:{}};
                         this.$store.commit('friendInfo/addFriendInfo',friend);  //更新好友列表
@@ -908,16 +860,12 @@
             },
             //已读反馈事件
             messageReadRece(receiver){
-                console.log("消息已读反馈",receiver);
                 //将自己发送给该好友信息修改为已读
                 this.$store.commit('chatInfo/readMeUpdate',receiver);
             },
             //接收消息反馈事件
             messageRece(response){
                 //----------------response:sender,text,time,sentiment---------------
-                 console.log("接收体",response);
-                // console.log("接收好友",response.sender);
-                // console.log("消息",response.text);
                 //*************
                 //实时渲染
                 //**************
@@ -925,8 +873,6 @@
                 let Text = response.text;
                 let time_show="";
                 time_show = this.utcTimeToString(response.time);
-                // console.log("收到新的信息Time:",Time)
-                // console.log("收到新的信息time_show:",time_show)
                 let ActiveRate = response.sentiment;
                 let Is_read = true;
                 let Is_friend = true;
@@ -942,7 +888,6 @@
                 //用户未处于发送者聊天对话框
                 if(Sender!==this.chattingFriendID || this.showChatArea=== false)
                 {
-                    //this.chatList[Sender].unread_num=this.chatList[Sender].unread_num+1;
                     //修改新消息相关数据
                     let info = [];
                     let chatBarTime = this.getChatBarTime(response.time);
@@ -952,8 +897,6 @@
                 }
                 //用户处于发送者聊天对话框
                 else{
-                    //this.$store.commit('chatInfo/removeNew',id);
-                    //this.toChat(Sender,this.$store.state.friendInfoDic[Sender].nickname,this.$store.state.friendInfoDic[Sender].avatar);
                     //更新侧边栏
                     let info = [];
                     let chatBarTime = this.getChatBarTime(response.time);
@@ -989,38 +932,7 @@
                 }
                 //更新聊天历史
                 let info =  {id:Sender,message:{message:Text,isFriend:Is_friend,isRead:Is_read,time:time_show,utcTime:response.time ,activeRate:ActiveRate}};
-
-                //*****************
-                //********查看chatInfo有没有sender,没有则增加
-                //************
-                // if(this.chatInfo[Sender]===undefined)
-                // {
-                //     console.log("新增sender的info",info);
-                //     this.$store.commit('friendInfo/addRecent',info);
-                // }
-                //console.log("收到新的信息is_Friend:",Is_friend);
-                //console.log("收到新的信息Sender:",Sender);
-                //else
-                //{
                 this.$store.commit('chatInfo/sendUpdate',info);
-                //}
-                //修改最近聊天信息info:[{id:~,newInfo:~,unread_num:~,message:~,time:~},...]
-                /*
-                let recentChat = {
-                    id:Sender,
-                    newInfo:Is_read,
-                    unread_num:this.chatList[Sender].unread_num,
-                    time:time_show,
-                    //recentMessage:{message:Text,time:time_show}
-                    message:Text
-                }
-                let arrrayRecent = [];
-                arrrayRecent.push(recentChat);
-                console.log("待存储info：",arrrayRecent);
-                this.$store.commit('friendInfo/addRecent',arrrayRecent);
-                console.log("获取最近好友信息：",this.$store.state.friendInfoDic[Sender]);
-                */
-                //this.$refs.chatArea.scrollBottom();
             },
             disconnect(){
                 this.$message({message:"服务器已断开连接",type:"error",duration:duration_time});
@@ -1028,7 +940,8 @@
             //删除好友反馈事件
             friendDeletedRece(friend){
                 console.log("删除好友反馈",friend);
-                this.$message({message:friend+"好友删除成功",type:"info",duration:duration_time});
+                let nickname = this.chatList[friend].nickname;
+                this.$message({message:nickname+"已将你从好友列表中删除",type:"warning"});
                 this.$store.commit('friendInfo/deleteFriendInfo',friend);
                 this.$store.commit('chatInfo/deleteChatInfo',friend);
             }

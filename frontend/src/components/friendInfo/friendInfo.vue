@@ -11,7 +11,7 @@
             <div id="friendId">
                 账号：{{friendId}}
             </div>
-            <el-button id="send" @click="toChat()">发送消息</el-button>
+            <el-button id="sendmessage" @click="toChat()">发送消息</el-button>
             <el-button id="delete" @click="deleteFriend()">删除好友</el-button>
         </div>
     </div>
@@ -30,6 +30,12 @@
         },
         methods:{
             toChat(){
+                if(this.$store.getters['friendInfo/getFriend'](this.friendId).recentMessage.message === undefined) // 好友未在聊天列表中
+                {
+                    let info = [];
+                    info.push({id:this.friendId,newInfo:false,unread_num:0,message:"",time:""});
+                    this.$store.commit('friendInfo/addRecent',info);
+                }
                 this.$emit('toChat',this.friendId,this.friendNickname,this.friendAvatar);
             },
             deleteFriend(){
@@ -76,29 +82,15 @@
         top:60px;
         left:140px;
     }
-    #send{
+    #sendmessage{
         position:relative;
         top:80px;
         left:120px;
-        background-color: rgb(62, 204, 58);
-        color:white;
-    }
-    #send:hover{
-        background-color:  rgb(30, 122, 30);
-        color:white;
     }
     #delete{
         position:relative;
         top:80px;
-        left:170px;
-        background-color: rgb(241, 48, 48);
-        color:white;
+        left:160px;
     }
-    #delete:hover{
-        background-color:  rgb(189, 19, 19);
-        color:white;
-    }
-    
-    
-</style>
 
+</style>
