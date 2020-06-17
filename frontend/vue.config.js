@@ -1,3 +1,5 @@
+const serverPath = 'http://localhost:3000';
+//const serverPath = 'http://qingmangserver.free.idcfengye.com';
 module.exports = {
   outputDir: 'dist',   //build输出目录
   assetsDir: 'assets', //静态资源目录（js, css, img）
@@ -8,9 +10,10 @@ module.exports = {
     port: '8080',
     https: false,   //是否使用https协议
     hotOnly: false, //是否开启热更新
+    disableHostCheck: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', //API服务器的地址
+        target: serverPath, //API服务器的地址
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''
