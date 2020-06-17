@@ -12,9 +12,9 @@ export default {
         state.data.unshift(info);
     },
     //接受好友申请更新
-    accept(state,info){
+    accept(state,id){
         for(let index in state.data)
-            if(state.data[index].id === info && state.data[index].dispose === 0) {
+            if(state.data[index].id === id && state.data[index].dispose === 0) {
                 state.data[index].dispose = 1;
             }
     },

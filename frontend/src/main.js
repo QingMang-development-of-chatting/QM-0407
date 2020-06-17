@@ -9,14 +9,16 @@ import VueSocketIO from 'vue-socket.io'
 import './plugins/element.js'
 //引入axios
 import axios from 'axios'
+const serverPath = 'http://localhost:3000'
+//const serverPath = 'http://qingmangserver.free.idcfengye.com';
 axios.defaults.baseURL = '/api';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 Vue.prototype.$axios = axios;
 Vue.config.productionTip = false;
 Vue.use(Vuex);
 Vue.use(new VueSocketIO({
-  debug: true,
-  connection: 'http://localhost:3000/',
+  debug: false,
+  connection: serverPath,
 }));
 
 new Vue({
