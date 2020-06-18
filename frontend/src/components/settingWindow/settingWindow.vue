@@ -114,7 +114,7 @@
                     this.$message({message: '上传头像只能是 jpg、png格式', type: 'warning',duration:1000});
                     return false;
                 }
-                if(file.size>1024*1024*5) {
+                if(file.size>1024*1024*0.5) {
                     this.$message({message: '上传头像大小不能超过 5MB!', type: 'warning',duration:1000});
                     return false;
                 }
